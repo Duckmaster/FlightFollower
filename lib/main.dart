@@ -127,24 +127,40 @@ class FlightLogForm extends StatefulWidget {
 class FlightLogFormState extends State<FlightLogForm> {
   @override
   Widget build(BuildContext context) {
-    return Form(
-        autovalidateMode: AutovalidateMode.always,
-        child: Wrap(
+    return ListView(
+      padding: const EdgeInsets.all(8.0),
+      children: [
+        Expanded(
+            child: Row(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ConstrainedBox(
-                constraints: BoxConstraints.tight(const Size(200, 50)),
-                child: TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: "Name",
-                  ),
-                  initialValue: "John Smith",
-                  readOnly: true,
+            Expanded(
+              child: TextFormField(
+                decoration: const InputDecoration(
+                  labelText: "Name",
                 ),
+                initialValue: "John Smith",
+                enabled: false,
+              ),
+            ),
+            Expanded(
+              child: TextFormField(
+                decoration: const InputDecoration(
+                  labelText: "Phone Number",
+                ),
+                initialValue: "07123456789",
+                enabled: false,
               ),
             ),
           ],
-        ));
+        )),
+      ],
+    );
+    /* TextFormField(
+        decoration: const InputDecoration(
+          labelText: "Name",
+        ),
+        initialValue: "John Smith",
+        enabled: false,
+      ), */
   }
 }
