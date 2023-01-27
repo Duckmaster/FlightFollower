@@ -125,35 +125,81 @@ class FlightLogForm extends StatefulWidget {
 }
 
 class FlightLogFormState extends State<FlightLogForm> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  static List<String> list = <String>['One', 'Two', 'Three', 'Four'];
+  late String name;
+  String? phoneNo;
+  String orgDropDownValue = list.first;
+
+  void onPressed() {
+    _formKey.currentState!.save();
+    print(name);
+    print(phoneNo);
+    print(orgDropDownValue);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(8.0),
-      children: [
-        Expanded(
-            child: Row(
-          children: [
-            Expanded(
-              child: TextFormField(
-                decoration: const InputDecoration(
-                  labelText: "Name",
-                ),
-                initialValue: "John Smith",
-                enabled: false,
+    return Form(
+      key: _formKey,
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                        decoration: const InputDecoration(
+                          labelText: "Name",
+                        ),
+                        initialValue: "John Smith",
+                        enabled: false,
+                        onSaved: (String? value) {
+                          name = value!;
+                        }),
+                  ),
+                  Expanded(
+                    child: TextFormField(
+                        decoration: const InputDecoration(
+                          labelText: "Phone Number",
+                        ),
+                        initialValue: "07123456789",
+                        enabled: false,
+                        onSaved: (String? value) {
+                          phoneNo = value!;
+                        }),
+                  ),
+                ],
               ),
-            ),
-            Expanded(
-              child: TextFormField(
-                decoration: const InputDecoration(
-                  labelText: "Phone Number",
-                ),
-                initialValue: "07123456789",
-                enabled: false,
+              Row(
+                children: [
+                  Expanded(
+                    child: DropdownButtonFormField(
+                      decoration: const InputDecoration(
+                        labelText: "Name",
+                      ),
+                      items: list.map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: (String? value) {
+                        setState(() {
+                          orgDropDownValue = value!;
+                        });
+                      },
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        )),
-      ],
+              ElevatedButton(onPressed: onPressed, child: const Text("Submit"))
+            ],
+          ),
+        ),
+      ),
     );
     /* TextFormField(
         decoration: const InputDecoration(
