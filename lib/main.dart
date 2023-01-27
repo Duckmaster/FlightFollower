@@ -111,6 +111,40 @@ class FlightLogPage extends StatelessWidget {
   const FlightLogPage({super.key});
   @override
   Widget build(BuildContext context) {
-    return const Text("Flight Log");
+    return const FlightLogForm();
+  }
+}
+
+class FlightLogForm extends StatefulWidget {
+  const FlightLogForm({super.key});
+
+  @override
+  FlightLogFormState createState() {
+    return FlightLogFormState();
+  }
+}
+
+class FlightLogFormState extends State<FlightLogForm> {
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+        autovalidateMode: AutovalidateMode.always,
+        child: Wrap(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ConstrainedBox(
+                constraints: BoxConstraints.tight(const Size(200, 50)),
+                child: TextFormField(
+                  decoration: const InputDecoration(
+                    labelText: "Name",
+                  ),
+                  initialValue: "John Smith",
+                  readOnly: true,
+                ),
+              ),
+            ),
+          ],
+        ));
   }
 }
