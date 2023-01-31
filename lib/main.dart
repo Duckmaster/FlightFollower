@@ -230,6 +230,11 @@ class FlightLogFormState extends State<FlightLogForm> {
                     createInputField(label)
                 ],
               ),
+              Row(
+                children: const [
+                  TimePicker("test"),
+                ],
+              ),
               ElevatedButton(onPressed: onPressed, child: const Text("Submit"))
             ],
           ),
@@ -243,5 +248,28 @@ class FlightLogFormState extends State<FlightLogForm> {
         initialValue: "John Smith",
         enabled: false,
       ), */
+  }
+}
+
+class TimePicker extends StatefulWidget {
+  final String label;
+  const TimePicker(this.label, {super.key});
+
+  @override
+  TimePickerState createState() {
+    return TimePickerState();
+  }
+}
+
+class TimePickerState extends State<TimePicker> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          children: [Text(widget.label)],
+        )
+      ],
+    );
   }
 }
