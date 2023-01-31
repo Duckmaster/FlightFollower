@@ -130,6 +130,7 @@ class FlightLogFormState extends State<FlightLogForm> {
   late String name;
   String? phoneNo;
   String orgDropDownValue = list.first;
+  int? numPersons;
 
   void onPressed() {
     _formKey.currentState!.save();
@@ -196,6 +197,36 @@ class FlightLogFormState extends State<FlightLogForm> {
                     "Aircraft Registration",
                     "Aircraft Callsign"
                   ])
+                    createInputField(label)
+                ],
+              ),
+              Row(
+                children: [
+                  createInputField("Co-pilot"),
+                  Expanded(
+                    child: DropdownButtonFormField(
+                      items: List<int>.generate(10, (i) => i + 1)
+                          .map<DropdownMenuItem<int>>((int value) {
+                        return DropdownMenuItem(
+                            value: value, child: Text(value.toString()));
+                      }).toList(),
+                      onChanged: (int? value) {
+                        setState(() {
+                          numPersons = value!;
+                        });
+                      },
+                      decoration: const InputDecoration(
+                          labelText: "Num. Persons",
+                          contentPadding:
+                              EdgeInsets.only(bottom: 9.5, top: 9.5)),
+                      value: 1,
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  for (String label in ["Departure", "Destination"])
                     createInputField(label)
                 ],
               ),
