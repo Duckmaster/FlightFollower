@@ -138,14 +138,14 @@ class FlightLogFormState extends State<FlightLogForm> {
     print(orgDropDownValue);
   }
 
-  Widget createInputField(String fieldLabel) {
+  Widget createInputField(String fieldLabel, {bool setEnabled = true}) {
     return Expanded(
       child: TextFormField(
           decoration: InputDecoration(
             labelText: fieldLabel,
           ),
           initialValue: "placeholder",
-          enabled: false,
+          enabled: setEnabled,
           onSaved: (String? value) {
             name = value!;
           }),
@@ -165,7 +165,7 @@ class FlightLogFormState extends State<FlightLogForm> {
               Row(
                 children: [
                   for (String label in ["Name", "Phone Number"])
-                    createInputField(label)
+                    createInputField(label, setEnabled: false)
                 ],
               ),
               Row(
@@ -188,6 +188,15 @@ class FlightLogFormState extends State<FlightLogForm> {
                       },
                     ),
                   ),
+                ],
+              ),
+              Row(
+                children: [
+                  for (String label in [
+                    "Aircraft Registration",
+                    "Aircraft Callsign"
+                  ])
+                    createInputField(label)
                 ],
               ),
               ElevatedButton(onPressed: onPressed, child: const Text("Submit"))
