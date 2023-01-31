@@ -138,6 +138,20 @@ class FlightLogFormState extends State<FlightLogForm> {
     print(orgDropDownValue);
   }
 
+  Widget createInputField(String fieldLabel) {
+    return Expanded(
+      child: TextFormField(
+          decoration: InputDecoration(
+            labelText: fieldLabel,
+          ),
+          initialValue: "placeholder",
+          enabled: false,
+          onSaved: (String? value) {
+            name = value!;
+          }),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -149,28 +163,8 @@ class FlightLogFormState extends State<FlightLogForm> {
             children: [
               Row(
                 children: [
-                  Expanded(
-                    child: TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: "Name",
-                        ),
-                        initialValue: "John Smith",
-                        enabled: false,
-                        onSaved: (String? value) {
-                          name = value!;
-                        }),
-                  ),
-                  Expanded(
-                    child: TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: "Phone Number",
-                        ),
-                        initialValue: "07123456789",
-                        enabled: false,
-                        onSaved: (String? value) {
-                          phoneNo = value!;
-                        }),
-                  ),
+                  for (String label in ["Name", "Phone Number"])
+                    createInputField(label)
                 ],
               ),
               Row(
