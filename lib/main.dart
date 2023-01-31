@@ -159,6 +159,7 @@ class FlightLogFormState extends State<FlightLogForm> {
       child: SizedBox(
         height: MediaQuery.of(context).size.height,
         child: SingleChildScrollView(
+          padding: const EdgeInsets.all(8),
           child: Column(
             children: [
               Row(
