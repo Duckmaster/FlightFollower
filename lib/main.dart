@@ -168,8 +168,18 @@ class FlightLogFormState extends State<FlightLogForm> {
     print(name);
     print(phoneNo);
     print(orgDropDownValue);
+    print(aircraftReg);
+    print(aircraftCallsign);
+    print(copilotName);
+    print(numPersons);
+    print(departure);
+    print(destination);
     print(departureTime);
+    print(ete);
+    print(endurance);
     print(locationServices);
+    print(monitoringPerson);
+    print(flightType);
 
     print("Form submitted: $formSubmitted");
   }
@@ -318,7 +328,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                         }).toList(),
                         onChanged: (double? value) {
                           setState(() {
-                            ete = value!;
+                            endurance = value!;
                           });
                         },
                         decoration: const InputDecoration(
@@ -395,7 +405,9 @@ class FlightLogFormState extends State<FlightLogForm> {
                       );
                     }).toList(),
                     onChanged: ((value) {
-                      setState(() {});
+                      setState(() {
+                        flightType = value;
+                      });
                     }),
                     decoration: const InputDecoration(
                       label: Text("Type of Flight"),
