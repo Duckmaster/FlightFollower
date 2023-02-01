@@ -237,11 +237,13 @@ class FlightLogFormState extends State<FlightLogForm> {
                           child: Text(value),
                         );
                       }).toList(),
-                      onChanged: (String? value) {
-                        setState(() {
-                          orgDropDownValue = value!;
-                        });
-                      },
+                      onChanged: formSubmitted
+                          ? null
+                          : (String? value) {
+                              setState(() {
+                                orgDropDownValue = value!;
+                              });
+                            },
                     ),
                   ),
                 ],
@@ -250,16 +252,19 @@ class FlightLogFormState extends State<FlightLogForm> {
               Row(
                 children: [
                   createInputField("Aircraft Registration",
-                      (String? value) => {aircraftReg = value}),
+                      (String? value) => {aircraftReg = value},
+                      setEnabled: !formSubmitted),
                   createInputField("Aircraft Callsign",
-                      (String? value) => {aircraftCallsign = value})
+                      (String? value) => {aircraftCallsign = value},
+                      setEnabled: !formSubmitted)
                 ],
               ),
               // Copilot and num. persons fields
               Row(
                 children: [
                   createInputField(
-                      "Co-pilot", (String? value) => {copilotName = value}),
+                      "Co-pilot", (String? value) => {copilotName = value},
+                      setEnabled: !formSubmitted),
                   Expanded(
                     child: DropdownButtonFormField(
                       items: List<int>.generate(10, (i) => i + 1)
@@ -267,11 +272,13 @@ class FlightLogFormState extends State<FlightLogForm> {
                         return DropdownMenuItem(
                             value: value, child: Text(value.toString()));
                       }).toList(),
-                      onChanged: (int? value) {
-                        setState(() {
-                          numPersons = value!;
-                        });
-                      },
+                      onChanged: formSubmitted
+                          ? null
+                          : (int? value) {
+                              setState(() {
+                                numPersons = value!;
+                              });
+                            },
                       decoration: const InputDecoration(
                           labelText: "Num. Persons",
                           contentPadding:
@@ -285,18 +292,24 @@ class FlightLogFormState extends State<FlightLogForm> {
               Row(
                 children: [
                   createInputField(
-                      "Departure", (String? value) => {departure = value}),
+                      "Departure", (String? value) => {departure = value},
+                      setEnabled: !formSubmitted),
                   createInputField(
-                      "Destination", (String? value) => {destination = value})
+                      "Destination", (String? value) => {destination = value},
+                      setEnabled: !formSubmitted)
                 ],
               ),
               // Departure time and ETE fields
               Row(
                 children: [
                   Expanded(
-                    child: TimePicker("Departure Time", (String time) {
-                      departureTime = time;
-                    }),
+                    child: TimePicker(
+                      "Departure Time",
+                      (String time) {
+                        departureTime = time;
+                      },
+                      enabled: !formSubmitted,
+                    ),
                   ),
                   Expanded(
                     child: DropdownButtonFormField(
@@ -305,11 +318,13 @@ class FlightLogFormState extends State<FlightLogForm> {
                           return DropdownMenuItem(
                               value: value, child: Text(value.toString()));
                         }).toList(),
-                        onChanged: (double? value) {
-                          setState(() {
-                            ete = value!;
-                          });
-                        },
+                        onChanged: formSubmitted
+                            ? null
+                            : (double? value) {
+                                setState(() {
+                                  ete = value!;
+                                });
+                              },
                         decoration: const InputDecoration(
                           labelText: "ETE",
                         )),
@@ -326,11 +341,13 @@ class FlightLogFormState extends State<FlightLogForm> {
                           return DropdownMenuItem(
                               value: value, child: Text(value.toString()));
                         }).toList(),
-                        onChanged: (double? value) {
-                          setState(() {
-                            endurance = value!;
-                          });
-                        },
+                        onChanged: formSubmitted
+                            ? null
+                            : (double? value) {
+                                setState(() {
+                                  endurance = value!;
+                                });
+                              },
                         decoration: const InputDecoration(
                           labelText: "Fuel Endurance",
                         )),
@@ -338,11 +355,13 @@ class FlightLogFormState extends State<FlightLogForm> {
                   Expanded(
                       child: SwitchListTile(
                     value: locationServices,
-                    onChanged: (value) {
-                      setState(() {
-                        locationServices = value;
-                      });
-                    },
+                    onChanged: formSubmitted
+                        ? null
+                        : (value) {
+                            setState(() {
+                              locationServices = value;
+                            });
+                          },
                     title: const Text("Location Services"),
                   ))
                 ],
@@ -362,11 +381,13 @@ class FlightLogFormState extends State<FlightLogForm> {
                                 child: Text(value),
                               );
                             }).toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                monitoringPerson = value;
-                              });
-                            },
+                            onChanged: formSubmitted
+                                ? null
+                                : (String? value) {
+                                    setState(() {
+                                      monitoringPerson = value;
+                                    });
+                                  },
                             decoration: const InputDecoration(
                               label: Text("Monitoring Person"),
                             ),
@@ -404,11 +425,13 @@ class FlightLogFormState extends State<FlightLogForm> {
                         child: Text(value),
                       );
                     }).toList(),
-                    onChanged: ((value) {
-                      setState(() {
-                        flightType = value;
-                      });
-                    }),
+                    onChanged: formSubmitted
+                        ? null
+                        : (String? value) {
+                            setState(() {
+                              flightType = value;
+                            });
+                          },
                     decoration: const InputDecoration(
                       label: Text("Type of Flight"),
                     ),
@@ -435,9 +458,10 @@ class FlightLogFormState extends State<FlightLogForm> {
 class TimePicker extends StatelessWidget {
   final String label;
   final Function callback;
+  bool enabled;
   int? hourValue;
   int? minuteValue;
-  TimePicker(this.label, this.callback, {super.key});
+  TimePicker(this.label, this.callback, {super.key, this.enabled = true});
 
   @override
   Widget build(BuildContext context) {
@@ -460,10 +484,12 @@ class TimePicker extends StatelessWidget {
                           value: value - 1,
                           child: Text((value - 1).toString()));
                     }).toList(),
-                    onChanged: (int? value) {
-                      hourValue = value;
-                      callback("$hourValue:$minuteValue");
-                    }),
+                    onChanged: !enabled
+                        ? null
+                        : (int? value) {
+                            hourValue = value;
+                            callback("$hourValue:$minuteValue");
+                          }),
               ],
             )),
             const Text(":"),
@@ -478,10 +504,12 @@ class TimePicker extends StatelessWidget {
                       return DropdownMenuItem(
                           value: value, child: Text(value.toString()));
                     }).toList(),
-                    onChanged: (int? value) {
-                      minuteValue = value;
-                      callback("$hourValue:$minuteValue");
-                    }),
+                    onChanged: !enabled
+                        ? null
+                        : (int? value) {
+                            minuteValue = value;
+                            callback("$hourValue:$minuteValue");
+                          }),
               ],
             ))
           ],
