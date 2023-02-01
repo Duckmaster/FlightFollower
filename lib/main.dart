@@ -132,12 +132,14 @@ class FlightLogFormState extends State<FlightLogForm> {
   String orgDropDownValue = list.first;
   int? numPersons;
   double? ete;
+  String? departureTime;
 
   void onPressed() {
     _formKey.currentState!.save();
     print(name);
     print(phoneNo);
     print(orgDropDownValue);
+    print(departureTime);
   }
 
   Widget createInputField(String fieldLabel, {bool setEnabled = true}) {
@@ -233,8 +235,10 @@ class FlightLogFormState extends State<FlightLogForm> {
               ),
               Row(
                 children: [
-                  const Expanded(
-                    child: TimePicker("Departure Time"),
+                  Expanded(
+                    child: TimePicker("Departure Time", (String time) {
+                      departureTime = time;
+                    }),
                   ),
                   Expanded(
                     child: DropdownButtonFormField(
@@ -270,26 +274,19 @@ class FlightLogFormState extends State<FlightLogForm> {
   }
 }
 
-class TimePicker extends StatefulWidget {
+class TimePicker extends StatelessWidget {
   final String label;
-  const TimePicker(this.label, {super.key});
-
-  @override
-  TimePickerState createState() {
-    return TimePickerState();
-  }
-}
-
-class TimePickerState extends State<TimePicker> {
+  final Function callback;
   int? hourValue;
   int? minuteValue;
+  TimePicker(this.label, this.callback, {super.key});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Row(
-          children: [Text(widget.label)],
+          children: [Text(label)],
         ),
         Row(
           children: [
@@ -306,9 +303,8 @@ class TimePickerState extends State<TimePicker> {
                           child: Text((value - 1).toString()));
                     }).toList(),
                     onChanged: (int? value) {
-                      setState(() {
-                        hourValue = value!;
-                      });
+                      hourValue = value;
+                      callback("$hourValue:$minuteValue");
                     }),
               ],
             )),
@@ -325,9 +321,8 @@ class TimePickerState extends State<TimePicker> {
                           value: value, child: Text(value.toString()));
                     }).toList(),
                     onChanged: (int? value) {
-                      setState(() {
-                        minuteValue = value!;
-                      });
+                      minuteValue = value;
+                      callback("$hourValue:$minuteValue");
                     }),
               ],
             ))
