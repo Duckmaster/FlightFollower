@@ -131,6 +131,7 @@ class FlightLogFormState extends State<FlightLogForm> {
   String? phoneNo;
   String orgDropDownValue = list.first;
   int? numPersons;
+  double? ete;
 
   void onPressed() {
     _formKey.currentState!.save();
@@ -231,8 +232,26 @@ class FlightLogFormState extends State<FlightLogForm> {
                 ],
               ),
               Row(
-                children: const [
-                  TimePicker("test"),
+                children: [
+                  const Expanded(
+                    child: TimePicker("Departure Time"),
+                  ),
+                  Expanded(
+                    child: DropdownButtonFormField(
+                        items: List<double>.generate(50, (i) => (i + 1) / 10)
+                            .map<DropdownMenuItem<double>>((double value) {
+                          return DropdownMenuItem(
+                              value: value, child: Text(value.toString()));
+                        }).toList(),
+                        onChanged: (double? value) {
+                          setState(() {
+                            ete = value!;
+                          });
+                        },
+                        decoration: const InputDecoration(
+                          labelText: "ETE",
+                        )),
+                  ),
                 ],
               ),
               ElevatedButton(onPressed: onPressed, child: const Text("Submit"))
@@ -262,12 +281,57 @@ class TimePicker extends StatefulWidget {
 }
 
 class TimePickerState extends State<TimePicker> {
+  int? hourValue;
+  int? minuteValue;
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Row(
           children: [Text(widget.label)],
+        ),
+        Row(
+          children: [
+            Expanded(
+                child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text("Hour"),
+                DropdownButtonFormField(
+                    items: List<int>.generate(24, (i) => i + 1)
+                        .map<DropdownMenuItem<int>>((int value) {
+                      return DropdownMenuItem(
+                          value: value - 1,
+                          child: Text((value - 1).toString()));
+                    }).toList(),
+                    onChanged: (int? value) {
+                      setState(() {
+                        hourValue = value!;
+                      });
+                    }),
+              ],
+            )),
+            const Text(":"),
+            Expanded(
+                child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text("Minute"),
+                DropdownButtonFormField(
+                    items: List<int>.generate(30, (i) => i * 2, growable: false)
+                        .map<DropdownMenuItem<int>>((int value) {
+                      return DropdownMenuItem(
+                          value: value, child: Text(value.toString()));
+                    }).toList(),
+                    onChanged: (int? value) {
+                      setState(() {
+                        minuteValue = value!;
+                      });
+                    }),
+              ],
+            ))
+          ],
         )
       ],
     );
