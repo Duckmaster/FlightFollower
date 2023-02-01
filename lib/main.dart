@@ -178,7 +178,8 @@ class FlightLogFormState extends State<FlightLogForm> {
     // do nothing yet
   }
 
-  Widget createInputField(String fieldLabel, {bool setEnabled = true}) {
+  Widget createInputField(String fieldLabel, Function callback,
+      {bool setEnabled = true}) {
     return Expanded(
       child: TextFormField(
           decoration: InputDecoration(
@@ -186,9 +187,7 @@ class FlightLogFormState extends State<FlightLogForm> {
           ),
           initialValue: "placeholder",
           enabled: setEnabled,
-          onSaved: (String? value) {
-            name = value!;
-          }),
+          onSaved: (value) => callback(value)),
     );
   }
 
@@ -206,8 +205,11 @@ class FlightLogFormState extends State<FlightLogForm> {
               // Name and Phone No fields
               Row(
                 children: [
-                  for (String label in ["Name", "Phone Number"])
-                    createInputField(label, setEnabled: false)
+                  createInputField("Name", (String? value) => {name = value},
+                      setEnabled: false),
+                  createInputField(
+                      "Phone Number", (String? value) => {phoneNo = value},
+                      setEnabled: false)
                 ],
               ),
               // Organisation dropdown
@@ -237,17 +239,17 @@ class FlightLogFormState extends State<FlightLogForm> {
               // Reg and callsign fields
               Row(
                 children: [
-                  for (String label in [
-                    "Aircraft Registration",
-                    "Aircraft Callsign"
-                  ])
-                    createInputField(label)
+                  createInputField("Aircraft Registration",
+                      (String? value) => {aircraftReg = value}),
+                  createInputField("Aircraft Callsign",
+                      (String? value) => {aircraftCallsign = value})
                 ],
               ),
               // Copilot and num. persons fields
               Row(
                 children: [
-                  createInputField("Co-pilot"),
+                  createInputField(
+                      "Co-pilot", (String? value) => {copilotName = value}),
                   Expanded(
                     child: DropdownButtonFormField(
                       items: List<int>.generate(10, (i) => i + 1)
@@ -272,8 +274,10 @@ class FlightLogFormState extends State<FlightLogForm> {
               // Departure and destination fields
               Row(
                 children: [
-                  for (String label in ["Departure", "Destination"])
-                    createInputField(label)
+                  createInputField(
+                      "Departure", (String? value) => {departure = value}),
+                  createInputField(
+                      "Destination", (String? value) => {destination = value})
                 ],
               ),
               // Departure time and ETE fields
