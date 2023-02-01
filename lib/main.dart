@@ -126,13 +126,28 @@ class FlightLogForm extends StatefulWidget {
 
 class FlightLogFormState extends State<FlightLogForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  static List<String> list = <String>['One', 'Two', 'Three', 'Four'];
+  static List<String> orgList = <String>['One', 'Two', 'Three', 'Four'];
+  static List<String> peopleList = <String>['Person 1', 'Person 2', 'Person 3'];
+  static List<String> flightTypes = <String>[
+    'Private',
+    'Test/check',
+    'AoC',
+    'CAT',
+    'Instructional',
+    'HESLO 1',
+    'HESLO 2',
+    'HESLO 3',
+    'HESLO 4',
+    'HESLO 5'
+  ];
   late String name;
   String? phoneNo;
-  String orgDropDownValue = list.first;
+  String orgDropDownValue = orgList.first;
   int? numPersons;
   double? ete;
   String? departureTime;
+  bool locationServices = true;
+  String? monitoringPerson;
 
   void onPressed() {
     _formKey.currentState!.save();
@@ -140,6 +155,7 @@ class FlightLogFormState extends State<FlightLogForm> {
     print(phoneNo);
     print(orgDropDownValue);
     print(departureTime);
+    print(locationServices);
   }
 
   Widget createInputField(String fieldLabel, {bool setEnabled = true}) {
@@ -179,7 +195,8 @@ class FlightLogFormState extends State<FlightLogForm> {
                       decoration: const InputDecoration(
                         labelText: "Name",
                       ),
-                      items: list.map<DropdownMenuItem<String>>((String value) {
+                      items:
+                          orgList.map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
                           child: Text(value),
@@ -256,6 +273,84 @@ class FlightLogFormState extends State<FlightLogForm> {
                           labelText: "ETE",
                         )),
                   ),
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: DropdownButtonFormField(
+                        items: List<double>.generate(50, (i) => (i + 1) / 10)
+                            .map<DropdownMenuItem<double>>((double value) {
+                          return DropdownMenuItem(
+                              value: value, child: Text(value.toString()));
+                        }).toList(),
+                        onChanged: (double? value) {
+                          setState(() {
+                            ete = value!;
+                          });
+                        },
+                        decoration: const InputDecoration(
+                          labelText: "Fuel Endurance",
+                        )),
+                  ),
+                  Expanded(
+                      child: SwitchListTile(
+                    value: locationServices,
+                    onChanged: (value) {
+                      setState(() {
+                        locationServices = value;
+                      });
+                    },
+                    title: const Text("Location Services"),
+                  ))
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: DropdownButtonFormField(
+                            items: peopleList
+                                .map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                monitoringPerson = value;
+                              });
+                            },
+                            decoration: const InputDecoration(
+                              label: Text("Monitoring Person"),
+                            ),
+                          ),
+                        ),
+                        const Icon(
+                          Icons.pending,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                      child: DropdownButtonFormField(
+                    items: flightTypes
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: ((value) {
+                      setState(() {});
+                    }),
+                    decoration: const InputDecoration(
+                      label: Text("Type of Flight"),
+                    ),
+                  ))
                 ],
               ),
               ElevatedButton(onPressed: onPressed, child: const Text("Submit"))
