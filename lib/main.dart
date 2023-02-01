@@ -140,14 +140,21 @@ class FlightLogFormState extends State<FlightLogForm> {
     'HESLO 4',
     'HESLO 5'
   ];
-  late String name;
+  String? name;
   String? phoneNo;
   String orgDropDownValue = orgList.first;
+  String? aircraftReg;
+  String? aircraftCallsign;
+  String? copilotName;
   int? numPersons;
-  double? ete;
+  String? departure;
+  String? destination;
   String? departureTime;
+  double? ete;
+  double? endurance;
   bool locationServices = true;
   String? monitoringPerson;
+  String? flightType;
 
   void onPressed() {
     _formKey.currentState!.save();
