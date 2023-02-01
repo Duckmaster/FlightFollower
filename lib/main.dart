@@ -186,15 +186,18 @@ class FlightLogFormState extends State<FlightLogForm> {
       child: SizedBox(
         height: MediaQuery.of(context).size.height,
         child: SingleChildScrollView(
+          // Some padding so the form doesnt go all the way to the edges
           padding: const EdgeInsets.all(8),
           child: Column(
             children: [
+              // Name and Phone No fields
               Row(
                 children: [
                   for (String label in ["Name", "Phone Number"])
                     createInputField(label, setEnabled: false)
                 ],
               ),
+              // Organisation dropdown
               Row(
                 children: [
                   Expanded(
@@ -218,6 +221,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                   ),
                 ],
               ),
+              // Reg and callsign fields
               Row(
                 children: [
                   for (String label in [
@@ -227,6 +231,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                     createInputField(label)
                 ],
               ),
+              // Copilot and num. persons fields
               Row(
                 children: [
                   createInputField("Co-pilot"),
@@ -251,12 +256,14 @@ class FlightLogFormState extends State<FlightLogForm> {
                   ),
                 ],
               ),
+              // Departure and destination fields
               Row(
                 children: [
                   for (String label in ["Departure", "Destination"])
                     createInputField(label)
                 ],
               ),
+              // Departure time and ETE fields
               Row(
                 children: [
                   Expanded(
@@ -282,6 +289,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                   ),
                 ],
               ),
+              // Fuel endurance field and location services toggle
               Row(
                 children: [
                   Expanded(
@@ -312,6 +320,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                   ))
                 ],
               ),
+              // Monitoring person and flight type dropdowns
               Row(
                 children: [
                   Expanded(
@@ -336,6 +345,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                             ),
                           ),
                         ),
+                        // Icon for visual feedback on monitoring person (waiting to accept, declined, accepted)
                         const Icon(
                           Icons.pending,
                         ),
@@ -360,6 +370,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                   ))
                 ],
               ),
+              // Submit button
               ElevatedButton(onPressed: onPressed, child: const Text("Submit"))
             ],
           ),
