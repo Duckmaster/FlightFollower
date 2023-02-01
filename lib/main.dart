@@ -156,13 +156,26 @@ class FlightLogFormState extends State<FlightLogForm> {
   String? monitoringPerson;
   String? flightType;
 
+  bool formSubmitted = false;
+
   void onPressed() {
     _formKey.currentState!.save();
+
+    setState(() {
+      formSubmitted = true;
+    });
+
     print(name);
     print(phoneNo);
     print(orgDropDownValue);
     print(departureTime);
     print(locationServices);
+
+    print("Form submitted: $formSubmitted");
+  }
+
+  void refreshMonitoringPerson() {
+    // do nothing yet
   }
 
   Widget createInputField(String fieldLabel, {bool setEnabled = true}) {
@@ -346,8 +359,24 @@ class FlightLogFormState extends State<FlightLogForm> {
                           ),
                         ),
                         // Icon for visual feedback on monitoring person (waiting to accept, declined, accepted)
-                        const Icon(
-                          Icons.pending,
+                        Visibility(
+                          visible: formSubmitted,
+                          maintainSize: true,
+                          maintainAnimation: true,
+                          maintainState: true,
+                          child: const Icon(
+                            Icons.pending,
+                          ),
+                        ),
+
+                        Visibility(
+                          visible: false,
+                          maintainSize: true,
+                          maintainAnimation: true,
+                          maintainState: true,
+                          child: IconButton(
+                              onPressed: refreshMonitoringPerson,
+                              icon: const Icon(Icons.refresh)),
                         ),
                       ],
                     ),
