@@ -161,8 +161,6 @@ class FlightLogFormState extends State<FlightLogForm> {
   String? rotorStopTime;
   DateTime? rotorStop;
   String? datconStop;
-  String? rotorDiff;
-  String? datconDiff;
   String submitButtonLabel = "Submit";
 
   TextEditingController rotorStartController = TextEditingController();
@@ -209,7 +207,6 @@ class FlightLogFormState extends State<FlightLogForm> {
 
     setState(() {
       rotorStopTime = time;
-      rotorDiff = diff;
     });
 
     rotorStopController.text = time;
