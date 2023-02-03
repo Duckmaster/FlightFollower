@@ -173,9 +173,14 @@ class FlightLogFormState extends State<FlightLogForm> {
   void onPressed() {
     _formKey.currentState!.save();
 
+    if (formSubmitted) {
+      // push to database
+      _formKey.currentState!.reset();
+    }
+
     setState(() {
-      formSubmitted = true;
-      submitButtonLabel = "Flight Completed";
+      formSubmitted = !formSubmitted;
+      submitButtonLabel = formSubmitted ? "Flight Completed" : "Submit";
     });
   }
 
