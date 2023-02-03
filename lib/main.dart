@@ -155,6 +155,12 @@ class FlightLogFormState extends State<FlightLogForm> {
   bool locationServices = true;
   String? monitoringPerson;
   String? flightType;
+  String? rotorStartTime;
+  String? datconStart;
+  String? rotorStopTime;
+  String? datconStop;
+  String? rotorDiff;
+  String? datconDiff;
 
   bool formSubmitted = false;
 
@@ -186,6 +192,16 @@ class FlightLogFormState extends State<FlightLogForm> {
 
   void refreshMonitoringPerson() {
     // do nothing yet
+  }
+
+  void rotorStartPressed() {
+    // store time button pressed
+    // update the relevant input field
+  }
+
+  void rotorStopPressed() {
+    // store time button pressed
+    // update the relevant input field
   }
 
   Widget createInputField(String fieldLabel, Function callback,
@@ -438,6 +454,80 @@ class FlightLogFormState extends State<FlightLogForm> {
                   ))
                 ],
               ),
+              // Honestly cant decide if i want 3 columns or 3 rows AAAAAAAAA
+              const SizedBox(
+                height: 50,
+              ),
+              Visibility(
+                visible: formSubmitted,
+                child: IntrinsicHeight(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: Column(
+                          children: [
+                            ElevatedButton(
+                                onPressed: rotorStartPressed,
+                                child: const Text("Rotor START")),
+                            createInputField("Rotor Start Time", (value) {
+                              setState(() {
+                                rotorStartTime = value;
+                              });
+                            }),
+                            createInputField("Datcon/Hobbs Start", (value) {
+                              setState(() {
+                                datconStart = value;
+                              });
+                            })
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child: Column(
+                          children: [
+                            ElevatedButton(
+                                onPressed: rotorStopPressed,
+                                child: const Text("Rotor STOP")),
+                            createInputField("Rotor Stop Time", (value) {
+                              setState(() {
+                                rotorStopTime = value;
+                              });
+                            }),
+                            createInputField("Datcon/Hobbs Stop", (value) {
+                              setState(() {
+                                datconStop = value;
+                              });
+                            })
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Column(
+                          children: [
+                            //const ElevatedButton(
+                            //    onPressed: null, child: Text("test")),
+                            const SizedBox(height: 48),
+                            createInputField("Difference", (value) {
+                              setState(() {
+                                rotorDiff = value;
+                              });
+                            }),
+                            createInputField("Difference", (value) {
+                              setState(() {
+                                datconDiff = value;
+                              });
+                            })
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
               // Submit button
               ElevatedButton(onPressed: onPressed, child: const Text("Submit"))
             ],
