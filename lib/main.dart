@@ -161,6 +161,7 @@ class FlightLogFormState extends State<FlightLogForm> {
   String? datconStop;
   String? rotorDiff;
   String? datconDiff;
+  String submitButtonLabel = "Submit";
 
   bool formSubmitted = false;
 
@@ -529,7 +530,8 @@ class FlightLogFormState extends State<FlightLogForm> {
               ),
 
               // Submit button
-              ElevatedButton(onPressed: onPressed, child: const Text("Submit"))
+              ElevatedButton(
+                  onPressed: onPressed, child: Text(submitButtonLabel))
             ],
           ),
         ),
