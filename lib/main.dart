@@ -156,12 +156,19 @@ class FlightLogFormState extends State<FlightLogForm> {
   String? monitoringPerson;
   String? flightType;
   String? rotorStartTime;
+  DateTime? rotorStart;
   String? datconStart;
   String? rotorStopTime;
+  DateTime? rotorStop;
   String? datconStop;
   String? rotorDiff;
   String? datconDiff;
   String submitButtonLabel = "Submit";
+
+  TextEditingController rotorStartController = TextEditingController();
+  TextEditingController rotorStopController = TextEditingController();
+  TextEditingController rotorDiffController = TextEditingController();
+  TextEditingController datconDiffController = TextEditingController();
 
   bool formSubmitted = false;
 
@@ -170,25 +177,8 @@ class FlightLogFormState extends State<FlightLogForm> {
 
     setState(() {
       formSubmitted = true;
+      submitButtonLabel = "Flight Completed";
     });
-
-    print(name);
-    print(phoneNo);
-    print(orgDropDownValue);
-    print(aircraftReg);
-    print(aircraftCallsign);
-    print(copilotName);
-    print(numPersons);
-    print(departure);
-    print(destination);
-    print(departureTime);
-    print(ete);
-    print(endurance);
-    print(locationServices);
-    print(monitoringPerson);
-    print(flightType);
-
-    print("Form submitted: $formSubmitted");
   }
 
   void refreshMonitoringPerson() {
@@ -198,23 +188,50 @@ class FlightLogFormState extends State<FlightLogForm> {
   void rotorStartPressed() {
     // store time button pressed
     // update the relevant input field
+    DateTime now = DateTime.now();
+    rotorStart = now;
+    String time = "${now.hour}:${now.minute}";
+
+    setState(() {
+      rotorStartTime = time;
+    });
+
+    rotorStartController.text = time;
   }
 
   void rotorStopPressed() {
     // store time button pressed
     // update the relevant input field
+    DateTime now = DateTime.now();
+    rotorStop = now;
+    String time = "${now.hour}:${now.minute}";
+    String diff = rotorStop!.difference(rotorStart!).toString();
+
+    setState(() {
+      rotorStopTime = time;
+      rotorDiff = diff;
+    });
+
+    rotorStopController.text = time;
+    rotorDiffController.text = diff;
   }
 
   Widget createInputField(String fieldLabel, Function callback,
-      {bool setEnabled = true}) {
+      {bool setEnabled = true,
+      String init = "placeholder",
+      TextEditingController? controller,
+      Function(String)? onChanged}) {
     return Expanded(
       child: TextFormField(
-          decoration: InputDecoration(
-            labelText: fieldLabel,
-          ),
-          initialValue: "placeholder",
-          enabled: setEnabled,
-          onSaved: (value) => callback(value)),
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: fieldLabel,
+        ),
+        initialValue: controller != null ? null : init,
+        enabled: setEnabled,
+        onSaved: (value) => callback(value),
+        onChanged: onChanged,
+      ),
     );
   }
 
@@ -469,14 +486,14 @@ class FlightLogFormState extends State<FlightLogForm> {
                         child: Column(
                           children: [
                             ElevatedButton(
-                                onPressed: rotorStartPressed,
+                                onPressed: rotorStartTime == null
+                                    ? rotorStartPressed
+                                    : null,
                                 child: const Text("Rotor START")),
-                            createInputField("Rotor Start Time", (value) {
-                              setState(() {
-                                rotorStartTime = value;
-                              });
-                            }),
-                            createInputField("Datcon/Hobbs Start", (value) {
+                            createInputField("Rotor Start Time", () => {},
+                                controller: rotorStartController),
+                            createInputField("Datcon/Hobbs Start", () => {},
+                                onChanged: (value) {
                               setState(() {
                                 datconStart = value;
                               });
@@ -489,17 +506,23 @@ class FlightLogFormState extends State<FlightLogForm> {
                         child: Column(
                           children: [
                             ElevatedButton(
-                                onPressed: rotorStopPressed,
+                                onPressed: rotorStartTime == null
+                                    ? null
+                                    : rotorStopPressed,
                                 child: const Text("Rotor STOP")),
-                            createInputField("Rotor Stop Time", (value) {
-                              setState(() {
-                                rotorStopTime = value;
-                              });
-                            }),
-                            createInputField("Datcon/Hobbs Stop", (value) {
+                            createInputField("Rotor Stop Time", () => {},
+                                controller: rotorStopController),
+                            createInputField("Datcon/Hobbs Stop", () => {},
+                                onChanged: (value) {
                               setState(() {
                                 datconStop = value;
                               });
+                              double? stopDouble = double.tryParse(datconStop!);
+                              double diff = stopDouble == null
+                                  ? 0
+                                  : stopDouble - double.parse(datconStart!);
+                              datconDiffController.text =
+                                  diff.toStringAsFixed(1);
                             })
                           ],
                         ),
@@ -511,16 +534,10 @@ class FlightLogFormState extends State<FlightLogForm> {
                             //const ElevatedButton(
                             //    onPressed: null, child: Text("test")),
                             const SizedBox(height: 48),
-                            createInputField("Difference", (value) {
-                              setState(() {
-                                rotorDiff = value;
-                              });
-                            }),
-                            createInputField("Difference", (value) {
-                              setState(() {
-                                datconDiff = value;
-                              });
-                            })
+                            createInputField("Difference", () => {},
+                                controller: rotorDiffController),
+                            createInputField("Difference", () => {},
+                                controller: datconDiffController),
                           ],
                         ),
                       ),
