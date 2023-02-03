@@ -178,6 +178,29 @@ class FlightLogFormState extends State<FlightLogForm> {
 
     if (formSubmitted) {
       // push to database
+
+      FirebaseFirestore db = FirebaseFirestore.instance;
+      final flightDetails = <String, dynamic>{
+        "user": "test",
+        "organisation": orgDropDownValue,
+        "aircraft_reg": aircraftReg,
+        "aircraft_call": aircraftCallsign,
+        "copilot": copilotName,
+        "num_persons": numPersons,
+        "departure": departure,
+        "destination": destination,
+        "departure_time": departureTime,
+        "ete": ete,
+        "endurance": endurance,
+        "monitoring_person": monitoringPerson,
+        "flight_type": flightType
+      };
+
+      db
+          .collection("flights")
+          .add(flightDetails)
+          .then((value) => print("Added to database"));
+
       _formKey.currentState!.reset();
     }
 
