@@ -213,11 +213,14 @@ class FlightLogFormState extends State<FlightLogForm> {
     rotorDiffController.text = diff;
   }
 
-  Widget createInputField(String fieldLabel, Function callback,
-      {bool setEnabled = true,
-      String init = "placeholder",
-      TextEditingController? controller,
-      Function(String)? onChanged}) {
+  Widget createInputField(
+    String fieldLabel, {
+    bool setEnabled = true,
+    String init = "placeholder",
+    TextEditingController? controller,
+    Function(String)? onChanged,
+    Function? callback,
+  }) {
     return Expanded(
       child: TextFormField(
         controller: controller,
@@ -226,7 +229,7 @@ class FlightLogFormState extends State<FlightLogForm> {
         ),
         initialValue: controller != null ? null : init,
         enabled: setEnabled,
-        onSaved: (value) => callback(value),
+        onSaved: callback != null ? (value) => callback(value) : null,
         onChanged: onChanged,
       ),
     );
@@ -246,10 +249,11 @@ class FlightLogFormState extends State<FlightLogForm> {
               // Name and Phone No fields
               Row(
                 children: [
-                  createInputField("Name", (String? value) => {name = value},
+                  createInputField("Name",
+                      callback: (String? value) => {name = value},
                       setEnabled: false),
-                  createInputField(
-                      "Phone Number", (String? value) => {phoneNo = value},
+                  createInputField("Phone Number",
+                      callback: (String? value) => {phoneNo = value},
                       setEnabled: false)
                 ],
               ),
@@ -283,18 +287,18 @@ class FlightLogFormState extends State<FlightLogForm> {
               Row(
                 children: [
                   createInputField("Aircraft Registration",
-                      (String? value) => {aircraftReg = value},
+                      callback: (String? value) => {aircraftReg = value},
                       setEnabled: !formSubmitted),
                   createInputField("Aircraft Callsign",
-                      (String? value) => {aircraftCallsign = value},
+                      callback: (String? value) => {aircraftCallsign = value},
                       setEnabled: !formSubmitted)
                 ],
               ),
               // Copilot and num. persons fields
               Row(
                 children: [
-                  createInputField(
-                      "Co-pilot", (String? value) => {copilotName = value},
+                  createInputField("Co-pilot",
+                      callback: (String? value) => {copilotName = value},
                       setEnabled: !formSubmitted),
                   Expanded(
                     child: DropdownButtonFormField(
@@ -322,11 +326,11 @@ class FlightLogFormState extends State<FlightLogForm> {
               // Departure and destination fields
               Row(
                 children: [
-                  createInputField(
-                      "Departure", (String? value) => {departure = value},
+                  createInputField("Departure",
+                      callback: (String? value) => {departure = value},
                       setEnabled: !formSubmitted),
-                  createInputField(
-                      "Destination", (String? value) => {destination = value},
+                  createInputField("Destination",
+                      callback: (String? value) => {destination = value},
                       setEnabled: !formSubmitted)
                 ],
               ),
@@ -487,9 +491,9 @@ class FlightLogFormState extends State<FlightLogForm> {
                                     ? rotorStartPressed
                                     : null,
                                 child: const Text("Rotor START")),
-                            createInputField("Rotor Start Time", () => {},
+                            createInputField("Rotor Start Time",
                                 controller: rotorStartController),
-                            createInputField("Datcon/Hobbs Start", () => {},
+                            createInputField("Datcon/Hobbs Start",
                                 onChanged: (value) {
                               setState(() {
                                 datconStart = value;
@@ -507,9 +511,9 @@ class FlightLogFormState extends State<FlightLogForm> {
                                     ? null
                                     : rotorStopPressed,
                                 child: const Text("Rotor STOP")),
-                            createInputField("Rotor Stop Time", () => {},
+                            createInputField("Rotor Stop Time",
                                 controller: rotorStopController),
-                            createInputField("Datcon/Hobbs Stop", () => {},
+                            createInputField("Datcon/Hobbs Stop",
                                 onChanged: (value) {
                               setState(() {
                                 datconStop = value;
@@ -531,9 +535,9 @@ class FlightLogFormState extends State<FlightLogForm> {
                             //const ElevatedButton(
                             //    onPressed: null, child: Text("test")),
                             const SizedBox(height: 48),
-                            createInputField("Difference", () => {},
+                            createInputField("Difference",
                                 controller: rotorDiffController),
-                            createInputField("Difference", () => {},
+                            createInputField("Difference",
                                 controller: datconDiffController),
                           ],
                         ),
