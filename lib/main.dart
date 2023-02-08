@@ -292,7 +292,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                   Expanded(
                     child: DropdownButtonFormField(
                       decoration: const InputDecoration(
-                        labelText: "Name",
+                        labelText: "Organisation",
                       ),
                       items:
                           orgList.map<DropdownMenuItem<String>>((String value) {
@@ -341,7 +341,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                               });
                             },
                       decoration: const InputDecoration(
-                          labelText: "Num. Persons",
+                          labelText: "Num. Persons on Board",
                           contentPadding:
                               EdgeInsets.only(bottom: 9.5, top: 9.5)),
                       value: 1,
@@ -365,7 +365,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                 children: [
                   Expanded(
                     child: TimePicker(
-                      "Departure Time",
+                      "Planned Departure Time",
                       (String time) {
                         departureTime = time;
                       },
