@@ -146,8 +146,7 @@ class FlightLogFormState extends State<FlightLogForm> {
   String? name;
   String? phoneNo;
   String orgDropDownValue = orgList.first;
-  String? aircraftReg;
-  String? aircraftCallsign;
+  String? aircraftIdent;
   String? copilotName;
   int? numPersons;
   String? departure;
@@ -183,8 +182,7 @@ class FlightLogFormState extends State<FlightLogForm> {
       final flightDetails = <String, dynamic>{
         "user": "test",
         "organisation": orgDropDownValue,
-        "aircraft_reg": aircraftReg,
-        "aircraft_call": aircraftCallsign,
+        "aircraft_ident": aircraftIdent,
         "copilot": copilotName,
         "num_persons": numPersons,
         "departure": departure,
@@ -317,12 +315,9 @@ class FlightLogFormState extends State<FlightLogForm> {
               // Reg and callsign fields
               Row(
                 children: [
-                  createInputField("Aircraft Registration",
-                      callback: (String? value) => {aircraftReg = value},
+                  createInputField("Aircraft Reg/Callsign",
+                      callback: (String? value) => {aircraftIdent = value},
                       setEnabled: !formSubmitted),
-                  createInputField("Aircraft Callsign",
-                      callback: (String? value) => {aircraftCallsign = value},
-                      setEnabled: !formSubmitted)
                 ],
               ),
               // Copilot and num. persons fields
