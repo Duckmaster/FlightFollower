@@ -242,20 +242,18 @@ class FlightLogFormState extends State<FlightLogForm> {
     rotorDiffController.text = diff;
   }
 
-  Widget createInputField(
-    String fieldLabel, {
-    bool setEnabled = true,
-    String init = "placeholder",
-    TextEditingController? controller,
-    Function(String)? onChanged,
-    Function? callback,
-  }) {
+  Widget createInputField(String fieldLabel,
+      {bool setEnabled = true,
+      String init = "placeholder",
+      TextEditingController? controller,
+      Function(String)? onChanged,
+      Function? callback,
+      double? fontSize}) {
     return Expanded(
       child: TextFormField(
         controller: controller,
         decoration: InputDecoration(
-          labelText: fieldLabel,
-        ),
+            labelText: fieldLabel, labelStyle: TextStyle(fontSize: fontSize)),
         initialValue: controller != null ? null : init,
         enabled: setEnabled,
         onSaved: callback != null ? (value) => callback(value) : null,
@@ -562,9 +560,9 @@ class FlightLogFormState extends State<FlightLogForm> {
                             //    onPressed: null, child: Text("test")),
                             const SizedBox(height: 48),
                             createInputField("Flight Time",
-                                controller: rotorDiffController),
-                            createInputField("Maintenance Time",
-                                controller: datconDiffController),
+                                controller: rotorDiffController, fontSize: 14),
+                            createInputField("Maintenance\nTime",
+                                controller: datconDiffController, fontSize: 12),
                           ],
                         ),
                       ),
