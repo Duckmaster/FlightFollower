@@ -516,8 +516,8 @@ class FlightLogFormState extends State<FlightLogForm> {
                                 onPressed: rotorStartTime == null
                                     ? rotorStartPressed
                                     : null,
-                                child: const Text("Rotor START")),
-                            createInputField("Rotor Start Time",
+                                child: const Text("START")),
+                            createInputField("Start Time",
                                 controller: rotorStartController),
                             createInputField("Datcon/Hobbs Start",
                                 onChanged: (value) {
@@ -536,8 +536,8 @@ class FlightLogFormState extends State<FlightLogForm> {
                                 onPressed: rotorStartTime == null
                                     ? null
                                     : rotorStopPressed,
-                                child: const Text("Rotor STOP")),
-                            createInputField("Rotor Stop Time",
+                                child: const Text("STOP")),
+                            createInputField("Stop Time",
                                 controller: rotorStopController),
                             createInputField("Datcon/Hobbs Stop",
                                 onChanged: (value) {
@@ -561,9 +561,9 @@ class FlightLogFormState extends State<FlightLogForm> {
                             //const ElevatedButton(
                             //    onPressed: null, child: Text("test")),
                             const SizedBox(height: 48),
-                            createInputField("Difference",
+                            createInputField("Flight Time",
                                 controller: rotorDiffController),
-                            createInputField("Difference",
+                            createInputField("Maintenance Time",
                                 controller: datconDiffController),
                           ],
                         ),
