@@ -71,7 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
         page = const FlightLogPage();
         break;
       case 1:
-        page = const Placeholder();
+        page = const FlightFollowingPage();
         break;
       default:
         throw UnimplementedError('no widget for $_selectedIndex');
@@ -107,6 +107,22 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       );
     });
+  }
+}
+
+class FlightFollowingPage extends StatefulWidget {
+  const FlightFollowingPage({super.key});
+
+  @override
+  FlightFollowingPageState createState() {
+    return FlightFollowingPageState();
+  }
+}
+
+class FlightFollowingPageState extends State<FlightFollowingPage> {
+  @override
+  Widget build(BuildContext context) {
+    return const Text("hi");
   }
 }
 
