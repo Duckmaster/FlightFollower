@@ -53,8 +53,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
   static const List<Widget> _titles = <Widget>[
-    Text("Flight Log"),
-    Text("Flight Monitoring"),
+    Text("Flight Details"),
+    Text("Flight Following Log"),
   ];
 
   void _onItemTapped(int index) {
