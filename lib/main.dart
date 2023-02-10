@@ -160,7 +160,53 @@ class FlightItemState extends State<FlightItem> {
           ),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: const Text("hi!"),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: Row(
+                          children: [Text("STATUS")],
+                        ),
+                      ),
+                      Expanded(
+                        child: Row(
+                          children: [Text("REG")],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    children: [
+                      Expanded(
+                          child: Row(
+                        children: [Text("DEP -> ARR")],
+                      )),
+                      Expanded(
+                          child: Column(
+                        children: [
+                          Row(
+                            children: [Text("DEP TIME")],
+                          ),
+                          Row(
+                            children: [Text("ETE")],
+                          )
+                        ],
+                      ))
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [Text("ETA/ETD")],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
