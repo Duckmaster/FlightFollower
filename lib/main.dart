@@ -210,6 +210,7 @@ class FlightItemState extends State<FlightItem> {
 
   @override
   Widget build(BuildContext context) {
+    Map<String, String> labels = getLabelsForStatus(widget.flightStatus);
     return SizedBox(
       width: MediaQuery.of(context).size.width,
       height: 100,
@@ -231,7 +232,7 @@ class FlightItemState extends State<FlightItem> {
                     children: [
                       Expanded(
                         child: Row(
-                          children: [Text("STATUS")],
+                          children: [Text(labels["status"]!)],
                         ),
                       ),
                       Expanded(
