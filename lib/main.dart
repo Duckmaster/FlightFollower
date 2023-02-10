@@ -126,8 +126,8 @@ class FlightFollowingPageState extends State<FlightFollowingPage> {
       padding: const EdgeInsets.all(8.0),
       child: ListView(
         children: const [
-          FlightItem(),
-          FlightItem(),
+          FlightItem("test"),
+          FlightItem("test"),
         ],
       ),
     );
@@ -135,7 +135,8 @@ class FlightFollowingPageState extends State<FlightFollowingPage> {
 }
 
 class FlightItem extends StatefulWidget {
-  const FlightItem({super.key});
+  final String flightStatus;
+  const FlightItem(this.flightStatus, {super.key});
 
   @override
   FlightItemState createState() {
