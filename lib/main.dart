@@ -128,7 +128,7 @@ class FlightFollowingPageState extends State<FlightFollowingPage> {
       padding: const EdgeInsets.all(8.0),
       child: ListView(
         children: const [
-          FlightItem(FlightStatuses.requested),
+          FlightItem(FlightStatuses.nearlyoverdue),
           FlightItem(FlightStatuses.notstarted),
         ],
       ),
@@ -249,10 +249,10 @@ class FlightItemState extends State<FlightItem> {
                           child: Column(
                         children: [
                           Row(
-                            children: [Text("DEP TIME")],
+                            children: [Text(labels["departure"]!)],
                           ),
                           Row(
-                            children: [Text("ETE")],
+                            children: [Text(labels["arrival"]!)],
                           )
                         ],
                       ))
@@ -262,7 +262,7 @@ class FlightItemState extends State<FlightItem> {
                 Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [Text("ETA/ETD")],
+                    children: [Text(labels["eta"]!)],
                   ),
                 ),
               ],
