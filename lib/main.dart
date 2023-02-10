@@ -147,8 +147,8 @@ class FlightItem extends StatefulWidget {
 }
 
 class FlightItemState extends State<FlightItem> {
-  Map<String, String> getLabelsForStatus(Enum status) {
-    switch (status) {
+  Map<String, String> getLabelsForStatus() {
+    switch (widget.flightStatus) {
       case FlightStatuses.requested:
         {
           return Map.fromEntries(<String, String>{
@@ -231,7 +231,7 @@ class FlightItemState extends State<FlightItem> {
 
   @override
   Widget build(BuildContext context) {
-    Map<String, String> labels = getLabelsForStatus(widget.flightStatus);
+    Map<String, String> labels = getLabelsForStatus();
     return SizedBox(
       width: MediaQuery.of(context).size.width,
       height: 100,
