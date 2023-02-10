@@ -161,7 +161,7 @@ class FlightItemState extends State<FlightItem> {
       case FlightStatuses.notstarted:
         {
           return Map.fromEntries(<String, String>{
-            "status": "START NOT LOGGED",
+            "status": "START \nNOT LOGGED",
             "departure": "Planned Departure:",
             "arrival": "ETE:",
             "eta": "ETD:"
