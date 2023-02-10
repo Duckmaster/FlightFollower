@@ -179,7 +179,7 @@ class FlightItemState extends State<FlightItem> {
       case FlightStatuses.nearlyoverdue:
         {
           return Map.fromEntries(<String, String>{
-            "status": "NEARLY OVERDUE",
+            "status": "NEARLY \nOVERDUE",
             "departure": "Departure:",
             "arrival": "Estimated arrival:",
             "eta": "ETA:"
@@ -222,7 +222,8 @@ class FlightItemState extends State<FlightItem> {
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
-                Expanded(
+                SizedBox(
+                  width: 100,
                   child: Column(
                     children: [
                       Expanded(
