@@ -122,7 +122,49 @@ class FlightFollowingPage extends StatefulWidget {
 class FlightFollowingPageState extends State<FlightFollowingPage> {
   @override
   Widget build(BuildContext context) {
-    return const Text("hi");
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ListView(
+        children: const [
+          FlightItem(),
+          FlightItem(),
+        ],
+      ),
+    );
+  }
+}
+
+class FlightItem extends StatefulWidget {
+  const FlightItem({super.key});
+
+  @override
+  FlightItemState createState() {
+    return FlightItemState();
+  }
+}
+
+class FlightItemState extends State<FlightItem> {
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      height: 100,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 15),
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Colors.black,
+            ),
+            borderRadius: BorderRadius.all(Radius.circular(20)),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: const Text("hi!"),
+          ),
+        ),
+      ),
+    );
   }
 }
 
