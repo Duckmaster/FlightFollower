@@ -203,6 +203,32 @@ class FlightItemState extends State<FlightItem> {
     }.entries);
   }
 
+  Color getColour() {
+    switch (widget.flightStatus) {
+      case FlightStatuses.requested:
+        {
+          return Colors.blue;
+        }
+      case FlightStatuses.notstarted:
+        {
+          return Colors.grey;
+        }
+      case FlightStatuses.enroute:
+        {
+          return Colors.green;
+        }
+      case FlightStatuses.nearlyoverdue:
+        {
+          return Colors.orange;
+        }
+      case FlightStatuses.overdue:
+        {
+          return Colors.red;
+        }
+    }
+    throw Exception("Invalid flight status");
+  }
+
   @override
   Widget build(BuildContext context) {
     Map<String, String> labels = getLabelsForStatus(widget.flightStatus);
@@ -213,11 +239,11 @@ class FlightItemState extends State<FlightItem> {
         padding: const EdgeInsets.only(bottom: 15),
         child: Container(
           decoration: BoxDecoration(
-            border: Border.all(
-              color: Colors.black,
-            ),
-            borderRadius: BorderRadius.all(Radius.circular(20)),
-          ),
+              border: Border.all(
+                color: Colors.black,
+              ),
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+              color: getColour()),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
