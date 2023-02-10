@@ -151,53 +151,48 @@ class FlightItemState extends State<FlightItem> {
     switch (status) {
       case FlightStatuses.requested:
         {
-          Map.fromEntries(<String, String>{
+          return Map.fromEntries(<String, String>{
             "status": "REQUESTED",
             "departure": "Planned Departure:",
             "arrival": "ETE:",
             "eta": "ACCEPT?"
           }.entries);
-          break;
         }
       case FlightStatuses.notstarted:
         {
-          Map.fromEntries(<String, String>{
+          return Map.fromEntries(<String, String>{
             "status": "START NOT LOGGED",
             "departure": "Planned Departure:",
             "arrival": "ETE:",
             "eta": "ETD:"
           }.entries);
-          break;
         }
       case FlightStatuses.enroute:
         {
-          Map.fromEntries(<String, String>{
+          return Map.fromEntries(<String, String>{
             "status": "EN ROUTE",
             "departure": "Departure:",
             "arrival": "Estimated arrival:",
             "eta": "ETA:"
           }.entries);
-          break;
         }
       case FlightStatuses.nearlyoverdue:
         {
-          Map.fromEntries(<String, String>{
+          return Map.fromEntries(<String, String>{
             "status": "NEARLY OVERDUE",
             "departure": "Departure:",
             "arrival": "Estimated arrival:",
             "eta": "ETA:"
           }.entries);
-          break;
         }
       case FlightStatuses.overdue:
         {
-          Map.fromEntries(<String, String>{
+          return Map.fromEntries(<String, String>{
             "status": "OVERDUE",
             "departure": "Departure:",
             "arrival": "Estimated arrival:",
             "eta": "ETA:"
           }.entries);
-          break;
         }
     }
     return Map.fromEntries(<String, String>{
