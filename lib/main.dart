@@ -290,6 +290,7 @@ class FlightItemState extends State<FlightItem> {
                   ),
                 ),
                 Expanded(
+                  flex: 2,
                   child: Column(
                     children: [
                       Expanded(
