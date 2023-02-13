@@ -131,9 +131,9 @@ class FlightFollowingPageState extends State<FlightFollowingPage> {
       child: ListView(
         children: [
           FlightItem(FlightStatuses.nearlyoverdue, "G-AAAA", "Blackpool",
-              "Blackpool", "1300", 0.5),
+              "Blackpool", "13:00", 0.5),
           FlightItem(FlightStatuses.notstarted, "G-AAAA", "Blackpool",
-              "Blackpool", "1300", 0.5),
+              "Blackpool", "13:00", 0.5),
         ],
       ),
     );
@@ -153,19 +153,26 @@ class FlightItem extends StatefulWidget {
   FlightItem(this.flightStatus, this.aircraftReg, this.departureLoc,
       this.arrivalLoc, this.departure, this.ete,
       {super.key})
-      : arrival = _calculateArrival(flightStatus, ete);
+      : arrival = _calculateArrival(flightStatus, ete, departure);
 
   @override
   FlightItemState createState() {
     return FlightItemState();
   }
 
-  static String _calculateArrival(Enum flightStatus, double ete) {
+  static String _calculateArrival(
+      Enum flightStatus, double ete, String depTime) {
     if (flightStatus == FlightStatuses.requested ||
         flightStatus == FlightStatuses.notstarted) {
       return ete.toString();
     } else {
-      return "TBD";
+      String hour = depTime.split(":")[0];
+      String min = depTime.split(":")[1];
+      num delta = 60 * ete;
+
+      hour = (int.parse(hour) + (delta ~/ 60)).toString();
+      min = (int.parse(min) + (delta % 60)).toString().split(".")[0];
+      return "$hour:$min";
     }
   }
 }
