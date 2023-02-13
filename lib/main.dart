@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 void main() async {
   runApp(const MyApp());
@@ -131,9 +132,9 @@ class FlightFollowingPageState extends State<FlightFollowingPage> {
       child: ListView(
         children: [
           FlightItem(FlightStatuses.nearlyoverdue, "G-AAAA", "Blackpool",
-              "Blackpool", "13:00", 0.5),
+              "Blackpool", "21:30", 0.5),
           FlightItem(FlightStatuses.notstarted, "G-AAAA", "Blackpool",
-              "Blackpool", "13:00", 0.5),
+              "Blackpool", "23:12", 0.5),
         ],
       ),
     );
@@ -260,6 +261,28 @@ class FlightItemState extends State<FlightItem> {
     throw Exception("Invalid flight status");
   }
 
+  String calculateETA() {
+    DateTime currentDate = DateTime.now();
+    DateTime currentTime =
+        DateFormat("HH:mm").parse("${currentDate.hour}:${currentDate.minute}");
+    DateTime time;
+
+    if (widget.flightStatus == FlightStatuses.notstarted) {
+      time = DateFormat("HH:mm").parse(widget.departure);
+    } else {
+      time = DateFormat("HH:mm").parse(widget.arrival);
+    }
+    Duration diff = time.difference(currentTime);
+
+    if (diff.inHours == 0) {
+      return "${diff.inMinutes}mins";
+    } else {
+      String hour = ((diff.inMinutes ~/ 60)).toString();
+      String min = ((diff.inMinutes % 60)).toString().split(".")[0];
+      return "${hour}hrs ${min}mins";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Map<String, String> labels = getLabelsForStatus();
@@ -328,7 +351,7 @@ class FlightItemState extends State<FlightItem> {
                 Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [Text(labels["eta"]!)],
+                    children: [Text("${labels["eta"]!} ${calculateETA()}")],
                   ),
                 ),
               ],
