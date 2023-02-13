@@ -153,14 +153,14 @@ class FlightItem extends StatefulWidget {
   FlightItem(this.flightStatus, this.aircraftReg, this.departureLoc,
       this.arrivalLoc, this.departure, this.ete,
       {super.key})
-      : arrival = calculateArrival(flightStatus, ete);
+      : arrival = _calculateArrival(flightStatus, ete);
 
   @override
   FlightItemState createState() {
     return FlightItemState();
   }
 
-  static String calculateArrival(Enum flightStatus, double ete) {
+  static String _calculateArrival(Enum flightStatus, double ete) {
     if (flightStatus == FlightStatuses.requested ||
         flightStatus == FlightStatuses.notstarted) {
       return ete.toString();
