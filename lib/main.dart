@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -127,9 +129,11 @@ class FlightFollowingPageState extends State<FlightFollowingPage> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: ListView(
-        children: const [
-          FlightItem(FlightStatuses.nearlyoverdue),
-          FlightItem(FlightStatuses.notstarted),
+        children: [
+          FlightItem(FlightStatuses.nearlyoverdue, "G-AAAA", "Blackpool",
+              "Blackpool", "1300", 0.5),
+          FlightItem(FlightStatuses.notstarted, "G-AAAA", "Blackpool",
+              "Blackpool", "1300", 0.5),
         ],
       ),
     );
@@ -138,11 +142,31 @@ class FlightFollowingPageState extends State<FlightFollowingPage> {
 
 class FlightItem extends StatefulWidget {
   final Enum flightStatus;
-  const FlightItem(this.flightStatus, {super.key});
+  final String aircraftReg;
+  final String departureLoc;
+  final String arrivalLoc;
+  final String
+      departure; // this could be either PLANNED or ACTUAL departure depending on flightStatus
+  final double ete;
+  final String arrival;
+
+  FlightItem(this.flightStatus, this.aircraftReg, this.departureLoc,
+      this.arrivalLoc, this.departure, this.ete,
+      {super.key})
+      : arrival = calculateArrival(flightStatus, ete);
 
   @override
   FlightItemState createState() {
     return FlightItemState();
+  }
+
+  static String calculateArrival(Enum flightStatus, double ete) {
+    if (flightStatus == FlightStatuses.requested ||
+        flightStatus == FlightStatuses.notstarted) {
+      return ete.toString();
+    } else {
+      return "TBD";
+    }
   }
 }
 
@@ -259,7 +283,7 @@ class FlightItemState extends State<FlightItem> {
                       ),
                       Expanded(
                         child: Row(
-                          children: [Text("REG")],
+                          children: [Text(widget.aircraftReg)],
                         ),
                       )
                     ],
@@ -270,16 +294,23 @@ class FlightItemState extends State<FlightItem> {
                     children: [
                       Expanded(
                           child: Row(
-                        children: [Text("DEP -> ARR")],
+                        children: [
+                          Text("${widget.departureLoc} -> ${widget.arrivalLoc}")
+                        ],
                       )),
                       Expanded(
                           child: Column(
                         children: [
                           Row(
-                            children: [Text(labels["departure"]!)],
+                            children: [
+                              Text(
+                                  "${labels["departure"]!} ${widget.departure}")
+                            ],
                           ),
                           Row(
-                            children: [Text(labels["arrival"]!)],
+                            children: [
+                              Text("${labels["arrival"]!} ${widget.arrival}")
+                            ],
                           )
                         ],
                       ))
