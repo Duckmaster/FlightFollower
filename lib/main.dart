@@ -130,9 +130,9 @@ class FlightFollowingPageState extends State<FlightFollowingPage> {
       child: ListView(
         children: [
           FlightItem(FlightStatuses.nearlyoverdue, "G-AAAA", "Blackpool",
-              "Blackpool", "14:00", 2),
+              "Blackpool", "23:00", 2),
           FlightItem(FlightStatuses.notstarted, "G-AAAA", "Blackpool",
-              "Blackpool", "23:12", 0.5),
+              "Blackpool", "23:58", 0.5),
         ],
       ),
     );
@@ -176,6 +176,8 @@ class FlightItem extends StatefulWidget {
         minInt -= 60;
         hourInt += 1;
       }
+
+      if (hourInt >= 24) hourInt -= 24;
 
       hour = hourInt.toString();
       min = minInt.toString().split(".")[0];
