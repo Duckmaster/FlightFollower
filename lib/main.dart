@@ -148,11 +148,13 @@ class FlightItem extends StatefulWidget {
       departure; // this could be either PLANNED or ACTUAL departure depending on flightStatus
   final double ete;
   final String arrival;
+  bool extended;
 
   FlightItem(this.flightStatus, this.aircraftReg, this.departureLoc,
       this.arrivalLoc, this.departure, this.ete,
       {super.key})
-      : arrival = _calculateArrival(flightStatus, ete, departure);
+      : arrival = _calculateArrival(flightStatus, ete, departure),
+        extended = false;
 
   @override
   FlightItemState createState() {
@@ -299,73 +301,81 @@ class FlightItemState extends State<FlightItem> {
     Map<String, String> labels = getLabelsForStatus();
     return SizedBox(
       width: MediaQuery.of(context).size.width,
-      height: 100,
+      height: widget.extended ? 250 : 100,
       child: Padding(
         padding: const EdgeInsets.only(bottom: 15),
-        child: Container(
-          decoration: BoxDecoration(
-              border: Border.all(
-                color: Colors.black,
-              ),
-              borderRadius: BorderRadius.all(Radius.circular(20)),
-              color: getColour()),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 100,
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: Row(
-                          children: [Text(labels["status"]!)],
-                        ),
-                      ),
-                      Expanded(
-                        child: Row(
-                          children: [Text(widget.aircraftReg)],
-                        ),
-                      )
-                    ],
-                  ),
+        child: GestureDetector(
+          onTap: () {
+            setState(() {
+              widget.extended = !widget.extended;
+            });
+          },
+          child: Container(
+            decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.black,
                 ),
-                Expanded(
-                  flex: 2,
-                  child: Column(
-                    children: [
-                      Expanded(
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+                color: getColour()),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 100,
+                    child: Column(
+                      children: [
+                        Expanded(
                           child: Row(
-                        children: [
-                          Text("${widget.departureLoc} -> ${widget.arrivalLoc}")
-                        ],
-                      )),
-                      Expanded(
-                          child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                  "${labels["departure"]!} ${widget.departure}")
-                            ],
+                            children: [Text(labels["status"]!)],
                           ),
-                          Row(
-                            children: [
-                              Text("${labels["arrival"]!} ${widget.arrival}")
-                            ],
-                          )
-                        ],
-                      ))
-                    ],
+                        ),
+                        Expanded(
+                          child: Row(
+                            children: [Text(widget.aircraftReg)],
+                          ),
+                        )
+                      ],
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [Text("${labels["eta"]!} ${calculateETA()}")],
+                  Expanded(
+                    flex: 2,
+                    child: Column(
+                      children: [
+                        Expanded(
+                            child: Row(
+                          children: [
+                            Text(
+                                "${widget.departureLoc} -> ${widget.arrivalLoc}")
+                          ],
+                        )),
+                        Expanded(
+                            child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                    "${labels["departure"]!} ${widget.departure}")
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Text("${labels["arrival"]!} ${widget.arrival}")
+                              ],
+                            )
+                          ],
+                        ))
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [Text("${labels["eta"]!} ${calculateETA()}")],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
