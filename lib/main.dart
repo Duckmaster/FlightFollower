@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flight_follower/models/user.dart';
 
 void main() async {
   runApp(const MyApp());
@@ -9,6 +10,8 @@ void main() async {
 }
 
 enum FlightStatuses { requested, notstarted, enroute, nearlyoverdue, overdue }
+
+User user = User("John Smith", "email@address.com", "07123456789");
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
