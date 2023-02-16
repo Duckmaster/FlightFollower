@@ -130,9 +130,9 @@ class FlightFollowingPageState extends State<FlightFollowingPage> {
       child: ListView(
         children: [
           FlightItem(FlightStatuses.nearlyoverdue, "G-AAAA", "Blackpool",
-              "Blackpool", "23:00", 2),
+              "Blackpool", "23:00", 2, "John Smith", 3, "07123456789", 2.5),
           FlightItem(FlightStatuses.notstarted, "G-AAAA", "Blackpool",
-              "Blackpool", "23:58", 0.5),
+              "Blackpool", "23:58", 0.5, "John Smith", 3, "07123456789", 2.5),
         ],
       ),
     );
@@ -149,22 +149,27 @@ class FlightItem extends StatefulWidget {
   final double ete;
   final String arrival;
 
-  final String? pilotName;
+  final String pilotName;
   final String? copilotName;
-  final int? personsOnBoard;
-  final String? phoneNumber;
-  final int? endurance;
+  final int personsOnBoard;
+  final String phoneNumber;
+  final double endurance;
   bool extended;
 
-  FlightItem(this.flightStatus, this.aircraftReg, this.departureLoc,
-      this.arrivalLoc, this.departure, this.ete,
-      {super.key,
-      this.pilotName,
-      this.copilotName,
-      this.personsOnBoard,
-      this.phoneNumber,
-      this.endurance})
-      : arrival = _calculateArrival(flightStatus, ete, departure),
+  FlightItem(
+    this.flightStatus,
+    this.aircraftReg,
+    this.departureLoc,
+    this.arrivalLoc,
+    this.departure,
+    this.ete,
+    this.pilotName,
+    this.personsOnBoard,
+    this.phoneNumber,
+    this.endurance, {
+    super.key,
+    this.copilotName,
+  })  : arrival = _calculateArrival(flightStatus, ete, departure),
         extended = false;
 
   @override
