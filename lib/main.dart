@@ -312,6 +312,10 @@ class FlightItemState extends State<FlightItem> {
     }
   }
 
+  String getCopilotName() {
+    return widget.copilotName == null ? "N/A" : widget.copilotName!;
+  }
+
   @override
   Widget build(BuildContext context) {
     Map<String, String> labels = getLabelsForStatus();
@@ -407,20 +411,24 @@ class FlightItemState extends State<FlightItem> {
                       children: [
                         Expanded(
                           child: Column(
-                            children: [Text("Pilot:"), Text("Co-pilot:")],
-                          ),
-                        ),
-                        Expanded(
-                          child: Column(
                             children: [
-                              Text("Persons on board:"),
-                              Text("Phone No.:")
+                              Text("Pilot: ${widget.pilotName}"),
+                              Text("Co-pilot: ${getCopilotName()}")
                             ],
                           ),
                         ),
                         Expanded(
                           child: Column(
-                            children: [Text("Endurance")],
+                            children: [
+                              Text(
+                                  "Persons on board: ${widget.personsOnBoard}"),
+                              Text("Phone No.: ${widget.phoneNumber}")
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: Column(
+                            children: [Text("Endurance: ${widget.endurance}")],
                           ),
                         ),
                       ],
