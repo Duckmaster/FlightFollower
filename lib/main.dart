@@ -148,11 +148,22 @@ class FlightItem extends StatefulWidget {
       departure; // this could be either PLANNED or ACTUAL departure depending on flightStatus
   final double ete;
   final String arrival;
+
+  final String? pilotName;
+  final String? copilotName;
+  final int? personsOnBoard;
+  final String? phoneNumber;
+  final int? endurance;
   bool extended;
 
   FlightItem(this.flightStatus, this.aircraftReg, this.departureLoc,
       this.arrivalLoc, this.departure, this.ete,
-      {super.key})
+      {super.key,
+      this.pilotName,
+      this.copilotName,
+      this.personsOnBoard,
+      this.phoneNumber,
+      this.endurance})
       : arrival = _calculateArrival(flightStatus, ete, departure),
         extended = false;
 
