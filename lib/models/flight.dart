@@ -28,6 +28,27 @@ class Flight {
       this.flightType,
       this.copilot});
 
+  factory Flight.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> snapshot,
+    SnapshotOptions? options,
+  ) {
+    final data = snapshot.data();
+    return Flight(
+      user: data?["user"],
+      organisation: data?["organisation"],
+      aircraftIdentifier: data?["aircraft_ident"],
+      copilot: data?["copilot"],
+      numPersons: data?["num_persons"],
+      departureLocation: data?["departure"],
+      destination: data?["destination"],
+      departureTime: data?["departure_time"],
+      ete: data?["ete"],
+      endurance: data?["endurance"],
+      monitoringPerson: data?["monitoring_person"],
+      flightType: data?["flight_type"],
+    );
+  }
+
   Map<String, dynamic> toFirestore() {
     return {
       "user": user,
