@@ -520,6 +520,7 @@ class FlightLogFormState extends State<FlightLogForm> {
       // push to database
 
       FirebaseFirestore db = FirebaseFirestore.instance;
+      String? id;
       final flightDetails = <String, dynamic>{
         "user": user.email,
         "organisation": orgDropDownValue,
@@ -535,10 +536,16 @@ class FlightLogFormState extends State<FlightLogForm> {
         "flight_type": flightType
       };
 
-      db
-          .collection("flights")
-          .add(flightDetails)
-          .then((value) => print("Added to database"));
+      final requestDetails = <String, dynamic>{
+        "flight_id": id,
+        "user_id": monitoringPerson!.email,
+        "status": "requested"
+      };
+
+      db.collection("flights").add(flightDetails).then((value) {
+        id = value.id;
+        db.collection("requests").add(requestDetails);
+      });
 
       _formKey.currentState!.reset();
     }
