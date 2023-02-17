@@ -467,7 +467,11 @@ class FlightLogForm extends StatefulWidget {
 class FlightLogFormState extends State<FlightLogForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   static List<String> orgList = <String>['One', 'Two', 'Three', 'Four'];
-  static List<String> peopleList = <String>['Person 1', 'Person 2', 'Person 3'];
+  static var peopleList = [
+    User("Person One", "personone@email.com", "07123456789"),
+    User("Person Two", "persontwo@email.com", "07123456789"),
+    User("Person Three", "personthree@email.com", "07123456789")
+  ];
   static List<String> flightTypes = <String>[
     'Private',
     'Test/check',
@@ -492,7 +496,7 @@ class FlightLogFormState extends State<FlightLogForm> {
   double? ete;
   double? endurance;
   bool locationServices = true;
-  String? monitoringPerson;
+  User? monitoringPerson;
   String? flightType;
   String? rotorStartTime;
   DateTime? rotorStart;
@@ -597,6 +601,14 @@ class FlightLogFormState extends State<FlightLogForm> {
         onChanged: onChanged,
       ),
     );
+  }
+
+  User getUserFromEmail(String? email) {
+    if (email == null) return User("", "", "");
+    for (User user in peopleList) {
+      if (user.email == email) return user;
+    }
+    throw Exception("Given email does not match to any known contacts");
   }
 
   @override
@@ -770,18 +782,20 @@ class FlightLogFormState extends State<FlightLogForm> {
                       children: [
                         Expanded(
                           child: DropdownButtonFormField(
+                            isExpanded: true,
                             items: peopleList
-                                .map<DropdownMenuItem<String>>((String value) {
+                                .map<DropdownMenuItem<String>>((User value) {
                               return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
+                                value: value.email,
+                                child: Text(value.username),
                               );
                             }).toList(),
                             onChanged: formSubmitted
                                 ? null
                                 : (String? value) {
                                     setState(() {
-                                      monitoringPerson = value;
+                                      monitoringPerson =
+                                          getUserFromEmail(value);
                                     });
                                   },
                             decoration: const InputDecoration(
