@@ -972,7 +972,7 @@ class TimePicker extends StatelessWidget {
               children: [
                 const Text("Minute"),
                 DropdownButtonFormField(
-                    items: List<int>.generate(30, (i) => i * 2, growable: false)
+                    items: List<int>.generate(12, (i) => i * 5, growable: false)
                         .map<DropdownMenuItem<int>>((int value) {
                       return DropdownMenuItem(
                           value: value, child: Text(value.toString()));
