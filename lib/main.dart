@@ -531,7 +531,7 @@ class FlightLogFormState extends State<FlightLogForm> {
         "departure_time": departureTime,
         "ete": ete,
         "endurance": endurance,
-        "monitoring_person": monitoringPerson,
+        "monitoring_person": monitoringPerson!.email,
         "flight_type": flightType
       };
 
