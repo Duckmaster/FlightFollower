@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flight_follower/models/user.dart';
+import 'package:flight_follower/models/flight.dart';
 
 void main() async {
   runApp(const MyApp());
@@ -484,20 +485,8 @@ class FlightLogFormState extends State<FlightLogForm> {
     'HESLO 4',
     'HESLO 5'
   ];
-  String? name;
   String? phoneNo;
-  String orgDropDownValue = orgList.first;
-  String? aircraftIdent;
-  String? copilotName;
-  int? numPersons;
-  String? departure;
-  String? destination;
-  String? departureTime;
-  double? ete;
-  double? endurance;
   bool locationServices = true;
-  User? monitoringPerson;
-  String? flightType;
   String? rotorStartTime;
   DateTime? rotorStart;
   String? datconStart;
@@ -505,6 +494,8 @@ class FlightLogFormState extends State<FlightLogForm> {
   DateTime? rotorStop;
   String? datconStop;
   String submitButtonLabel = "Submit";
+
+  Flight flight = Flight(user: user.email);
 
   TextEditingController rotorStartController = TextEditingController();
   TextEditingController rotorStopController = TextEditingController();
@@ -521,28 +512,21 @@ class FlightLogFormState extends State<FlightLogForm> {
 
       FirebaseFirestore db = FirebaseFirestore.instance;
       String? id;
-      final flightDetails = <String, dynamic>{
-        "user": user.email,
-        "organisation": orgDropDownValue,
-        "aircraft_ident": aircraftIdent,
-        "copilot": copilotName,
-        "num_persons": numPersons,
-        "departure": departure,
-        "destination": destination,
-        "departure_time": departureTime,
-        "ete": ete,
-        "endurance": endurance,
-        "monitoring_person": monitoringPerson!.email,
-        "flight_type": flightType
-      };
 
       final requestDetails = <String, dynamic>{
         "flight_id": id,
-        "user_id": monitoringPerson!.email,
+        "user_id": flight.monitoringPerson,
         "status": "requested"
       };
 
-      db.collection("flights").add(flightDetails).then((value) {
+      db
+          .collection("flights")
+          .withConverter(
+              fromFirestore: Flight.fromFirestore,
+              toFirestore: (Flight flight, options) => flight.toFirestore())
+          .add(flight)
+          .then((value) {
+        print("sent data");
         id = value.id;
         db.collection("requests").add(requestDetails);
       });
@@ -632,12 +616,8 @@ class FlightLogFormState extends State<FlightLogForm> {
               // Name and Phone No fields
               Row(
                 children: [
-                  createInputField("Name",
-                      callback: (String? value) => {name = value},
-                      setEnabled: false),
-                  createInputField("Phone Number",
-                      callback: (String? value) => {phoneNo = value},
-                      setEnabled: false)
+                  createInputField("Name", setEnabled: false),
+                  createInputField("Phone Number", setEnabled: false)
                 ],
               ),
               // Organisation dropdown
@@ -659,7 +639,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                           ? null
                           : (String? value) {
                               setState(() {
-                                orgDropDownValue = value!;
+                                flight.organisation = value!;
                               });
                             },
                     ),
@@ -670,7 +650,8 @@ class FlightLogFormState extends State<FlightLogForm> {
               Row(
                 children: [
                   createInputField("Aircraft Reg/Callsign",
-                      callback: (String? value) => {aircraftIdent = value},
+                      callback: (String? value) =>
+                          {flight.aircraftIdentifier = value},
                       setEnabled: !formSubmitted),
                 ],
               ),
@@ -678,7 +659,7 @@ class FlightLogFormState extends State<FlightLogForm> {
               Row(
                 children: [
                   createInputField("Co-pilot",
-                      callback: (String? value) => {copilotName = value},
+                      callback: (String? value) => {flight.copilot = value},
                       setEnabled: !formSubmitted),
                   Expanded(
                     child: DropdownButtonFormField(
@@ -691,7 +672,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                           ? null
                           : (int? value) {
                               setState(() {
-                                numPersons = value!;
+                                flight.numPersons = value.toString();
                               });
                             },
                       decoration: const InputDecoration(
@@ -707,10 +688,11 @@ class FlightLogFormState extends State<FlightLogForm> {
               Row(
                 children: [
                   createInputField("Departure",
-                      callback: (String? value) => {departure = value},
+                      callback: (String? value) =>
+                          {flight.departureLocation = value},
                       setEnabled: !formSubmitted),
                   createInputField("Destination",
-                      callback: (String? value) => {destination = value},
+                      callback: (String? value) => {flight.destination = value},
                       setEnabled: !formSubmitted)
                 ],
               ),
@@ -721,7 +703,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                     child: TimePicker(
                       "Planned Departure Time",
                       (String time) {
-                        departureTime = time;
+                        flight.departureTime = time;
                       },
                       enabled: !formSubmitted,
                     ),
@@ -737,7 +719,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                             ? null
                             : (double? value) {
                                 setState(() {
-                                  ete = value!;
+                                  flight.ete = value.toString();
                                 });
                               },
                         decoration: const InputDecoration(
@@ -760,7 +742,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                             ? null
                             : (double? value) {
                                 setState(() {
-                                  endurance = value!;
+                                  flight.endurance = value.toString();
                                 });
                               },
                         decoration: const InputDecoration(
@@ -801,8 +783,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                                 ? null
                                 : (String? value) {
                                     setState(() {
-                                      monitoringPerson =
-                                          getUserFromEmail(value);
+                                      flight.monitoringPerson = value;
                                     });
                                   },
                             decoration: const InputDecoration(
@@ -846,7 +827,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                         ? null
                         : (String? value) {
                             setState(() {
-                              flightType = value;
+                              flight.flightType = value;
                             });
                           },
                     decoration: const InputDecoration(
