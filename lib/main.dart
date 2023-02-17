@@ -521,7 +521,7 @@ class FlightLogFormState extends State<FlightLogForm> {
 
       FirebaseFirestore db = FirebaseFirestore.instance;
       final flightDetails = <String, dynamic>{
-        "user": "test",
+        "user": user.email,
         "organisation": orgDropDownValue,
         "aircraft_ident": aircraftIdent,
         "copilot": copilotName,
