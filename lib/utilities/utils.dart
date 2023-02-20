@@ -7,3 +7,12 @@ Future<void> storeObject(Object obj, String name) async {
   String objString = jsonEncode(obj);
   await prefs.setString(name, objString);
 }
+
+Future<void> getObject(String name) async {
+  final prefs = await SharedPreferences.getInstance();
+  String? objString = prefs.getString(name);
+  if (objString == null) {
+    throw Exception('"$name" not found in shared preferences');
+  }
+  return jsonDecode(objString);
+}
