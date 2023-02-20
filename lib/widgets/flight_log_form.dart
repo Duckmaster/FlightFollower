@@ -4,8 +4,7 @@ import 'package:flight_follower/models/user.dart';
 import 'package:flight_follower/models/flight.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flight_follower/widgets/time_picker.dart';
-
-User user = User("John Smith", "email@address.com", "07123456789");
+import 'package:flight_follower/utilities/utils.dart';
 
 class FlightLogForm extends StatefulWidget {
   const FlightLogForm({super.key});
@@ -46,7 +45,9 @@ class FlightLogFormState extends State<FlightLogForm> {
   String? datconStop;
   String submitButtonLabel = "Submit";
 
-  Flight flight = Flight(user: user.email);
+  User user = getObject("user_object") as User;
+
+  late Flight flight;
 
   TextEditingController rotorStartController = TextEditingController();
   TextEditingController rotorStopController = TextEditingController();
@@ -54,6 +55,12 @@ class FlightLogFormState extends State<FlightLogForm> {
   TextEditingController datconDiffController = TextEditingController();
 
   bool formSubmitted = false;
+
+  @override
+  void initState() {
+    flight = Flight(user: user.email);
+    super.initState();
+  }
 
   void onPressed() {
     _formKey.currentState!.save();
