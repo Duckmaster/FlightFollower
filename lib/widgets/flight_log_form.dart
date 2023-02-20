@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flight_follower/models/request.dart';
 import 'package:flutter/material.dart';
 import 'package:flight_follower/models/user.dart';
 import 'package:flight_follower/models/flight.dart';
@@ -74,14 +75,6 @@ class FlightLogFormState extends State<FlightLogForm> {
       // push to database
 
       FirebaseFirestore db = FirebaseFirestore.instance;
-      String? id;
-
-      final requestDetails = <String, dynamic>{
-        "flight_id": id,
-        "user_id": flight.monitoringPerson,
-        "status": "requested"
-      };
-
       db
           .collection("flights")
           .withConverter(
@@ -90,8 +83,14 @@ class FlightLogFormState extends State<FlightLogForm> {
           .add(flight)
           .then((value) {
         print("sent data");
-        id = value.id;
-        db.collection("requests").add(requestDetails);
+        Request request = Request(
+            value.id, flight.monitoringPerson!, FlightStatuses.requested);
+        db
+            .collection("requests")
+            .withConverter(
+                fromFirestore: Request.fromFirestore,
+                toFirestore: (Request r, options) => r.toFirestore())
+            .add(request);
       });
 
       _formKey.currentState!.reset();
