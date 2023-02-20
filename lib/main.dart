@@ -1,13 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:flight_follower/models/user.dart';
-import 'package:flight_follower/models/flight.dart';
-import 'package:flight_follower/widgets/flight_log_form.dart';
-import 'package:flight_follower/widgets/time_picker.dart';
 import 'package:flight_follower/screens/flight_following_page.dart';
-import 'package:flight_follower/widgets/flight_item.dart';
 import 'package:flight_follower/screens/flight_log_page.dart';
 import 'package:flight_follower/utilities/utils.dart';
 
