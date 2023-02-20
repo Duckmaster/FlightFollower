@@ -45,8 +45,7 @@ class FlightLogFormState extends State<FlightLogForm> {
   String? datconStop;
   String submitButtonLabel = "Submit";
 
-  User user = getObject("user_object") as User;
-
+  late User user;
   late Flight flight;
 
   TextEditingController rotorStartController = TextEditingController();
@@ -58,7 +57,13 @@ class FlightLogFormState extends State<FlightLogForm> {
 
   @override
   void initState() {
-    flight = Flight(user: user.email);
+    getObject("user_object").then((result) {
+      setState(() {
+        Map<String, dynamic> userMap = result;
+        user = User.fromJson(userMap);
+        flight = Flight(user: user.email);
+      });
+    });
     super.initState();
   }
 
