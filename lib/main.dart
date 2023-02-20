@@ -9,6 +9,7 @@ import 'package:flight_follower/widgets/time_picker.dart';
 import 'package:flight_follower/screens/flight_following_page.dart';
 import 'package:flight_follower/widgets/flight_item.dart';
 import 'package:flight_follower/screens/flight_log_page.dart';
+import 'package:flight_follower/utilities/utils.dart';
 
 void main() async {
   runApp(const MyApp());
@@ -69,6 +70,13 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  @override
+  void initState() {
+    User user = User("John Smith", "email@address.com", "07123456789");
+    storeObject(user, "user_object");
+    super.initState();
   }
 
   @override
