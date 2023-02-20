@@ -8,7 +8,7 @@ Future<void> storeObject(Object obj, String name) async {
   await prefs.setString(name, objString);
 }
 
-Future<void> getObject(String name) async {
+Object getObject(String name) async {
   final prefs = await SharedPreferences.getInstance();
   String? objString = prefs.getString(name);
   if (objString == null) {
