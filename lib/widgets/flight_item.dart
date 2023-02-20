@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
-enum FlightStatuses { requested, notstarted, enroute, nearlyoverdue, overdue }
+import 'package:flight_follower/utilities/utils.dart';
 
 class FlightItem extends StatefulWidget {
   final Enum flightStatus;

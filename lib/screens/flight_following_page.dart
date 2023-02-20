@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flight_follower/widgets/flight_item.dart';
-
-enum FlightStatuses { requested, notstarted, enroute, nearlyoverdue, overdue }
+import 'package:flight_follower/utilities/utils.dart';
 
 class FlightFollowingPage extends StatefulWidget {
   const FlightFollowingPage({super.key});
