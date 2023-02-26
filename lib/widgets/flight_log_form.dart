@@ -20,7 +20,7 @@ class FlightLogFormState extends State<FlightLogForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   static List<String> orgList = <String>['One', 'Two', 'Three', 'Four'];
   static var peopleList = [
-    User("Person One", "personone@email.com", "07123456789"),
+    User("Person One", "email@address.com", "07123456789"),
     User("Person Two", "persontwo@email.com", "07123456789"),
     User("Person Three", "personthree@email.com", "07123456789")
   ];
@@ -281,7 +281,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                             ? null
                             : (double? value) {
                                 setState(() {
-                                  flight.ete = value.toString();
+                                  flight.ete = value;
                                 });
                               },
                         decoration: const InputDecoration(
