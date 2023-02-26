@@ -1,38 +1,23 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flight_follower/utilities/utils.dart';
+import 'package:flight_follower/models/flight.dart';
+import 'package:flight_follower/models/user.dart';
 
 class FlightItem extends StatefulWidget {
+  final Flight flight;
   final Enum flightStatus;
-  final String aircraftReg;
-  final String departureLoc;
-  final String arrivalLoc;
-  final String
-      departure; // this could be either PLANNED or ACTUAL departure depending on flightStatus
-  final double ete;
   final String arrival;
 
-  final String pilotName;
-  final String? copilotName;
-  final int personsOnBoard;
-  final String phoneNumber;
-  final double endurance;
   bool extended;
 
   FlightItem(
-    this.flightStatus,
-    this.aircraftReg,
-    this.departureLoc,
-    this.arrivalLoc,
-    this.departure,
-    this.ete,
-    this.pilotName,
-    this.personsOnBoard,
-    this.phoneNumber,
-    this.endurance, {
+    this.flight,
+    this.flightStatus, {
     super.key,
-    this.copilotName,
-  })  : arrival = _calculateArrival(flightStatus, ete, departure),
+  })  : arrival =
+            _calculateArrival(flightStatus, flight.ete!, flight.departureTime!),
         extended = false;
 
   @override
@@ -71,6 +56,18 @@ class FlightItem extends StatefulWidget {
 }
 
 class FlightItemState extends State<FlightItem> {
+  late User pilot;
+
+  @override
+  void initState() {
+    super.initState();
+    getUser(widget.flight.user!).then((value) {
+      setState(() {
+        pilot = value;
+      });
+    });
+  }
+
   Map<String, String> getLabelsForStatus() {
     switch (widget.flightStatus) {
       case FlightStatuses.requested:
@@ -159,8 +156,9 @@ class FlightItemState extends State<FlightItem> {
         DateFormat("HH:mm").parse("${currentDate.hour}:${currentDate.minute}");
     DateTime time;
 
-    if (widget.flightStatus == FlightStatuses.notstarted) {
-      time = DateFormat("HH:mm").parse(widget.departure);
+    if (widget.flightStatus == FlightStatuses.notstarted ||
+        widget.flightStatus == FlightStatuses.requested) {
+      time = DateFormat("HH:mm").parse(widget.flight.departureTime!);
     } else {
       time = DateFormat("HH:mm").parse(widget.arrival);
     }
@@ -176,7 +174,7 @@ class FlightItemState extends State<FlightItem> {
   }
 
   String getCopilotName() {
-    return widget.copilotName == null ? "N/A" : widget.copilotName!;
+    return "placeholder";
   }
 
   @override
@@ -219,7 +217,9 @@ class FlightItemState extends State<FlightItem> {
                               ),
                               Expanded(
                                 child: Row(
-                                  children: [Text(widget.aircraftReg)],
+                                  children: [
+                                    Text(widget.flight.aircraftIdentifier!)
+                                  ],
                                 ),
                               )
                             ],
@@ -233,7 +233,7 @@ class FlightItemState extends State<FlightItem> {
                                   child: Row(
                                 children: [
                                   Text(
-                                      "${widget.departureLoc} -> ${widget.arrivalLoc}")
+                                      "${widget.flight.departureLocation} -> ${widget.flight.destination}")
                                 ],
                               )),
                               Expanded(
@@ -242,7 +242,7 @@ class FlightItemState extends State<FlightItem> {
                                   Row(
                                     children: [
                                       Text(
-                                          "${labels["departure"]!} ${widget.departure}")
+                                          "${labels["departure"]!} ${widget.flight.departureTime}")
                                     ],
                                   ),
                                   Row(
@@ -275,7 +275,7 @@ class FlightItemState extends State<FlightItem> {
                         Expanded(
                           child: Column(
                             children: [
-                              Text("Pilot: ${widget.pilotName}"),
+                              Text("Pilot: ${pilot.username}"),
                               Text("Co-pilot: ${getCopilotName()}")
                             ],
                           ),
@@ -284,14 +284,16 @@ class FlightItemState extends State<FlightItem> {
                           child: Column(
                             children: [
                               Text(
-                                  "Persons on board: ${widget.personsOnBoard}"),
-                              Text("Phone No.: ${widget.phoneNumber}")
+                                  "Persons on board: ${widget.flight.numPersons}"),
+                              Text("Phone No.: ${pilot.phoneNumber}")
                             ],
                           ),
                         ),
                         Expanded(
                           child: Column(
-                            children: [Text("Endurance: ${widget.endurance}")],
+                            children: [
+                              Text("Endurance: ${widget.flight.endurance}")
+                            ],
                           ),
                         ),
                       ],
