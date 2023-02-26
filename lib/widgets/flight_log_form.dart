@@ -58,6 +58,7 @@ class FlightLogFormState extends State<FlightLogForm> {
 
   @override
   void initState() {
+    super.initState();
     getObject("user_object").then((result) {
       setState(() {
         Map<String, dynamic> userMap = result;
@@ -65,7 +66,6 @@ class FlightLogFormState extends State<FlightLogForm> {
         flight = Flight(user: user.email);
       });
     });
-    super.initState();
   }
 
   void onPressed() {
