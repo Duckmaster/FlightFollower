@@ -156,9 +156,10 @@ class FlightItemState extends State<FlightItem> {
         DateFormat("HH:mm").parse("${currentDate.hour}:${currentDate.minute}");
     DateTime time;
 
-    if (widget.flightStatus == FlightStatuses.notstarted ||
-        widget.flightStatus == FlightStatuses.requested) {
+    if (widget.flightStatus == FlightStatuses.notstarted) {
       time = DateFormat("HH:mm").parse(widget.flight.departureTime!);
+    } else if (widget.flightStatus == FlightStatuses.requested) {
+      return "";
     } else {
       time = DateFormat("HH:mm").parse(widget.arrival);
     }
