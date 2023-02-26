@@ -26,7 +26,23 @@ class Flight {
       this.endurance,
       this.monitoringPerson,
       this.flightType,
-      this.copilot});
+      this.copilot}) {
+    prefixDepartureWithNaught();
+  }
+
+  void prefixDepartureWithNaught() {
+    if (departureTime == null) return;
+    var parts = departureTime!.split(":");
+    if (parts[0].length == 1) {
+      parts[0] = "0${parts[0]}";
+    }
+
+    if (parts[1].length == 1) {
+      parts[1] = "0${parts[1]}";
+    }
+
+    departureTime = parts.join("");
+  }
 
   factory Flight.fromFirestore(
     DocumentSnapshot<Map<String, dynamic>> snapshot,
