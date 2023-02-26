@@ -9,7 +9,7 @@ class Flight {
   String? departureLocation;
   String? destination;
   String? departureTime;
-  String? ete;
+  double? ete;
   String? endurance;
   String? monitoringPerson;
   String? flightType;
