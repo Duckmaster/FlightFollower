@@ -7,6 +7,7 @@ import 'package:flight_follower/models/user.dart';
 
 class FlightItem extends StatefulWidget {
   final Flight flight;
+  final String flightID;
   Enum flightStatus;
   final String arrival;
 
@@ -17,7 +18,8 @@ class FlightItem extends StatefulWidget {
   FlightItem(
     this.flight,
     this.flightStatus,
-    this.deleteFunc, {
+    this.deleteFunc,
+    this.flightID, {
     super.key,
   })  : arrival =
             _calculateArrival(flightStatus, flight.ete!, flight.departureTime!),
