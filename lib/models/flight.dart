@@ -41,7 +41,7 @@ class Flight {
       parts[1] = "0${parts[1]}";
     }
 
-    departureTime = parts.join("");
+    departureTime = parts.join(":");
   }
 
   factory Flight.fromFirestore(
