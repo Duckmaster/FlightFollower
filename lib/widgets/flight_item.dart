@@ -12,9 +12,12 @@ class FlightItem extends StatefulWidget {
 
   bool extended;
 
+  Function deleteFunc;
+
   FlightItem(
     this.flight,
-    this.flightStatus, {
+    this.flightStatus,
+    this.deleteFunc, {
     super.key,
   })  : arrival =
             _calculateArrival(flightStatus, flight.ete!, flight.departureTime!),
