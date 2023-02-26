@@ -55,8 +55,8 @@ class FlightFollowingPageState extends State<FlightFollowingPage> {
                 .get()
                 .then((value) {
               Flight flight = value.data()!;
-              FlightItem flightItem =
-                  FlightItem(flight, request.status, deleteFlightItem);
+              FlightItem flightItem = FlightItem(
+                  flight, request.status, deleteFlightItem, value.id);
               setState(() {
                 flights.add(flightItem);
               });
