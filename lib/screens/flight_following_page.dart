@@ -55,7 +55,8 @@ class FlightFollowingPageState extends State<FlightFollowingPage> {
                 .get()
                 .then((value) {
               Flight flight = value.data()!;
-              FlightItem flightItem = FlightItem(flight, request.status);
+              FlightItem flightItem =
+                  FlightItem(flight, request.status, deleteFlightItem);
               setState(() {
                 flights.add(flightItem);
               });
@@ -67,6 +68,12 @@ class FlightFollowingPageState extends State<FlightFollowingPage> {
             break;
         }
       }
+    });
+  }
+
+  void deleteFlightItem(FlightItem item) {
+    setState(() {
+      flights.remove(item);
     });
   }
 
