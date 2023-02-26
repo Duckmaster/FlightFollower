@@ -178,6 +178,10 @@ class FlightItemState extends State<FlightItem> {
     return "placeholder";
   }
 
+  void onAccept() {}
+
+  void onDecline() {}
+
   @override
   Widget build(BuildContext context) {
     Map<String, String> labels = getLabelsForStatus();
@@ -261,7 +265,24 @@ class FlightItemState extends State<FlightItem> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text("${labels["eta"]!} ${calculateETA()}")
+                              Text("${labels["eta"]!} ${calculateETA()}"),
+                              Visibility(
+                                  child: Expanded(
+                                child: Row(children: [
+                                  Expanded(
+                                    child: IconButton(
+                                        onPressed: onAccept,
+                                        iconSize: 30,
+                                        icon: const Icon(Icons.check)),
+                                  ),
+                                  Expanded(
+                                    child: IconButton(
+                                        onPressed: onDecline,
+                                        iconSize: 30,
+                                        icon: const Icon(Icons.close)),
+                                  )
+                                ]),
+                              ))
                             ],
                           ),
                         ),
