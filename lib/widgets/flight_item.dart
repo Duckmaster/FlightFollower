@@ -56,7 +56,7 @@ class FlightItem extends StatefulWidget {
 }
 
 class FlightItemState extends State<FlightItem> {
-  late User pilot;
+  User pilot = User("placeholder", "placeholder", "placeholder");
 
   @override
   void initState() {
