@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flight_follower/models/user.dart';
 import 'dart:convert';
@@ -17,4 +19,9 @@ Future<Map<String, dynamic>> getObject(String name) async {
     throw Exception('"$name" not found in shared preferences');
   }
   return jsonDecode(objString);
+}
+
+// retrieves user data from db
+Future<User> getUser(String userID) async {
+  return getObject("user_object").then((value) => User.fromJson(value));
 }
