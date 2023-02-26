@@ -7,7 +7,7 @@ import 'package:flight_follower/models/user.dart';
 
 class FlightItem extends StatefulWidget {
   final Flight flight;
-  final Enum flightStatus;
+  Enum flightStatus;
   final String arrival;
 
   bool extended;
@@ -178,9 +178,17 @@ class FlightItemState extends State<FlightItem> {
     return "placeholder";
   }
 
-  void onAccept() {}
+  void onAccept() {
+    setState(() {
+      widget.flightStatus = FlightStatuses.notstarted;
+    });
+    // update status
+    // listen for timings
+  }
 
-  void onDecline() {}
+  void onDecline() {
+    // delete this item
+  }
 
   @override
   Widget build(BuildContext context) {
