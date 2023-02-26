@@ -190,7 +190,7 @@ class FlightItemState extends State<FlightItem> {
   }
 
   void onDecline() {
-    // delete this item
+    widget.deleteFunc(widget);
   }
 
   @override
