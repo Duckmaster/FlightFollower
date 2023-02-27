@@ -4,6 +4,8 @@ import 'package:flight_follower/models/user.dart';
 import 'package:flight_follower/screens/flight_following_page.dart';
 import 'package:flight_follower/screens/flight_log_page.dart';
 import 'package:flight_follower/utilities/utils.dart';
+import 'package:flight_follower/models/flights_listener.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   runApp(const MyApp());
@@ -30,7 +32,9 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: ChangeNotifierProvider(
+          create: (context) => FlightsListener(),
+          child: const MyHomePage(title: 'Flutter Demo Home Page')),
     );
   }
 }
