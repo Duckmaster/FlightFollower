@@ -293,22 +293,26 @@ class FlightItemState extends State<FlightItem> {
                             children: [
                               Text("${labels["eta"]!} ${calculateETA()}"),
                               Visibility(
+                                  visible: widget.flightStatus ==
+                                          FlightStatuses.requested
+                                      ? true
+                                      : false,
                                   child: Expanded(
-                                child: Row(children: [
-                                  Expanded(
-                                    child: IconButton(
-                                        onPressed: onAccept,
-                                        iconSize: 30,
-                                        icon: const Icon(Icons.check)),
-                                  ),
-                                  Expanded(
-                                    child: IconButton(
-                                        onPressed: onDecline,
-                                        iconSize: 30,
-                                        icon: const Icon(Icons.close)),
-                                  )
-                                ]),
-                              ))
+                                    child: Row(children: [
+                                      Expanded(
+                                        child: IconButton(
+                                            onPressed: onAccept,
+                                            iconSize: 30,
+                                            icon: const Icon(Icons.check)),
+                                      ),
+                                      Expanded(
+                                        child: IconButton(
+                                            onPressed: onDecline,
+                                            iconSize: 30,
+                                            icon: const Icon(Icons.close)),
+                                      )
+                                    ]),
+                                  ))
                             ],
                           ),
                         ),
