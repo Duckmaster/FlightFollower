@@ -40,6 +40,7 @@ dependencies:
   cloud_firestore: ^4.3.1
   intl: 
   shared_preferences:
+  provider:
 
 dev_dependencies:
   flutter_test:
