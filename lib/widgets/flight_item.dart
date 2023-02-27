@@ -7,23 +7,24 @@ import 'package:flight_follower/models/user.dart';
 
 class FlightItem extends StatefulWidget {
   final Flight flight;
-  final String flightID;
+  final String requestID;
   Enum flightStatus;
-  final String arrival;
+  final String _arrival;
 
   bool extended;
-
-  Function deleteFunc;
 
   FlightItem(
     this.flight,
     this.flightStatus,
-    this.deleteFunc,
-    this.flightID, {
+    this.requestID, {
     super.key,
-  })  : arrival =
+  })  : _arrival =
             _calculateArrival(flightStatus, flight.ete!, flight.departureTime!),
-        extended = false;
+        extended = false {
+    if (flightStatus == FlightStatuses.accepted) {
+      flightStatus = FlightStatuses.notstarted;
+    }
+  }
 
   @override
   FlightItemState createState() {
@@ -151,6 +152,10 @@ class FlightItemState extends State<FlightItem> {
         {
           return Colors.red;
         }
+      case FlightStatuses.declined:
+        {
+          return Colors.grey;
+        }
     }
     throw Exception("Invalid flight status");
   }
@@ -166,7 +171,7 @@ class FlightItemState extends State<FlightItem> {
     } else if (widget.flightStatus == FlightStatuses.requested) {
       return "";
     } else {
-      time = DateFormat("HH:mm").parse(widget.arrival);
+      time = DateFormat("HH:mm").parse(widget._arrival);
     }
     Duration diff = time.difference(currentTime);
 
@@ -187,12 +192,20 @@ class FlightItemState extends State<FlightItem> {
     setState(() {
       widget.flightStatus = FlightStatuses.notstarted;
     });
-    // update status
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    db
+        .collection("requests")
+        .doc(widget.requestID)
+        .update({"status": FlightStatuses.accepted.name});
     // listen for timings
   }
 
   void onDecline() {
-    widget.deleteFunc(widget);
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    db
+        .collection("requests")
+        .doc(widget.requestID)
+        .update({"status": FlightStatuses.declined.name});
   }
 
   @override
@@ -266,7 +279,7 @@ class FlightItemState extends State<FlightItem> {
                                   Row(
                                     children: [
                                       Text(
-                                          "${labels["arrival"]!} ${widget.arrival}")
+                                          "${labels["arrival"]!} ${widget._arrival}")
                                     ],
                                   )
                                 ],
