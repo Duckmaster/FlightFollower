@@ -81,4 +81,16 @@ class Flight {
       "flight_type": flightType
     };
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (other is! Flight) {
+      return false;
+    }
+    return (other.aircraftIdentifier == aircraftIdentifier &&
+        other.departureTime == departureTime);
+  }
+
+  @override
+  int get hashCode => Object.hash(aircraftIdentifier, departureTime);
 }
