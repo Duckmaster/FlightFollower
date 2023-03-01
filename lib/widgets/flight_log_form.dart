@@ -52,6 +52,7 @@ class FlightLogFormState extends State<FlightLogForm> {
   FlightTimings timings = FlightTimings();
 
   String? flightID;
+  String? requestID;
 
   TextEditingController rotorStartController = TextEditingController();
   TextEditingController rotorStopController = TextEditingController();
@@ -99,7 +100,8 @@ class FlightLogFormState extends State<FlightLogForm> {
             .withConverter(
                 fromFirestore: Request.fromFirestore,
                 toFirestore: (Request r, options) => r.toFirestore())
-            .add(request);
+            .add(request)
+            .then((value) => requestID = value.id);
       });
     } else {
       timings.rotorStart = rotorStartController.value.text;
