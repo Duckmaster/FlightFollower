@@ -156,6 +156,8 @@ class FlightItemState extends State<FlightItem> {
         {
           return Colors.grey;
         }
+      case FlightStatuses.completed:
+        return Colors.grey;
     }
     throw Exception("Invalid flight status");
   }

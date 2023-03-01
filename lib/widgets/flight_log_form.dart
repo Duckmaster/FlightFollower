@@ -113,6 +113,11 @@ class FlightLogFormState extends State<FlightLogForm> {
               fromFirestore: FlightTimings.fromFirestore,
               toFirestore: (FlightTimings t, options) => t.toFirestore())
           .add(timings);
+
+      db
+          .collection("requests")
+          .doc(requestID)
+          .update({"status": FlightStatuses.completed});
       _formKey.currentState!.reset();
     }
   }
