@@ -11,7 +11,8 @@ enum FlightStatuses {
   nearlyoverdue,
   overdue,
   declined,
-  accepted
+  accepted,
+  completed
 }
 
 Future<void> storeObject(Object obj, String name) async {
