@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flight_follower/models/flight_timings.dart';
 import 'package:flight_follower/models/request.dart';
 import 'package:flutter/material.dart';
 import 'package:flight_follower/models/user.dart';
@@ -48,6 +49,9 @@ class FlightLogFormState extends State<FlightLogForm> {
 
   late User user;
   late Flight flight;
+  FlightTimings timings = FlightTimings();
+
+  String? flightID;
 
   TextEditingController rotorStartController = TextEditingController();
   TextEditingController rotorStopController = TextEditingController();
@@ -69,12 +73,16 @@ class FlightLogFormState extends State<FlightLogForm> {
   }
 
   void onPressed() {
+    FirebaseFirestore db = FirebaseFirestore.instance;
     _formKey.currentState!.save();
+
+    setState(() {
+      formSubmitted = !formSubmitted;
+      submitButtonLabel = formSubmitted ? "Flight Completed" : "Submit";
+    });
 
     if (formSubmitted) {
       // push to database
-
-      FirebaseFirestore db = FirebaseFirestore.instance;
       db
           .collection("flights")
           .withConverter(
@@ -83,6 +91,7 @@ class FlightLogFormState extends State<FlightLogForm> {
           .add(flight)
           .then((value) {
         print("sent data");
+        flightID = value.id;
         Request request = Request(
             value.id, flight.monitoringPerson!, FlightStatuses.requested);
         db
@@ -92,14 +101,18 @@ class FlightLogFormState extends State<FlightLogForm> {
                 toFirestore: (Request r, options) => r.toFirestore())
             .add(request);
       });
-
+    } else {
+      timings.rotorStart = rotorStartController.value.text;
+      timings.rotorStop = rotorStopController.value.text;
+      timings.flightID = flightID;
+      db
+          .collection("timings")
+          .withConverter(
+              fromFirestore: FlightTimings.fromFirestore,
+              toFirestore: (FlightTimings t, options) => t.toFirestore())
+          .add(timings);
       _formKey.currentState!.reset();
     }
-
-    setState(() {
-      formSubmitted = !formSubmitted;
-      submitButtonLabel = formSubmitted ? "Flight Completed" : "Submit";
-    });
   }
 
   void refreshMonitoringPerson() {
@@ -422,6 +435,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                                 onChanged: (value) {
                               setState(() {
                                 datconStart = value;
+                                timings.datconStart = value;
                               });
                             })
                           ],
@@ -442,6 +456,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                                 onChanged: (value) {
                               setState(() {
                                 datconStop = value;
+                                timings.datconStop = value;
                               });
                               double? stopDouble = double.tryParse(datconStop!);
                               double diff = stopDouble == null
