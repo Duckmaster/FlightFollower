@@ -133,6 +133,12 @@ class FlightLogFormState extends State<FlightLogForm> {
     });
 
     rotorStartController.text = time;
+
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    db
+        .collection("requests")
+        .doc(requestID)
+        .update({"status": FlightStatuses.enroute.name});
   }
 
   void rotorStopPressed() {
