@@ -1,4 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flight_follower/models/contacts.dart';
+import 'package:flight_follower/screens/contacts_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flight_follower/models/user_model.dart';
 import 'package:flight_follower/screens/flight_following_page.dart';
@@ -32,9 +34,10 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: ChangeNotifierProvider(
-          create: (context) => FlightsListener(),
-          child: const MyHomePage(title: 'Flutter Demo Home Page')),
+      home: MultiProvider(providers: [
+        ChangeNotifierProvider(create: (context) => FlightsListener()),
+        ChangeNotifierProvider(create: (context) => Contacts())
+      ], child: const MyHomePage(title: 'Flutter Demo Home Page')),
     );
   }
 }
@@ -62,6 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
   static const List<Widget> _titles = <Widget>[
     Text("Flight Details"),
     Text("Flight Following Log"),
+    Text("Contacts")
   ];
 
   void _onItemTapped(int index) {
@@ -87,6 +91,9 @@ class _MyHomePageState extends State<MyHomePage> {
         break;
       case 1:
         page = const FlightFollowingPage();
+        break;
+      case 2:
+        page = const ContactsPage();
         break;
       default:
         throw UnimplementedError('no widget for $_selectedIndex');
@@ -115,6 +122,10 @@ class _MyHomePageState extends State<MyHomePage> {
             BottomNavigationBarItem(
               icon: Icon(Icons.flight),
               label: 'Flight Monitoring',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.contacts),
+              label: 'Contacts',
             ),
           ],
           currentIndex: _selectedIndex,
