@@ -2,7 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flight_follower/models/flight_timings.dart';
 import 'package:flight_follower/models/request.dart';
 import 'package:flutter/material.dart';
-import 'package:flight_follower/models/user.dart';
+import 'package:flight_follower/models/user_model.dart';
 import 'package:flight_follower/models/flight.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flight_follower/widgets/time_picker.dart';
@@ -21,9 +21,9 @@ class FlightLogFormState extends State<FlightLogForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   static List<String> orgList = <String>['One', 'Two', 'Three', 'Four'];
   static var peopleList = [
-    User("Person One", "email@address.com", "07123456789"),
-    User("Person Two", "persontwo@email.com", "07123456789"),
-    User("Person Three", "personthree@email.com", "07123456789")
+    UserModel("Person One", "email@address.com", "07123456789"),
+    UserModel("Person Two", "persontwo@email.com", "07123456789"),
+    UserModel("Person Three", "personthree@email.com", "07123456789")
   ];
   static List<String> flightTypes = <String>[
     'Private',
@@ -47,7 +47,7 @@ class FlightLogFormState extends State<FlightLogForm> {
   String? datconStop;
   String submitButtonLabel = "Submit";
 
-  late User user;
+  late UserModel user;
   late Flight flight;
   FlightTimings timings = FlightTimings();
 
@@ -67,7 +67,7 @@ class FlightLogFormState extends State<FlightLogForm> {
     getObject("user_object").then((result) {
       setState(() {
         Map<String, dynamic> userMap = result;
-        user = User.fromJson(userMap);
+        user = UserModel.fromJson(userMap);
         flight = Flight(user: user.email);
       });
     });
@@ -182,9 +182,9 @@ class FlightLogFormState extends State<FlightLogForm> {
     );
   }
 
-  User getUserFromEmail(String? email) {
-    if (email == null) return User("", "", "");
-    for (User user in peopleList) {
+  UserModel getUserFromEmail(String? email) {
+    if (email == null) return UserModel("", "", "");
+    for (UserModel user in peopleList) {
       if (user.email == email) return user;
     }
     throw Exception("Given email does not match to any known contacts");
@@ -360,8 +360,8 @@ class FlightLogFormState extends State<FlightLogForm> {
                         Expanded(
                           child: DropdownButtonFormField(
                             isExpanded: true,
-                            items: peopleList
-                                .map<DropdownMenuItem<String>>((User value) {
+                            items: peopleList.map<DropdownMenuItem<String>>(
+                                (UserModel value) {
                               return DropdownMenuItem<String>(
                                 value: value.email,
                                 child: Text(value.username),

@@ -5,18 +5,18 @@ import 'package:flight_follower/models/flight.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flight_follower/models/request.dart';
 import 'package:flight_follower/models/flight.dart';
-import 'package:flight_follower/models/user.dart';
+import 'package:flight_follower/models/user_model.dart';
 import 'package:flight_follower/widgets/flight_item.dart';
 import 'package:flight_follower/utilities/utils.dart';
 
 class FlightsListener extends ChangeNotifier {
   final List<FlightItem> _flights = [];
-  late User _user;
+  late UserModel _user;
 
   FlightsListener() {
     getObject("user_object").then((result) {
       Map<String, dynamic> userMap = result;
-      _user = User.fromJson(userMap);
+      _user = UserModel.fromJson(userMap);
       initListener();
     });
   }

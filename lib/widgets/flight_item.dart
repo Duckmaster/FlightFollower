@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flight_follower/utilities/utils.dart';
 import 'package:flight_follower/models/flight.dart';
-import 'package:flight_follower/models/user.dart';
+import 'package:flight_follower/models/user_model.dart';
 
 class FlightItem extends StatefulWidget {
   final Flight flight;
@@ -62,7 +62,7 @@ class FlightItem extends StatefulWidget {
 }
 
 class FlightItemState extends State<FlightItem> {
-  User pilot = User("placeholder", "placeholder", "placeholder");
+  UserModel pilot = UserModel("placeholder", "placeholder", "placeholder");
 
   @override
   void initState() {
