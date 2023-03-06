@@ -8,6 +8,37 @@ import '../models/user_model.dart';
 
 class ContactsPage extends StatelessWidget {
   const ContactsPage({super.key});
+
+  void addContactDialog(BuildContext context) {
+    TextEditingController controller = TextEditingController();
+    showDialog(
+        context: context,
+        builder: (_) => SimpleDialog(
+              title: Text("Add New Contact"),
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: controller,
+                        decoration: InputDecoration(
+                            label: Text("Email address/phone number:")),
+                      ),
+                      ElevatedButton(
+                          onPressed: () => addContact(controller.text),
+                          child: Text("Add"))
+                    ],
+                  ),
+                ),
+              ],
+            ));
+  }
+
+  void addContact(String value) {
+    print(value);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
