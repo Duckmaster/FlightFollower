@@ -43,6 +43,7 @@ class FlightsListener extends ChangeNotifier {
                 toFirestore: (Flight flight, _) => flight.toFirestore())
             .get()
             .then((value) {
+          if (!value.exists) return;
           Flight flight = value.data()!;
           FlightItem newFlightItem =
               FlightItem(flight, request.status, change.doc.id);
