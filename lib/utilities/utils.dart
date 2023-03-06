@@ -36,6 +36,6 @@ Future<UserModel> getUser(String userID) async {
   db.collection("users").doc(userID).get().then((docSnapshot) {
     final data = docSnapshot.data() as String;
     return UserModel.fromJson(jsonDecode(data));
-  });
+  }, onError: (e) => throw Exception(e));
   return UserModel("", "", "");
 }
