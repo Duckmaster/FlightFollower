@@ -86,9 +86,8 @@ class _MyHomePageState extends State<MyHomePage> {
     {
       'page': ContactsPage(),
       'title': 'Contacts',
-      'actions': <Widget>[
-        /* List of actions for screen3 */
-      ] //<-- optional just in case you need default actions that depend on parent as well
+      'actions': <
+          Widget>[] //<-- optional just in case you need default actions that depend on parent as well
     },
   ];
 
@@ -119,7 +118,15 @@ class _MyHomePageState extends State<MyHomePage> {
     return LayoutBuilder(builder: (context, constraints) {
       return Scaffold(
         appBar: _buildAppBar(_pages[_selectedIndex]["title"] as String,
-            actions: _pages[_selectedIndex]["actions"] as List<Widget>),
+            actions: page is ContactsPage
+                ? [
+                    IconButton(
+                        onPressed: () => page.addContactDialog(context),
+                        icon: const Icon(
+                          Icons.add,
+                        ))
+                  ]
+                : _pages[_selectedIndex]["actions"] as List<Widget>),
         body: Column(
           children: [
             Expanded(
