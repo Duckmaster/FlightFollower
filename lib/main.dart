@@ -62,10 +62,34 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
-  static const List<Widget> _titles = <Widget>[
+  /* static const List<Widget> _titles = <Widget>[
     Text("Flight Details"),
     Text("Flight Following Log"),
     Text("Contacts")
+  ]; */
+
+  final List<Map<String, Object>> _pages = [
+    {
+      'page': FlightLogPage(),
+      'title': 'Flight Details',
+      'actions': <Widget>[
+        /* List of actions for screen1 */
+      ] //<-- optional just in case you need default actions that depend on parent as well
+    },
+    {
+      'page': FlightFollowingPage(),
+      'title': 'Flight Following Log',
+      'actions': <Widget>[
+        /* List of actions for screen2 */
+      ] //<-- optional just in case you need default actions that depend on parent as well
+    },
+    {
+      'page': ContactsPage(),
+      'title': 'Contacts',
+      'actions': <Widget>[
+        /* List of actions for screen3 */
+      ] //<-- optional just in case you need default actions that depend on parent as well
+    },
   ];
 
   void _onItemTapped(int index) {
@@ -73,6 +97,12 @@ class _MyHomePageState extends State<MyHomePage> {
       _selectedIndex = index;
     });
   }
+
+  AppBar _buildAppBar(String title, {List<Widget>? actions}) => AppBar(
+        title: Text(title),
+        actions: actions,
+        centerTitle: true,
+      );
 
   @override
   void initState() {
@@ -84,26 +114,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    Widget page;
-    switch (_selectedIndex) {
-      case 0:
-        page = const FlightLogPage();
-        break;
-      case 1:
-        page = const FlightFollowingPage();
-        break;
-      case 2:
-        page = const ContactsPage();
-        break;
-      default:
-        throw UnimplementedError('no widget for $_selectedIndex');
-    }
+    Widget page = _pages[_selectedIndex]["page"] as Widget;
+
     return LayoutBuilder(builder: (context, constraints) {
       return Scaffold(
-        appBar: AppBar(
-          title: _titles.elementAt(_selectedIndex),
-          centerTitle: true,
-        ),
+        appBar: _buildAppBar(_pages[_selectedIndex]["title"] as String,
+            actions: _pages[_selectedIndex]["actions"] as List<Widget>),
         body: Column(
           children: [
             Expanded(
