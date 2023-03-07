@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flight_follower/models/contacts.dart';
+import 'package:flight_follower/utilities/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flight_follower/widgets/flight_item.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +11,13 @@ import 'package:flight_follower/models/flights_listener.dart';
 import '../models/user_model.dart';
 
 class ContactsPage extends StatelessWidget {
-  const ContactsPage({super.key});
+  late UserModel _user;
+  ContactsPage({super.key}) {
+    getObject("user_object").then((result) {
+      Map<String, dynamic> userMap = result;
+      _user = UserModel.fromJson(userMap);
+    });
+  }
 
   void addContactDialog(BuildContext context) {
     TextEditingController controller = TextEditingController();
@@ -48,15 +55,33 @@ class ContactsPage extends StatelessWidget {
     RegExp phoneRegex = RegExp("[0-9]{11}");
 
     String message;
-    UserModel match;
+    UserModel match = UserModel("", "", "");
 
     if (emailRegex.hasMatch(value)) {
       // query db for email
+      getUser(value).then((value) => match = value);
     } else if (phoneRegex.hasMatch(value)) {
-      // query db for phone
+      db
+          .collection("users")
+          .where("phoneNumber", isEqualTo: value)
+          .get()
+          .then((querySnapshot) {
+        for (var docSnapshot in querySnapshot.docs) {
+          final data = docSnapshot.data() as String;
+          match = UserModel.fromJson(jsonDecode(data));
+        }
+      });
     } else {
       // not valid phone number/email
+      print("not valid");
+      return;
     }
+
+    var contacts = Provider.of<Contacts>(context, listen: false).items;
+    contacts.add(match);
+    db.collection("contacts").doc(_user.email).set(<String, dynamic>{
+      "contact_list": contacts.map((e) => e.email).join(",")
+    });
     print(value);
   }
 
