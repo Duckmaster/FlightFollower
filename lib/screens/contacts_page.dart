@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flight_follower/models/contacts.dart';
 import 'package:flutter/material.dart';
 import 'package:flight_follower/widgets/flight_item.dart';
@@ -26,7 +29,7 @@ class ContactsPage extends StatelessWidget {
                             label: Text("Email address/phone number:")),
                       ),
                       ElevatedButton(
-                          onPressed: () => addContact(controller.text),
+                          onPressed: () => addContact(controller.text, context),
                           child: Text("Add"))
                     ],
                   ),
@@ -35,7 +38,25 @@ class ContactsPage extends StatelessWidget {
             ));
   }
 
-  void addContact(String value) {
+  void addContact(String value, BuildContext context) {
+    FirebaseFirestore db = FirebaseFirestore.instance;
+
+    // regex to match either email or phone no, then query db
+    //db.collection("users").where("email", isEqualTo: )
+
+    RegExp emailRegex = RegExp(r"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
+    RegExp phoneRegex = RegExp("[0-9]{11}");
+
+    String message;
+    UserModel match;
+
+    if (emailRegex.hasMatch(value)) {
+      // query db for email
+    } else if (phoneRegex.hasMatch(value)) {
+      // query db for phone
+    } else {
+      // not valid phone number/email
+    }
     print(value);
   }
 
