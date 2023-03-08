@@ -101,19 +101,18 @@ class ContactsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Consumer<Contacts>(builder: (context, value, child) {
-          return Expanded(
+        Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ListView(
-                children: [
-                  for (UserModel user in value.items)
-                    ListTile(title: Text(user.username)),
-                ],
-              ),
-            ),
-          );
-        }),
+          padding: const EdgeInsets.all(8.0),
+          child: Consumer<Contacts>(builder: (context, value, child) {
+            return ListView(
+              children: [
+                for (UserModel user in value.items)
+                  ListTile(title: Text(user.username)),
+              ],
+            );
+          }),
+        )),
       ],
     );
   }

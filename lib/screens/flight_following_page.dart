@@ -7,13 +7,12 @@ class FlightFollowingPage extends StatelessWidget {
   const FlightFollowingPage({super.key});
   @override
   Widget build(BuildContext context) {
-    return Consumer<FlightsListener>(builder: (context, value, child) {
-      return Padding(
+    return Padding(
         padding: const EdgeInsets.all(8.0),
-        child: ListView(
-          children: [for (FlightItem flightItem in value.items) flightItem],
-        ),
-      );
-    });
+        child: Consumer<FlightsListener>(builder: (context, value, child) {
+          return ListView(
+            children: [for (FlightItem flightItem in value.items) flightItem],
+          );
+        }));
   }
 }
