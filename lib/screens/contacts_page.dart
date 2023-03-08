@@ -47,6 +47,8 @@ class ContactsPage extends StatelessWidget {
 
   void addContact(String value, BuildContext context) {
     FirebaseFirestore db = FirebaseFirestore.instance;
+    var contactsCopy =
+        Provider.of<Contacts>(context, listen: false).items.toList();
 
     // regex to match either email or phone no, then query db
     //db.collection("users").where("email", isEqualTo: )
@@ -60,6 +62,10 @@ class ContactsPage extends StatelessWidget {
     if (emailRegex.hasMatch(value)) {
       // query db for email
       getUser(value).then((value) => match = value);
+      if (match.email != "") {
+        contactsCopy.add(match);
+        storeContacts(db, contactsCopy);
+      }
     } else if (phoneRegex.hasMatch(value)) {
       db
           .collection("users")
@@ -67,8 +73,12 @@ class ContactsPage extends StatelessWidget {
           .get()
           .then((querySnapshot) {
         for (var docSnapshot in querySnapshot.docs) {
-          final data = docSnapshot.data() as String;
-          match = UserModel.fromJson(jsonDecode(data));
+          final data = docSnapshot.data();
+          match = UserModel.fromJson(data);
+        }
+        if (match.email != "") {
+          contactsCopy.add(match);
+          storeContacts(db, contactsCopy);
         }
       });
     } else {
@@ -76,14 +86,13 @@ class ContactsPage extends StatelessWidget {
       print("not valid");
       return;
     }
-
-    var contactsCopy =
-        Provider.of<Contacts>(context, listen: false).items.toList();
-    contactsCopy.add(match);
-    db.collection("contacts").doc(_user.email).set(<String, dynamic>{
-      "contact_list": contactsCopy.map((e) => e.email).join(",")
-    });
     print(value);
+  }
+
+  void storeContacts(FirebaseFirestore db, List<UserModel> contactList) {
+    db.collection("contacts").doc(_user.email).set(<String, dynamic>{
+      "contact_list": contactList.map((e) => e.email).join(",")
+    });
   }
 
   @override
