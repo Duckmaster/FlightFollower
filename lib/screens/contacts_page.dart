@@ -61,7 +61,7 @@ class ContactsPage extends StatelessWidget {
 
     if (emailRegex.hasMatch(value)) {
       // query db for email
-      getUser(value).then((value) => match = value);
+      getUser(value).then((foundUser) => match = foundUser);
       if (match.email != "") {
         contactsCopy.add(match);
         storeContacts(db, contactsCopy);
