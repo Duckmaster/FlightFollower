@@ -77,10 +77,11 @@ class ContactsPage extends StatelessWidget {
       return;
     }
 
-    var contacts = Provider.of<Contacts>(context, listen: false).items;
-    contacts.add(match);
+    var contactsCopy =
+        Provider.of<Contacts>(context, listen: false).items.toList();
+    contactsCopy.add(match);
     db.collection("contacts").doc(_user.email).set(<String, dynamic>{
-      "contact_list": contacts.map((e) => e.email).join(",")
+      "contact_list": contactsCopy.map((e) => e.email).join(",")
     });
     print(value);
   }
