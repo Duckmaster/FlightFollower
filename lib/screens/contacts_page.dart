@@ -61,11 +61,13 @@ class ContactsPage extends StatelessWidget {
 
     if (emailRegex.hasMatch(value)) {
       // query db for email
-      getUser(value).then((foundUser) => match = foundUser);
-      if (match.email != "") {
-        contactsCopy.add(match);
-        storeContacts(db, contactsCopy);
-      }
+      getUser(value).then((foundUser) {
+        match = foundUser;
+        if (match.email != "") {
+          contactsCopy.add(match);
+          storeContacts(db, contactsCopy);
+        }
+      });
     } else if (phoneRegex.hasMatch(value)) {
       db
           .collection("users")
