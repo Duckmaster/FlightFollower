@@ -67,6 +67,10 @@ class ContactsPage extends StatelessWidget {
           contactsCopy.add(match);
           contacts.addContact(match);
           storeContacts(db, contactsCopy);
+          showSnackBar(context, "Contact successfully added!");
+        } else {
+          showSnackBar(context,
+              "Email address provided does not belong to a registered user");
         }
       });
     } else if (phoneRegex.hasMatch(value)) {
@@ -83,14 +87,18 @@ class ContactsPage extends StatelessWidget {
           contactsCopy.add(match);
           contacts.addContact(match);
           storeContacts(db, contactsCopy);
+          showSnackBar(context, "Contact successfully added!");
+        } else {
+          showSnackBar(context,
+              "Phone number provided does not belong to a registered user");
         }
       });
     } else {
       // not valid phone number/email
-      print("not valid");
+      showSnackBar(context,
+          "Please make sure the email address/phone number provided is valid and try again");
       return;
     }
-    print(value);
   }
 
   void storeContacts(FirebaseFirestore db, List<UserModel> contactList) {
