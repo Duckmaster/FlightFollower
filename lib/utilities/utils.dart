@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flight_follower/models/user_model.dart';
 import 'dart:convert';
@@ -38,4 +40,9 @@ Future<UserModel> getUser(String userID) async {
     final data = docSnapshot.data();
     return UserModel.fromJson(data!);
   });
+}
+
+void showSnackBar(BuildContext context, String message) {
+  SnackBar snackBar = SnackBar(content: Text(message));
+  ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
