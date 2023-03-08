@@ -7,6 +7,9 @@ import 'package:flight_follower/models/flight.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flight_follower/widgets/time_picker.dart';
 import 'package:flight_follower/utilities/utils.dart';
+import 'package:provider/provider.dart';
+
+import '../models/contacts.dart';
 
 class FlightLogForm extends StatefulWidget {
   const FlightLogForm({super.key});
@@ -20,11 +23,7 @@ class FlightLogForm extends StatefulWidget {
 class FlightLogFormState extends State<FlightLogForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   static List<String> orgList = <String>['One', 'Two', 'Three', 'Four'];
-  static var peopleList = [
-    UserModel("Person One", "email@address.com", "07123456789"),
-    UserModel("Person Two", "persontwo@email.com", "07123456789"),
-    UserModel("Person Three", "personthree@email.com", "07123456789")
-  ];
+  //static var peopleList = <UserModel>[];
   static List<String> flightTypes = <String>[
     'Private',
     'Test/check',
@@ -64,6 +63,7 @@ class FlightLogFormState extends State<FlightLogForm> {
   @override
   void initState() {
     super.initState();
+    //peopleList = Provider.of<Contacts>(_formKey.currentContext!).items;
     getObject("user_object").then((result) {
       setState(() {
         Map<String, dynamic> userMap = result;
@@ -180,14 +180,6 @@ class FlightLogFormState extends State<FlightLogForm> {
         onChanged: onChanged,
       ),
     );
-  }
-
-  UserModel getUserFromEmail(String? email) {
-    if (email == null) return UserModel("", "", "");
-    for (UserModel user in peopleList) {
-      if (user.email == email) return user;
-    }
-    throw Exception("Given email does not match to any known contacts");
   }
 
   @override
@@ -357,28 +349,30 @@ class FlightLogFormState extends State<FlightLogForm> {
                   Expanded(
                     child: Row(
                       children: [
-                        Expanded(
-                          child: DropdownButtonFormField(
-                            isExpanded: true,
-                            items: peopleList.map<DropdownMenuItem<String>>(
-                                (UserModel value) {
-                              return DropdownMenuItem<String>(
-                                value: value.email,
-                                child: Text(value.username),
-                              );
-                            }).toList(),
-                            onChanged: formSubmitted
-                                ? null
-                                : (String? value) {
-                                    setState(() {
-                                      flight.monitoringPerson = value;
-                                    });
-                                  },
-                            decoration: const InputDecoration(
-                              label: Text("Monitoring Person"),
-                            ),
-                          ),
-                        ),
+                        Expanded(child: Consumer<Contacts>(
+                          builder: (context, value, child) {
+                            return DropdownButtonFormField(
+                              isExpanded: true,
+                              items: value.items.map<DropdownMenuItem<String>>(
+                                  (UserModel value) {
+                                return DropdownMenuItem<String>(
+                                  value: value.email,
+                                  child: Text(value.username),
+                                );
+                              }).toList(),
+                              onChanged: formSubmitted
+                                  ? null
+                                  : (String? value) {
+                                      setState(() {
+                                        flight.monitoringPerson = value;
+                                      });
+                                    },
+                              decoration: const InputDecoration(
+                                label: Text("Monitoring Person"),
+                              ),
+                            );
+                          },
+                        )),
                         // Icon for visual feedback on monitoring person (waiting to accept, declined, accepted)
                         Visibility(
                           visible: formSubmitted,
