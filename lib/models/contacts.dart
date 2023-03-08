@@ -27,9 +27,11 @@ class Contacts extends ChangeNotifier {
       String contactsList = data["contact_list"];
       if (contactsList.isEmpty) return;
       for (var user in contactsList.split(",")) {
-        getUser(user).then((value) => _contacts.add(value));
+        getUser(user).then((value) {
+          _contacts.add(value);
+          notifyListeners();
+        });
       }
     });
-    notifyListeners();
   }
 }
