@@ -25,6 +25,7 @@ class Contacts extends ChangeNotifier {
       if (!docSnapshot.exists) return;
       final data = docSnapshot.data() as Map<String, dynamic>;
       String contactsList = data["contact_list"];
+      if (contactsList.isEmpty) return;
       for (var user in contactsList.split(",")) {
         getUser(user).then((value) => _contacts.add(value));
       }
