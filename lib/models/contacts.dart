@@ -19,6 +19,11 @@ class Contacts extends ChangeNotifier {
 
   UnmodifiableListView<UserModel> get items => UnmodifiableListView(_contacts);
 
+  void addContact(UserModel newContact) {
+    _contacts.add(newContact);
+    notifyListeners();
+  }
+
   void retrieveContactsFromDatabase() {
     FirebaseFirestore db = FirebaseFirestore.instance;
     db.collection("contacts").doc(_user.email).get().then((docSnapshot) {
