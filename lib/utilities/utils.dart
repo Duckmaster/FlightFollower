@@ -33,10 +33,9 @@ Future<Map<String, dynamic>> getObject(String name) async {
 // retrieves user data from db
 Future<UserModel> getUser(String userID) async {
   FirebaseFirestore db = FirebaseFirestore.instance;
-  db.collection("users").doc(userID).get().then((docSnapshot) {
+  return db.collection("users").doc(userID).get().then((docSnapshot) {
     if (!docSnapshot.exists) return UserModel("", "", "");
     final data = docSnapshot.data();
     return UserModel.fromJson(data!);
   });
-  return UserModel("", "", "");
 }
