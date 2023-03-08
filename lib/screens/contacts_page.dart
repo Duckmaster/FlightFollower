@@ -47,8 +47,8 @@ class ContactsPage extends StatelessWidget {
 
   void addContact(String value, BuildContext context) {
     FirebaseFirestore db = FirebaseFirestore.instance;
-    var contactsCopy =
-        Provider.of<Contacts>(context, listen: false).items.toList();
+    var contacts = Provider.of<Contacts>(context, listen: false);
+    var contactsCopy = contacts.items.toList();
 
     // regex to match either email or phone no, then query db
     //db.collection("users").where("email", isEqualTo: )
@@ -65,6 +65,7 @@ class ContactsPage extends StatelessWidget {
         match = foundUser;
         if (match.email != "") {
           contactsCopy.add(match);
+          contacts.addContact(match);
           storeContacts(db, contactsCopy);
         }
       });
@@ -80,6 +81,7 @@ class ContactsPage extends StatelessWidget {
         }
         if (match.email != "") {
           contactsCopy.add(match);
+          contacts.addContact(match);
           storeContacts(db, contactsCopy);
         }
       });
