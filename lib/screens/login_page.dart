@@ -7,6 +7,10 @@ class LoginPage extends StatelessWidget {
   static TextEditingController emailController = TextEditingController();
   static TextEditingController passwordController = TextEditingController();
 
+  void login() {}
+
+  void register() {}
+
   @override
   Widget build(BuildContext context) {
     TextStyle linkStyle = const TextStyle(color: Colors.blue);
@@ -68,10 +72,9 @@ class LoginPage extends StatelessWidget {
                           flex: 3,
                           child: Column(children: [
                             ElevatedButton(
-                                onPressed: () => print("login"),
-                                child: const Text("Login")),
+                                onPressed: login, child: const Text("Login")),
                             ElevatedButton(
-                                onPressed: () => print("register"),
+                                onPressed: register,
                                 child: const Text("Register"))
                           ]),
                         )
