@@ -1,5 +1,7 @@
+import 'package:flight_follower/models/login_manager.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -7,7 +9,14 @@ class LoginPage extends StatelessWidget {
   static TextEditingController emailController = TextEditingController();
   static TextEditingController passwordController = TextEditingController();
 
-  void login() {}
+  void login(BuildContext context) {
+    LoginManager loginManager =
+        Provider.of<LoginManager>(context, listen: false);
+    String result = "";
+    loginManager
+        .loginUser(emailController.text, passwordController.text)
+        .then((value) => result = value);
+  }
 
   void register() {}
 
@@ -72,7 +81,8 @@ class LoginPage extends StatelessWidget {
                           flex: 3,
                           child: Column(children: [
                             ElevatedButton(
-                                onPressed: login, child: const Text("Login")),
+                                onPressed: () => login(context),
+                                child: const Text("Login")),
                             ElevatedButton(
                                 onPressed: register,
                                 child: const Text("Register"))
