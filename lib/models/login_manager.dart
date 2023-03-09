@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 
 class LoginManager extends ChangeNotifier {
   bool _isLoggedIn;
+  User? _currentUser;
   LoginManager() : _isLoggedIn = false {
     initListener();
   }
@@ -13,7 +14,6 @@ class LoginManager extends ChangeNotifier {
     try {
       final credential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
-      _isLoggedIn = true;
       notifyListeners();
       return "success";
     } on FirebaseAuthException catch (e) {
@@ -23,10 +23,14 @@ class LoginManager extends ChangeNotifier {
 
   void initListener() {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      _currentUser = user;
+      notifyListeners();
       if (user == null) {
         print('User is currently signed out!');
+        _isLoggedIn = false;
       } else {
         print('User is signed in!');
+        _isLoggedIn = true;
       }
     });
   }
