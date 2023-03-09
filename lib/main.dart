@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flight_follower/models/contacts.dart';
+import 'package:flight_follower/models/login_manager.dart';
 import 'package:flight_follower/screens/contacts_page.dart';
+import 'package:flight_follower/screens/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flight_follower/models/user_model.dart';
 import 'package:flight_follower/screens/flight_following_page.dart';
@@ -10,8 +12,9 @@ import 'package:flight_follower/models/flights_listener.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -36,7 +39,8 @@ class MyApp extends StatelessWidget {
       ),
       home: MultiProvider(providers: [
         ChangeNotifierProvider(create: (context) => FlightsListener()),
-        ChangeNotifierProvider(create: (context) => Contacts())
+        ChangeNotifierProvider(create: (context) => Contacts()),
+        ChangeNotifierProvider(create: (context) => LoginManager())
       ], child: const MyHomePage(title: 'Flutter Demo Home Page')),
     );
   }
@@ -116,45 +120,55 @@ class _MyHomePageState extends State<MyHomePage> {
     Widget page = _pages[_selectedIndex]["page"] as Widget;
 
     return LayoutBuilder(builder: (context, constraints) {
-      return Scaffold(
-        appBar: _buildAppBar(_pages[_selectedIndex]["title"] as String,
-            actions: page is ContactsPage
-                ? [
-                    IconButton(
-                        onPressed: () => page.addContactDialog(context),
-                        icon: const Icon(
-                          Icons.add,
-                        ))
-                  ]
-                : _pages[_selectedIndex]["actions"] as List<Widget>),
-        body: Column(
-          children: [
-            Expanded(
-              child: Container(
-                child: page,
-              ),
+      return Consumer<LoginManager>(builder: (context, value, child) {
+        if (value.isLoggedIn) {
+          return Scaffold(
+            appBar: _buildAppBar(_pages[_selectedIndex]["title"] as String,
+                actions: page is ContactsPage
+                    ? [
+                        IconButton(
+                            onPressed: () => page.addContactDialog(context),
+                            icon: const Icon(
+                              Icons.add,
+                            ))
+                      ]
+                    : _pages[_selectedIndex]["actions"] as List<Widget>),
+            body: Column(
+              children: [
+                Expanded(
+                  child: Container(
+                    child: page,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.book),
-              label: 'Log',
+            bottomNavigationBar: BottomNavigationBar(
+              items: const <BottomNavigationBarItem>[
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.book),
+                  label: 'Log',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.flight),
+                  label: 'Monitoring',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.contacts),
+                  label: 'Contacts',
+                ),
+              ],
+              currentIndex: _selectedIndex,
+              onTap: _onItemTapped,
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.flight),
-              label: 'Monitoring',
+          );
+        } else {
+          return const Scaffold(
+            body: SafeArea(
+              child: LoginPage(),
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.contacts),
-              label: 'Contacts',
-            ),
-          ],
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
-        ),
-      );
+          );
+        }
+      });
     });
   }
 }
