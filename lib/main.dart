@@ -140,11 +140,11 @@ class _MyHomePageState extends State<MyHomePage> {
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: Icon(Icons.book),
-              label: 'Flight Log',
+              label: 'Log',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.flight),
-              label: 'Flight Monitoring',
+              label: 'Monitoring',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.contacts),
