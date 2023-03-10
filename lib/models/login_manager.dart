@@ -9,6 +9,7 @@ class LoginManager extends ChangeNotifier {
   }
 
   bool get isLoggedIn => _isLoggedIn;
+  User? get currentUser => _currentUser;
 
   Future<String> loginUser(String email, String password) async {
     try {
