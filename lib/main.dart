@@ -1,8 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flight_follower/models/contacts.dart';
 import 'package:flight_follower/models/login_manager.dart';
+import 'package:flight_follower/models/user.dart';
 import 'package:flight_follower/screens/contacts_page.dart';
 import 'package:flight_follower/screens/login_page.dart';
+import 'package:flight_follower/screens/user_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flight_follower/models/user_model.dart';
 import 'package:flight_follower/screens/flight_following_page.dart';
@@ -109,9 +111,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    UserModel user =
-        UserModel("John Smith", "email@address.com", "07123456789");
-    storeObject(user, "user_object");
     super.initState();
   }
 
