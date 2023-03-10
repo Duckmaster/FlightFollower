@@ -26,6 +26,16 @@ class LoginManager extends ChangeNotifier {
     }
   }
 
+  Future<String> logoutUser() async {
+    try {
+      final credential = await FirebaseAuth.instance.signOut();
+      notifyListeners();
+      return "success";
+    } on FirebaseAuthException catch (e) {
+      return e.code;
+    }
+  }
+
   void initListener() {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       _currentUser = user;
