@@ -1,7 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flight_follower/models/contacts.dart';
 import 'package:flight_follower/models/login_manager.dart';
-import 'package:flight_follower/models/user.dart';
 import 'package:flight_follower/screens/contacts_page.dart';
 import 'package:flight_follower/screens/login_page.dart';
 import 'package:flight_follower/screens/user_page.dart';
@@ -95,6 +94,12 @@ class _MyHomePageState extends State<MyHomePage> {
       'actions': <
           Widget>[] //<-- optional just in case you need default actions that depend on parent as well
     },
+    {
+      'page': UserPage(),
+      'title': 'Contacts',
+      'actions': <
+          Widget>[] //<-- optional just in case you need default actions that depend on parent as well
+    },
   ];
 
   void _onItemTapped(int index) {
@@ -111,6 +116,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
+    UserModel user =
+        UserModel("John Smith", "email@address.com", "07123456789");
+    storeObject(user, "user_object");
     super.initState();
   }
 
@@ -142,6 +150,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
             bottomNavigationBar: BottomNavigationBar(
+              type: BottomNavigationBarType.fixed,
               items: const <BottomNavigationBarItem>[
                 BottomNavigationBarItem(
                   icon: Icon(Icons.book),
@@ -154,6 +163,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 BottomNavigationBarItem(
                   icon: Icon(Icons.contacts),
                   label: 'Contacts',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.person),
+                  label: 'User',
                 ),
               ],
               currentIndex: _selectedIndex,
