@@ -36,7 +36,6 @@ class FlightLogFormState extends State<FlightLogForm> {
     'HESLO 4',
     'HESLO 5'
   ];
-  String? phoneNo;
   bool locationServices = true;
   String? rotorStartTime;
   DateTime? rotorStart;
@@ -47,7 +46,7 @@ class FlightLogFormState extends State<FlightLogForm> {
   String submitButtonLabel = "Submit";
 
   late UserModel user;
-  late Flight flight;
+  Flight flight = Flight();
   FlightTimings timings = FlightTimings();
 
   String? flightID;
@@ -57,6 +56,8 @@ class FlightLogFormState extends State<FlightLogForm> {
   TextEditingController rotorStopController = TextEditingController();
   TextEditingController rotorDiffController = TextEditingController();
   TextEditingController datconDiffController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
 
   bool formSubmitted = false;
 
@@ -68,7 +69,9 @@ class FlightLogFormState extends State<FlightLogForm> {
       setState(() {
         Map<String, dynamic> userMap = result;
         user = UserModel.fromJson(userMap);
-        flight = Flight(user: user.email);
+        flight.user = user.email;
+        nameController.text = user.username;
+        phoneController.text = user.phoneNumber;
       });
     });
   }
@@ -196,8 +199,18 @@ class FlightLogFormState extends State<FlightLogForm> {
               // Name and Phone No fields
               Row(
                 children: [
-                  createInputField("Name", setEnabled: false),
-                  createInputField("Phone Number", setEnabled: false)
+                  Expanded(
+                      child: TextFormField(
+                    controller: nameController,
+                    decoration: InputDecoration(labelText: "Name"),
+                    enabled: false,
+                  )),
+                  Expanded(
+                      child: TextFormField(
+                    controller: phoneController,
+                    decoration: InputDecoration(labelText: "Phone Number"),
+                    enabled: false,
+                  )),
                 ],
               ),
               // Organisation dropdown
