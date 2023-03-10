@@ -50,6 +50,8 @@ class ContactsPage extends StatelessWidget {
     var contacts = Provider.of<Contacts>(context, listen: false);
     var contactsCopy = contacts.items.toList();
 
+    value = value.trimLeft().trimRight();
+
     // regex to match either email or phone no, then query db
     //db.collection("users").where("email", isEqualTo: )
 
