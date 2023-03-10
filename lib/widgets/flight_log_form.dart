@@ -167,7 +167,7 @@ class FlightLogFormState extends State<FlightLogForm> {
 
   Widget createInputField(String fieldLabel,
       {bool setEnabled = true,
-      String init = "placeholder",
+      String init = "",
       TextEditingController? controller,
       Function(String)? onChanged,
       Function? callback,
