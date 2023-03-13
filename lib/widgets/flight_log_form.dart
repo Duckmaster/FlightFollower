@@ -98,15 +98,17 @@ class FlightLogFormState extends State<FlightLogForm> {
           .then((value) {
         print("sent data");
         flightID = value.id;
-        Request request = Request(
-            value.id, flight.monitoringPerson!, FlightStatuses.requested);
-        db
-            .collection("requests")
-            .withConverter(
-                fromFirestore: Request.fromFirestore,
-                toFirestore: (Request r, options) => r.toFirestore())
-            .add(request)
-            .then((value) => requestID = value.id);
+        if (flight.monitoringPerson != null) {
+          Request request = Request(
+              value.id, flight.monitoringPerson!, FlightStatuses.requested);
+          db
+              .collection("requests")
+              .withConverter(
+                  fromFirestore: Request.fromFirestore,
+                  toFirestore: (Request r, options) => r.toFirestore())
+              .add(request)
+              .then((value) => requestID = value.id);
+        }
       });
     } else {
       timings.rotorStart = rotorStartController.value.text;
