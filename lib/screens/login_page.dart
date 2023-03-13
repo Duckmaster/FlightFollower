@@ -22,7 +22,8 @@ class LoginPage extends StatelessWidget {
   void register(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => RegisterPage(),
+        builder: (context) => ChangeNotifierProvider(
+            create: (context) => LoginManager(), child: RegisterPage()),
       ),
     );
   }
