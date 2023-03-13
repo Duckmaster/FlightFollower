@@ -13,6 +13,9 @@ class LoginPage extends StatelessWidget {
   void login(BuildContext context) {
     LoginManager loginManager =
         Provider.of<LoginManager>(context, listen: false);
+    if (loginManager.listener!.isPaused) {
+      loginManager.listener!.resume();
+    }
     String result = "";
     loginManager
         .loginUser(emailController.text, passwordController.text)
@@ -20,6 +23,9 @@ class LoginPage extends StatelessWidget {
   }
 
   void register(BuildContext context) {
+    LoginManager loginManager =
+        Provider.of<LoginManager>(context, listen: false);
+    loginManager.listener!.pause();
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => ChangeNotifierProvider(
