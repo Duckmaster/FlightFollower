@@ -115,14 +115,6 @@ class _MyHomePageState extends State<MyHomePage> {
       );
 
   @override
-  void initState() {
-    UserModel user =
-        UserModel("John Smith", "email@address.com", "07123456789");
-    storeObject(user, "user_object");
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     Widget page = _pages[_selectedIndex]["page"] as Widget;
 
