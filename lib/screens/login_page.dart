@@ -1,4 +1,5 @@
 import 'package:flight_follower/models/login_manager.dart';
+import 'package:flight_follower/screens/register_page.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +19,13 @@ class LoginPage extends StatelessWidget {
         .then((value) => result = value);
   }
 
-  void register() {}
+  void register(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => RegisterPage(),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +92,7 @@ class LoginPage extends StatelessWidget {
                                 onPressed: () => login(context),
                                 child: const Text("Login")),
                             ElevatedButton(
-                                onPressed: register,
+                                onPressed: () => register(context),
                                 child: const Text("Register"))
                           ]),
                         )
