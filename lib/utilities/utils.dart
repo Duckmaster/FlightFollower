@@ -43,6 +43,34 @@ Future<UserModel> getUser(String userID) async {
 }
 
 void showSnackBar(BuildContext context, String message) {
-  SnackBar snackBar = SnackBar(content: Text(message));
+  SnackBar snackBar;
+  switch (message) {
+    case "email-already-in-use":
+      snackBar =
+          SnackBar(content: Text("An account with that email already exists."));
+      break;
+    case "invalid-email":
+      snackBar = SnackBar(
+          content: Text(
+              "The email address provided is not valid. Please try again."));
+      break;
+    case "user-disabled":
+      snackBar = SnackBar(
+          content: Text(
+              "The account associated with this email has been disabled."));
+      break;
+    case "user-not-found":
+      snackBar = SnackBar(
+          content: Text(
+              "An account matching the given email address could not be found. Please check the email address is correct, or register an account."));
+      break;
+    case "wrong-password":
+      snackBar =
+          SnackBar(content: Text("Incorrect password, please try again."));
+      break;
+    default:
+      snackBar = SnackBar(content: Text(message));
+      break;
+  }
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
