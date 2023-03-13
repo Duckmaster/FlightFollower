@@ -232,6 +232,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                 children: [
                   Expanded(
                     child: TextFormField(
+                      initialValue: flight.aircraftIdentifier,
                       decoration: const InputDecoration(
                         labelText: "Aircraft Reg/Callsign",
                       ),
@@ -246,6 +247,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                 children: [
                   Expanded(
                     child: TextFormField(
+                      initialValue: flight.copilot,
                       decoration: const InputDecoration(
                         labelText: "Co-pilot",
                       ),
@@ -271,7 +273,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                           labelText: "Num. Persons on Board",
                           contentPadding:
                               EdgeInsets.only(bottom: 9.5, top: 9.5)),
-                      value: 1,
+                      value: int.parse(flight.numPersons ?? "1"),
                     ),
                   ),
                 ],
@@ -281,6 +283,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                 children: [
                   Expanded(
                     child: TextFormField(
+                      initialValue: flight.departureLocation,
                       decoration: const InputDecoration(
                         labelText: "Departure",
                       ),
@@ -290,6 +293,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                   ),
                   Expanded(
                     child: TextFormField(
+                      initialValue: flight.destination,
                       decoration: const InputDecoration(
                         labelText: "Destination",
                       ),
@@ -318,6 +322,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                           return DropdownMenuItem(
                               value: value, child: Text(value.toString()));
                         }).toList(),
+                        value: flight.ete,
                         onChanged: formSubmitted
                             ? null
                             : (double? value) {
@@ -341,6 +346,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                           return DropdownMenuItem(
                               value: value, child: Text(value.toString()));
                         }).toList(),
+                        value: double.parse(flight.endurance ?? "0.1"),
                         onChanged: formSubmitted
                             ? null
                             : (double? value) {
@@ -376,6 +382,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                           builder: (context, value, child) {
                             return DropdownButtonFormField(
                               isExpanded: true,
+                              value: flight.monitoringPerson,
                               items: value.items.map<DropdownMenuItem<String>>(
                                   (UserModel value) {
                                 return DropdownMenuItem<String>(
@@ -428,6 +435,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                         child: Text(value),
                       );
                     }).toList(),
+                    value: flight.flightType,
                     onChanged: formSubmitted
                         ? null
                         : (String? value) {
