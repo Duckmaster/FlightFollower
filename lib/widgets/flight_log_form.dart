@@ -165,26 +165,6 @@ class FlightLogFormState extends State<FlightLogForm> {
     rotorDiffController.text = diff;
   }
 
-  Widget createInputField(String fieldLabel,
-      {bool setEnabled = true,
-      String init = "",
-      TextEditingController? controller,
-      Function(String)? onChanged,
-      Function? callback,
-      double? fontSize}) {
-    return Expanded(
-      child: TextFormField(
-        controller: controller,
-        decoration: InputDecoration(
-            labelText: fieldLabel, labelStyle: TextStyle(fontSize: fontSize)),
-        initialValue: controller != null ? null : init,
-        enabled: setEnabled,
-        onSaved: callback != null ? (value) => callback(value) : null,
-        onChanged: onChanged,
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -221,6 +201,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                       decoration: const InputDecoration(
                         labelText: "Organisation",
                       ),
+                      value: flight.organisation,
                       items:
                           orgList.map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
@@ -242,18 +223,29 @@ class FlightLogFormState extends State<FlightLogForm> {
               // Reg and callsign fields
               Row(
                 children: [
-                  createInputField("Aircraft Reg/Callsign",
-                      callback: (String? value) =>
-                          {flight.aircraftIdentifier = value},
-                      setEnabled: !formSubmitted),
+                  Expanded(
+                    child: TextFormField(
+                      decoration: const InputDecoration(
+                        labelText: "Aircraft Reg/Callsign",
+                      ),
+                      enabled: !formSubmitted,
+                      onChanged: (value) => flight.aircraftIdentifier = value,
+                    ),
+                  ),
                 ],
               ),
               // Copilot and num. persons fields
               Row(
                 children: [
-                  createInputField("Co-pilot",
-                      callback: (String? value) => {flight.copilot = value},
-                      setEnabled: !formSubmitted),
+                  Expanded(
+                    child: TextFormField(
+                      decoration: const InputDecoration(
+                        labelText: "Co-pilot",
+                      ),
+                      enabled: !formSubmitted,
+                      onChanged: (value) => flight.copilot = value,
+                    ),
+                  ),
                   Expanded(
                     child: DropdownButtonFormField(
                       items: List<int>.generate(10, (i) => i + 1)
@@ -280,13 +272,24 @@ class FlightLogFormState extends State<FlightLogForm> {
               // Departure and destination fields
               Row(
                 children: [
-                  createInputField("Departure",
-                      callback: (String? value) =>
-                          {flight.departureLocation = value},
-                      setEnabled: !formSubmitted),
-                  createInputField("Destination",
-                      callback: (String? value) => {flight.destination = value},
-                      setEnabled: !formSubmitted)
+                  Expanded(
+                    child: TextFormField(
+                      decoration: const InputDecoration(
+                        labelText: "Departure",
+                      ),
+                      enabled: !formSubmitted,
+                      onChanged: (value) => flight.departureLocation = value,
+                    ),
+                  ),
+                  Expanded(
+                    child: TextFormField(
+                      decoration: const InputDecoration(
+                        labelText: "Destination",
+                      ),
+                      enabled: !formSubmitted,
+                      onChanged: (value) => flight.destination = value,
+                    ),
+                  )
                 ],
               ),
               // Departure time and ETE fields
@@ -449,15 +452,27 @@ class FlightLogFormState extends State<FlightLogForm> {
                                     ? rotorStartPressed
                                     : null,
                                 child: const Text("START")),
-                            createInputField("Start Time",
-                                controller: rotorStartController),
-                            createInputField("Datcon/Hobbs Start",
+                            Expanded(
+                              child: TextFormField(
+                                decoration: const InputDecoration(
+                                  labelText: "Start Time",
+                                ),
+                                controller: rotorStartController,
+                              ),
+                            ),
+                            Expanded(
+                              child: TextFormField(
+                                decoration: const InputDecoration(
+                                  labelText: "Datcon/Hobbs Start",
+                                ),
                                 onChanged: (value) {
-                              setState(() {
-                                datconStart = value;
-                                timings.datconStart = value;
-                              });
-                            })
+                                  setState(() {
+                                    datconStart = value;
+                                    timings.datconStart = value;
+                                  });
+                                },
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -470,21 +485,34 @@ class FlightLogFormState extends State<FlightLogForm> {
                                     ? null
                                     : rotorStopPressed,
                                 child: const Text("STOP")),
-                            createInputField("Stop Time",
-                                controller: rotorStopController),
-                            createInputField("Datcon/Hobbs Stop",
+                            Expanded(
+                              child: TextFormField(
+                                decoration: const InputDecoration(
+                                  labelText: "Stop Time",
+                                ),
+                                controller: rotorStopController,
+                              ),
+                            ),
+                            Expanded(
+                              child: TextFormField(
+                                decoration: const InputDecoration(
+                                  labelText: "Datcon/Hobbs Stop",
+                                ),
                                 onChanged: (value) {
-                              setState(() {
-                                datconStop = value;
-                                timings.datconStop = value;
-                              });
-                              double? stopDouble = double.tryParse(datconStop!);
-                              double diff = stopDouble == null
-                                  ? 0
-                                  : stopDouble - double.parse(datconStart!);
-                              datconDiffController.text =
-                                  diff.toStringAsFixed(1);
-                            })
+                                  setState(() {
+                                    datconStop = value;
+                                    timings.datconStop = value;
+                                  });
+                                  double? stopDouble =
+                                      double.tryParse(datconStop!);
+                                  double diff = stopDouble == null
+                                      ? 0
+                                      : stopDouble - double.parse(datconStart!);
+                                  datconDiffController.text =
+                                      diff.toStringAsFixed(1);
+                                },
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -495,10 +523,23 @@ class FlightLogFormState extends State<FlightLogForm> {
                             //const ElevatedButton(
                             //    onPressed: null, child: Text("test")),
                             const SizedBox(height: 48),
-                            createInputField("Flight Time",
-                                controller: rotorDiffController, fontSize: 14),
-                            createInputField("Maintenance\nTime",
-                                controller: datconDiffController, fontSize: 12),
+
+                            Expanded(
+                              child: TextFormField(
+                                decoration: const InputDecoration(
+                                    labelText: "Flight Time",
+                                    labelStyle: TextStyle(fontSize: 14)),
+                                controller: rotorDiffController,
+                              ),
+                            ),
+                            Expanded(
+                              child: TextFormField(
+                                decoration: const InputDecoration(
+                                    labelText: "Maintenance\nTime",
+                                    labelStyle: TextStyle(fontSize: 12)),
+                                controller: datconDiffController,
+                              ),
+                            ),
                           ],
                         ),
                       ),
