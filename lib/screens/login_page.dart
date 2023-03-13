@@ -3,6 +3,7 @@ import 'package:flight_follower/screens/register_page.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flight_follower/utilities/utils.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -16,10 +17,14 @@ class LoginPage extends StatelessWidget {
     if (loginManager.listener!.isPaused) {
       loginManager.listener!.resume();
     }
-    String result = "";
+    //String result = "";
     loginManager
         .loginUser(emailController.text, passwordController.text)
-        .then((value) => result = value);
+        .then((returnCode) {
+      if (returnCode != "success") {
+        showSnackBar(context, returnCode);
+      }
+    });
   }
 
   void register(BuildContext context) {

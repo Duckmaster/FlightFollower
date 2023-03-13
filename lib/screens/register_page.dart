@@ -1,5 +1,6 @@
 import 'package:flight_follower/models/login_manager.dart';
 import 'package:flight_follower/models/user_model.dart';
+import 'package:flight_follower/utilities/utils.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -19,9 +20,17 @@ class RegisterPage extends StatelessWidget {
     String returnCode =
         await manager.registerUser(newUser, passwordController.text);
     if (returnCode == "success") {
+      if (context.mounted) {
+        showSnackBar(context,
+            "Successfully registered! Please check your email for a verification email before logging in.");
+      }
       manager.sendVerificationEmail();
       if (context.mounted) {
         Navigator.of(context).pop();
+      }
+    } else {
+      if (context.mounted) {
+        showSnackBar(context, returnCode);
       }
     }
   }
