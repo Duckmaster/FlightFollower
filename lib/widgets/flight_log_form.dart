@@ -10,6 +10,7 @@ import 'package:flight_follower/utilities/utils.dart';
 import 'package:provider/provider.dart';
 
 import '../models/contacts.dart';
+import '../models/form_state_manager.dart';
 
 class FlightLogForm extends StatefulWidget {
   const FlightLogForm({super.key});
@@ -48,6 +49,7 @@ class FlightLogFormState extends State<FlightLogForm> {
   late UserModel user;
   Flight flight = Flight();
   FlightTimings timings = FlightTimings();
+  late FormStateManager formStateManager;
 
   String? flightID;
   String? requestID;
@@ -167,6 +169,11 @@ class FlightLogFormState extends State<FlightLogForm> {
 
   @override
   Widget build(BuildContext context) {
+    formStateManager = Provider.of<FormStateManager>(context, listen: false);
+    setState(() {
+      flight = formStateManager.flight;
+      timings = formStateManager.timings;
+    });
     return Form(
       key: _formKey,
       child: SizedBox(
