@@ -120,11 +120,13 @@ class FlightLogFormState extends State<FlightLogForm> {
               fromFirestore: FlightTimings.fromFirestore,
               toFirestore: (FlightTimings t, options) => t.toFirestore())
           .add(timings);
+      if (flight.monitoringPerson != null) {
+        db
+            .collection("requests")
+            .doc(requestID)
+            .update({"status": FlightStatuses.completed});
+      }
 
-      db
-          .collection("requests")
-          .doc(requestID)
-          .update({"status": FlightStatuses.completed});
       _formKey.currentState!.reset();
     }
   }
@@ -146,11 +148,13 @@ class FlightLogFormState extends State<FlightLogForm> {
 
     rotorStartController.text = time;
 
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    db
-        .collection("requests")
-        .doc(requestID)
-        .update({"status": FlightStatuses.enroute.name});
+    if (flight.monitoringPerson != null) {
+      FirebaseFirestore db = FirebaseFirestore.instance;
+      db
+          .collection("requests")
+          .doc(requestID)
+          .update({"status": FlightStatuses.enroute.name});
+    }
   }
 
   void rotorStopPressed() {
