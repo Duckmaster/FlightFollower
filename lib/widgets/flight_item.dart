@@ -187,7 +187,7 @@ class FlightItemState extends State<FlightItem> {
   }
 
   String getCopilotName() {
-    return "placeholder";
+    return widget.flight.copilot ?? "N/A";
   }
 
   void onAccept() {
