@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:collection';
 import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +13,7 @@ import 'package:flight_follower/utilities/utils.dart';
 class FlightsListener extends ChangeNotifier {
   final List<FlightItem> _flights = [];
   late UserModel _user;
+  StreamSubscription? listener;
 
   FlightsListener() {
     getObject("user_object").then((result) {
@@ -25,7 +27,7 @@ class FlightsListener extends ChangeNotifier {
 
   void initListener() {
     FirebaseFirestore db = FirebaseFirestore.instance;
-    db
+    listener = db
         .collection("requests")
         .withConverter(
             fromFirestore: Request.fromFirestore,

@@ -1,3 +1,4 @@
+import 'package:flight_follower/models/flights_listener.dart';
 import 'package:flight_follower/models/login_manager.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,9 @@ class UserPage extends StatelessWidget {
 
   void logout(BuildContext context) {
     LoginManager manager = Provider.of<LoginManager>(context, listen: false);
+    FlightsListener flightsListener =
+        Provider.of<FlightsListener>(context, listen: false);
+    flightsListener.listener?.cancel();
     manager.logoutUser();
   }
 
