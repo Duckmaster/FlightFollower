@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flight_follower/models/contacts.dart';
+import 'package:flight_follower/models/form_state_manager.dart';
 import 'package:flight_follower/models/login_manager.dart';
 import 'package:flight_follower/screens/contacts_page.dart';
 import 'package:flight_follower/screens/login_page.dart';
@@ -41,7 +42,8 @@ class MyApp extends StatelessWidget {
       home: MultiProvider(providers: [
         ChangeNotifierProvider(create: (context) => FlightsListener()),
         ChangeNotifierProvider(create: (context) => Contacts()),
-        ChangeNotifierProvider(create: (context) => LoginManager())
+        ChangeNotifierProvider(create: (context) => LoginManager()),
+        ChangeNotifierProvider(create: (context) => FormStateManager())
       ], child: const MyHomePage(title: 'Flutter Demo Home Page')),
     );
   }
