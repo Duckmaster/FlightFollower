@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:core';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flight_follower/models/user_model.dart';
@@ -26,6 +28,27 @@ class LoginManager extends ChangeNotifier {
     }
   }
 
+  Future<String> registerUser(UserModel user, String password) async {
+    try {
+      final auth = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: user.email, password: password);
+      FirebaseFirestore.instance
+          .collection("users")
+          .withConverter(
+              fromFirestore: UserModel.fromFirestore,
+              toFirestore: (UserModel user, options) => user.toFirestore())
+          .doc(user.email)
+          .set(user);
+      return "success";
+    } on FirebaseAuthException catch (e) {
+      return e.code;
+    }
+  }
+
+  void sendVerificationEmail() {
+    _currentUser!.sendEmailVerification();
+  }
+
   Future<String> logoutUser() async {
     try {
       final credential = await FirebaseAuth.instance.signOut();
@@ -38,13 +61,15 @@ class LoginManager extends ChangeNotifier {
 
   void initListener() {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
-      _currentUser = user;
-      notifyListeners();
       if (user == null) {
         print('User is currently signed out!');
         _isLoggedIn = false;
         notifyListeners();
       } else {
+        _currentUser = user;
+        if (!user.emailVerified) {
+          logoutUser();
+        }
         print('User is signed in!');
         _isLoggedIn = true;
         notifyListeners();
