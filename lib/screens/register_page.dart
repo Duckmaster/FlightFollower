@@ -12,16 +12,18 @@ class RegisterPage extends StatelessWidget {
   static TextEditingController phoneController = TextEditingController();
   static TextEditingController passwordController = TextEditingController();
 
-  void register(BuildContext context) {
+  void register(BuildContext context) async {
     UserModel newUser = UserModel(
         nameController.text, emailController.text, phoneController.text);
     LoginManager manager = Provider.of<LoginManager>(context, listen: false);
-    manager.registerUser(newUser, passwordController.text).then((returnCode) {
-      if (returnCode == "success") {
-        manager.sendVerificationEmail();
+    String returnCode =
+        await manager.registerUser(newUser, passwordController.text);
+    if (returnCode == "success") {
+      manager.sendVerificationEmail();
+      if (context.mounted) {
+        Navigator.of(context).pop();
       }
-    });
-    Navigator.of(context).pop();
+    }
   }
 
   @override

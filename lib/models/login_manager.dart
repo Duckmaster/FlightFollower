@@ -10,6 +10,9 @@ import '../utilities/utils.dart';
 class LoginManager extends ChangeNotifier {
   bool _isLoggedIn;
   User? _currentUser;
+  StreamSubscription? listener;
+  bool _isRegistering = false;
+  bool _disposed = false;
   LoginManager() : _isLoggedIn = false {
     initListener();
   }
@@ -29,8 +32,10 @@ class LoginManager extends ChangeNotifier {
   }
 
   Future<String> registerUser(UserModel user, String password) async {
+    _isRegistering = true;
     try {
-      final auth = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      final auth = FirebaseAuth.instance;
+      final cred = await auth.createUserWithEmailAndPassword(
           email: user.email, password: password);
       FirebaseFirestore.instance
           .collection("users")
@@ -39,8 +44,10 @@ class LoginManager extends ChangeNotifier {
               toFirestore: (UserModel user, options) => user.toFirestore())
           .doc(user.email)
           .set(user);
+      _isRegistering = false;
       return "success";
     } on FirebaseAuthException catch (e) {
+      _isRegistering = false;
       return e.code;
     }
   }
@@ -61,12 +68,17 @@ class LoginManager extends ChangeNotifier {
 
   @override
   void dispose() {
-    removeListener(() => listenerCallback);
+    _disposed = true;
     super.dispose();
   }
 
+  @override
+  void notifyListeners() {
+    if (!_disposed) super.notifyListeners();
+  }
+
   void initListener() {
-    FirebaseAuth.instance
+    listener = FirebaseAuth.instance
         .authStateChanges()
         .listen((User? user) => listenerCallback(user));
   }
@@ -79,7 +91,8 @@ class LoginManager extends ChangeNotifier {
     } else {
       _currentUser = user;
       if (!user.emailVerified) {
-        logoutUser();
+        if (!_isRegistering) logoutUser();
+        return;
       }
       print('User is signed in!');
       _isLoggedIn = true;
