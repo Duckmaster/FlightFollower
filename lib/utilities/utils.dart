@@ -74,3 +74,9 @@ void showSnackBar(BuildContext context, String message) {
   }
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
+
+String formattedTimeFromDateTime(DateTime? dateTime) {
+  if (dateTime == null) return "";
+
+  return "${dateTime.hour}:${dateTime.minute}";
+}
