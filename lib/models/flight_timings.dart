@@ -3,8 +3,8 @@ import 'package:flight_follower/models/flight.dart';
 
 class FlightTimings {
   String? flightID;
-  String? rotorStart;
-  String? rotorStop;
+  DateTime? rotorStart;
+  DateTime? rotorStop;
   String? datconStart;
   String? datconStop;
 
@@ -22,8 +22,8 @@ class FlightTimings {
     final data = snapshot.data();
     return FlightTimings(
         flightID: data?["flight_id"],
-        rotorStart: data?["rotor_start"],
-        rotorStop: data?["rotor_stop"],
+        rotorStart: DateTime.parse(data?["rotor_start"]),
+        rotorStop: DateTime.parse(data?["rotor_stop"]),
         datconStart: data?["datcon_start"],
         datconStop: data?["datcon_stop"]);
   }
@@ -31,8 +31,8 @@ class FlightTimings {
   Map<String, dynamic> toFirestore() {
     return {
       "flight_id": flightID,
-      "rotor_start": rotorStart,
-      "rotor_stop": rotorStop,
+      "rotor_start": rotorStart.toString(),
+      "rotor_stop": rotorStop.toString(),
       "datcon_start": datconStart,
       "datcon_stop": datconStop,
     };
