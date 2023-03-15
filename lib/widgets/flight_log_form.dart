@@ -38,12 +38,12 @@ class FlightLogFormState extends State<FlightLogForm> {
     'HESLO 5'
   ];
   bool locationServices = true;
-  String? rotorStartTime;
-  DateTime? rotorStart;
-  String? datconStart;
-  String? rotorStopTime;
-  DateTime? rotorStop;
-  String? datconStop;
+  //String? rotorStartTime;
+  //DateTime? rotorStart;
+  //String? datconStart;
+  //String? rotorStopTime;
+  //DateTime? rotorStop;
+  //String? datconStop;
   String submitButtonLabel = "Submit";
 
   late UserModel user;
@@ -74,6 +74,9 @@ class FlightLogFormState extends State<FlightLogForm> {
         flight.user = user.email;
         nameController.text = user.username;
         phoneController.text = user.phoneNumber;
+        rotorStartController.text =
+            formattedTimeFromDateTime(timings.rotorStart);
+        rotorStopController.text = formattedTimeFromDateTime(timings.rotorStop);
       });
     });
   }
@@ -83,7 +86,7 @@ class FlightLogFormState extends State<FlightLogForm> {
     _formKey.currentState!.save();
 
     setState(() {
-      formSubmitted = !formSubmitted;
+      formSubmitted = formStateManager.isSubmitted = !formSubmitted;
       submitButtonLabel = formSubmitted ? "Flight Completed" : "Submit";
     });
 
@@ -111,8 +114,11 @@ class FlightLogFormState extends State<FlightLogForm> {
         }
       });
     } else {
-      timings.rotorStart = rotorStartController.value.text;
-      timings.rotorStop = rotorStopController.value.text;
+      // TODO: parse rotor start/stop times from string to datetime
+      DateTime now = DateTime.now();
+      String date = "${now.year}-${now.day}-${now.month}";
+      timings.rotorStart = DateTime.parse("$date ${rotorStartController.text}");
+      timings.rotorStop = DateTime.parse("$date ${rotorStopController.text}");
       timings.flightID = flightID;
       db
           .collection("timings")
@@ -139,11 +145,11 @@ class FlightLogFormState extends State<FlightLogForm> {
     // store time button pressed
     // update the relevant input field
     DateTime now = DateTime.now();
-    rotorStart = now;
+
     String time = "${now.hour}:${now.minute}";
 
     setState(() {
-      rotorStartTime = time;
+      timings.rotorStart = now;
     });
 
     rotorStartController.text = time;
@@ -161,14 +167,12 @@ class FlightLogFormState extends State<FlightLogForm> {
     // store time button pressed
     // update the relevant input field
     DateTime now = DateTime.now();
-    rotorStop = now;
+    //rotorStop = now;
     String time = "${now.hour}:${now.minute}";
-    String diff = rotorStop!.difference(rotorStart!).toString();
-
     setState(() {
-      rotorStopTime = time;
+      timings.rotorStop = now;
     });
-
+    String diff = timings.rotorStop!.difference(timings.rotorStart!).toString();
     rotorStopController.text = time;
     rotorDiffController.text = diff;
   }
@@ -179,6 +183,7 @@ class FlightLogFormState extends State<FlightLogForm> {
     setState(() {
       flight = formStateManager.flight;
       timings = formStateManager.timings;
+      formSubmitted = formStateManager.isSubmitted;
     });
     return Form(
       key: _formKey,
@@ -469,7 +474,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                         child: Column(
                           children: [
                             ElevatedButton(
-                                onPressed: rotorStartTime == null
+                                onPressed: timings.rotorStart == null
                                     ? rotorStartPressed
                                     : null,
                                 child: const Text("START")),
@@ -488,7 +493,6 @@ class FlightLogFormState extends State<FlightLogForm> {
                                 ),
                                 onChanged: (value) {
                                   setState(() {
-                                    datconStart = value;
                                     timings.datconStart = value;
                                   });
                                 },
@@ -502,7 +506,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                         child: Column(
                           children: [
                             ElevatedButton(
-                                onPressed: rotorStartTime == null
+                                onPressed: timings.rotorStart == null
                                     ? null
                                     : rotorStopPressed,
                                 child: const Text("STOP")),
@@ -521,14 +525,15 @@ class FlightLogFormState extends State<FlightLogForm> {
                                 ),
                                 onChanged: (value) {
                                   setState(() {
-                                    datconStop = value;
                                     timings.datconStop = value;
                                   });
+                                  // TODO: Move this into a sep func
                                   double? stopDouble =
-                                      double.tryParse(datconStop!);
+                                      double.tryParse(timings.datconStop!);
                                   double diff = stopDouble == null
                                       ? 0
-                                      : stopDouble - double.parse(datconStart!);
+                                      : stopDouble -
+                                          double.parse(timings.datconStart!);
                                   datconDiffController.text =
                                       diff.toStringAsFixed(1);
                                 },
