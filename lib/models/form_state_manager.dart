@@ -6,7 +6,9 @@ import 'flight.dart';
 class FormStateManager extends ChangeNotifier {
   Flight flight;
   FlightTimings timings;
+  bool isSubmitted;
   FormStateManager()
       : flight = Flight(),
-        timings = FlightTimings();
+        timings = FlightTimings(),
+        isSubmitted = false;
 }
