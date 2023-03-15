@@ -491,6 +491,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                                 decoration: const InputDecoration(
                                   labelText: "Datcon/Hobbs Start",
                                 ),
+                                initialValue: timings.datconStart,
                                 onChanged: (value) {
                                   setState(() {
                                     timings.datconStart = value;
@@ -523,6 +524,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                                 decoration: const InputDecoration(
                                   labelText: "Datcon/Hobbs Stop",
                                 ),
+                                initialValue: timings.datconStop,
                                 onChanged: (value) {
                                   setState(() {
                                     timings.datconStop = value;
