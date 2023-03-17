@@ -101,6 +101,7 @@ class FlightLogFormState extends State<FlightLogForm> {
           .then((value) {
         print("sent data");
         flightID = value.id;
+        formStateManager.flightID = flightID!;
         if (flight.monitoringPerson != null) {
           Request request = Request(
               value.id, flight.monitoringPerson!, FlightStatuses.requested);
@@ -110,13 +111,14 @@ class FlightLogFormState extends State<FlightLogForm> {
                   fromFirestore: Request.fromFirestore,
                   toFirestore: (Request r, options) => r.toFirestore())
               .add(request)
-              .then((value) => requestID = value.id);
+              .then(
+                  (value) => formStateManager.requestID = requestID = value.id);
         }
       });
     } else {
       // TODO: parse rotor start/stop times from string to datetime
       DateTime now = DateTime.now();
-      String date = "${now.year}-${now.day}-${now.month}";
+      String date = now.toString().split(" ")[0];
       timings.rotorStart = DateTime.parse("$date ${rotorStartController.text}");
       timings.rotorStop = DateTime.parse("$date ${rotorStopController.text}");
       timings.flightID = flightID;
@@ -145,8 +147,10 @@ class FlightLogFormState extends State<FlightLogForm> {
     // store time button pressed
     // update the relevant input field
     DateTime now = DateTime.now();
-
-    String time = "${now.hour}:${now.minute}";
+    // make X:X into XX:XX
+    String hour = now.hour < 10 ? "0${now.hour}" : now.hour.toString();
+    String minute = now.minute < 10 ? "0${now.minute}" : now.minute.toString();
+    String time = "$hour:$minute";
 
     setState(() {
       timings.rotorStart = now;
@@ -167,8 +171,9 @@ class FlightLogFormState extends State<FlightLogForm> {
     // store time button pressed
     // update the relevant input field
     DateTime now = DateTime.now();
-    //rotorStop = now;
-    String time = "${now.hour}:${now.minute}";
+    String hour = now.hour < 10 ? "0${now.hour}" : now.hour.toString();
+    String minute = now.minute < 10 ? "0${now.minute}" : now.minute.toString();
+    String time = "$hour:$minute";
     setState(() {
       timings.rotorStop = now;
     });
@@ -184,6 +189,8 @@ class FlightLogFormState extends State<FlightLogForm> {
       flight = formStateManager.flight;
       timings = formStateManager.timings;
       formSubmitted = formStateManager.isSubmitted;
+      flightID = formStateManager.flightID;
+      requestID = formStateManager.requestID;
     });
     return Form(
       key: _formKey,
