@@ -96,7 +96,6 @@ class LoginManager extends ChangeNotifier {
       }
       print('User is signed in!');
       _isLoggedIn = true;
-      notifyListeners();
       getObject("user_object").then((result) {
         Map<String, dynamic> userMap = result;
         if (UserModel.fromJson(userMap).email != user.email) {
@@ -104,7 +103,8 @@ class LoginManager extends ChangeNotifier {
           db.collection("users").doc(user.email).get().then(
             (docSnapshot) {
               storeObject(
-                  UserModel.fromJson(docSnapshot.data()!), "user_object");
+                      UserModel.fromJson(docSnapshot.data()!), "user_object")
+                  .then((value) => notifyListeners());
             },
           );
         }
