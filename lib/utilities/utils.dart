@@ -77,6 +77,5 @@ void showSnackBar(BuildContext context, String message) {
 
 String formattedTimeFromDateTime(DateTime? dateTime) {
   if (dateTime == null) return "";
-
-  return "${dateTime.hour}:${dateTime.minute}";
+  return dateTime.toString().split(" ")[1];
 }
