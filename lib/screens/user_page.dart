@@ -11,8 +11,7 @@ class UserPage extends StatelessWidget {
     LoginManager manager = Provider.of<LoginManager>(context, listen: false);
     FlightsListener flightsListener =
         Provider.of<FlightsListener>(context, listen: false);
-    flightsListener.listener?.cancel();
-    manager.logoutUser();
+    flightsListener.listener?.cancel().then((value) => manager.logoutUser());
   }
 
   @override
