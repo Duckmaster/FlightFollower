@@ -4,6 +4,7 @@ import 'package:flight_follower/models/form_state_manager.dart';
 import 'package:flight_follower/models/login_manager.dart';
 import 'package:flight_follower/screens/contacts_page.dart';
 import 'package:flight_follower/screens/login_page.dart';
+import 'package:flight_follower/screens/screen_handler.dart';
 import 'package:flight_follower/screens/user_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flight_follower/models/user_model.dart';
@@ -68,105 +69,24 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _selectedIndex = 0;
   /* static const List<Widget> _titles = <Widget>[
     Text("Flight Details"),
     Text("Flight Following Log"),
     Text("Contacts")
   ]; */
 
-  final List<Map<String, Object>> _pages = [
-    {
-      'page': FlightLogPage(),
-      'title': 'Flight Details',
-      'actions': <Widget>[
-        /* List of actions for screen1 */
-      ] //<-- optional just in case you need default actions that depend on parent as well
-    },
-    {
-      'page': FlightFollowingPage(),
-      'title': 'Flight Following Log',
-      'actions': <Widget>[
-        /* List of actions for screen2 */
-      ] //<-- optional just in case you need default actions that depend on parent as well
-    },
-    {
-      'page': ContactsPage(),
-      'title': 'Contacts',
-      'actions': <
-          Widget>[] //<-- optional just in case you need default actions that depend on parent as well
-    },
-    {
-      'page': UserPage(),
-      'title': 'Contacts',
-      'actions': <
-          Widget>[] //<-- optional just in case you need default actions that depend on parent as well
-    },
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+  void reset(BuildContext context) {
+    Contacts contacts = Provider.of<Contacts>(context, listen: false);
+    contacts.refreshContacts();
   }
-
-  AppBar _buildAppBar(String title, {List<Widget>? actions}) => AppBar(
-        title: Text(title),
-        actions: actions,
-        centerTitle: true,
-      );
 
   @override
   Widget build(BuildContext context) {
-    Widget page = _pages[_selectedIndex]["page"] as Widget;
-
     return LayoutBuilder(builder: (context, constraints) {
       return Consumer<LoginManager>(builder: (context, value, child) {
         if (value.isLoggedIn) {
-          return Scaffold(
-            appBar: _buildAppBar(_pages[_selectedIndex]["title"] as String,
-                actions: page is ContactsPage
-                    ? [
-                        IconButton(
-                            onPressed: () => page.addContactDialog(context),
-                            icon: const Icon(
-                              Icons.add,
-                            ))
-                      ]
-                    : _pages[_selectedIndex]["actions"] as List<Widget>),
-            body: Column(
-              children: [
-                Expanded(
-                  child: Container(
-                    child: page,
-                  ),
-                ),
-              ],
-            ),
-            bottomNavigationBar: BottomNavigationBar(
-              type: BottomNavigationBarType.fixed,
-              items: const <BottomNavigationBarItem>[
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.book),
-                  label: 'Log',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.flight),
-                  label: 'Monitoring',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.contacts),
-                  label: 'Contacts',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.person),
-                  label: 'User',
-                ),
-              ],
-              currentIndex: _selectedIndex,
-              onTap: _onItemTapped,
-            ),
-          );
+          reset(context);
+          return ScreenHandler();
         } else {
           return const Scaffold(
             body: SafeArea(
