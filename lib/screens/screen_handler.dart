@@ -1,6 +1,8 @@
+import 'package:flight_follower/models/flights_listener.dart';
 import 'package:flight_follower/screens/user_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'contacts_page.dart';
 import 'flight_following_page.dart';
@@ -17,6 +19,15 @@ class ScreenHandler extends StatefulWidget {
 
 class ScreenHandlerState extends State<ScreenHandler> {
   int _selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    FlightsListener flightsListener =
+        Provider.of<FlightsListener>(context, listen: false);
+    flightsListener.listener?.resume();
+  }
+
   AppBar _buildAppBar(String title, {List<Widget>? actions}) => AppBar(
         title: Text(title),
         actions: actions,
