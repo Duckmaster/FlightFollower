@@ -69,20 +69,26 @@ class ScreenHandlerState extends State<ScreenHandler> {
     });
   }
 
+  List<Widget>? getActionsForPage(Widget page) {
+    if (page is ContactsPage) {
+      return [
+        IconButton(
+            onPressed: () => page.addContactDialog(context),
+            icon: const Icon(
+              Icons.add,
+            ))
+      ];
+    } else {
+      return [];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget page = _pages[_selectedIndex]["page"] as Widget;
     return Scaffold(
       appBar: _buildAppBar(_pages[_selectedIndex]["title"] as String,
-          actions: page is ContactsPage
-              ? [
-                  IconButton(
-                      onPressed: () => page.addContactDialog(context),
-                      icon: const Icon(
-                        Icons.add,
-                      ))
-                ]
-              : _pages[_selectedIndex]["actions"] as List<Widget>),
+          actions: getActionsForPage(page)),
       body: Column(
         children: [
           Expanded(
