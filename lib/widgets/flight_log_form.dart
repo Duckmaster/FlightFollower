@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flight_follower/models/flight_timings.dart';
+import 'package:flight_follower/models/login_manager.dart';
 import 'package:flight_follower/models/request.dart';
 import 'package:flutter/material.dart';
 import 'package:flight_follower/models/user_model.dart';
@@ -58,8 +59,6 @@ class FlightLogFormState extends State<FlightLogForm> {
   TextEditingController rotorStopController = TextEditingController();
   TextEditingController rotorDiffController = TextEditingController();
   TextEditingController datconDiffController = TextEditingController();
-  TextEditingController nameController = TextEditingController();
-  TextEditingController phoneController = TextEditingController();
 
   bool formSubmitted = false;
 
@@ -68,12 +67,10 @@ class FlightLogFormState extends State<FlightLogForm> {
     super.initState();
     //peopleList = Provider.of<Contacts>(_formKey.currentContext!).items;
     getObject("user_object").then((result) {
+      Map<String, dynamic> userMap = result;
       setState(() {
-        Map<String, dynamic> userMap = result;
         user = UserModel.fromJson(userMap);
         flight.user = user.email;
-        nameController.text = user.username;
-        phoneController.text = user.phoneNumber;
         rotorStartController.text =
             formattedTimeFromDateTime(timings.rotorStart);
         rotorStopController.text = formattedTimeFromDateTime(timings.rotorStop);
@@ -202,22 +199,25 @@ class FlightLogFormState extends State<FlightLogForm> {
           child: Column(
             children: [
               // Name and Phone No fields
-              Row(
-                children: [
-                  Expanded(
-                      child: TextFormField(
-                    controller: nameController,
-                    decoration: InputDecoration(labelText: "Name"),
-                    enabled: false,
-                  )),
-                  Expanded(
-                      child: TextFormField(
-                    controller: phoneController,
-                    decoration: InputDecoration(labelText: "Phone Number"),
-                    enabled: false,
-                  )),
-                ],
-              ),
+
+              Consumer<LoginManager>(builder: (context, value, child) {
+                return Row(
+                  children: [
+                    Expanded(
+                        child: TextFormField(
+                      initialValue: value.currentUserModel.username,
+                      decoration: InputDecoration(labelText: "Name"),
+                      enabled: false,
+                    )),
+                    Expanded(
+                        child: TextFormField(
+                      initialValue: value.currentUserModel.phoneNumber,
+                      decoration: InputDecoration(labelText: "Phone Number"),
+                      enabled: false,
+                    )),
+                  ],
+                );
+              }),
               // Organisation dropdown
               Row(
                 children: [
