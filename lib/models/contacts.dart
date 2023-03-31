@@ -22,6 +22,7 @@ class Contacts extends ChangeNotifier {
   }
 
   void refreshContacts() {
+    _contacts.clear();
     getObject("user_object").then((result) {
       Map<String, dynamic> userMap = result;
       _user = UserModel.fromJson(userMap);
@@ -36,6 +37,7 @@ class Contacts extends ChangeNotifier {
       final data = docSnapshot.data() as Map<String, dynamic>;
       String contactsList = data["contact_list"];
       if (contactsList.isEmpty) return;
+      if (contactsList.length == _contacts.length) return;
       for (var user in contactsList.split(",")) {
         getUser(user).then((value) {
           _contacts.add(value);
