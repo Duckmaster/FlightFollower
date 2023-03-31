@@ -14,9 +14,48 @@ class UserPage extends StatelessWidget {
     flightsListener.listener?.cancel().then((value) => manager.logoutUser());
   }
 
+  void downloadFlights() {}
+
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-        onPressed: () => logout(context), child: Text("logout"));
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: [
+          Expanded(
+              child: Consumer<LoginManager>(builder: (context, value, child) {
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    initialValue: value.currentUserModel.username,
+                    decoration: InputDecoration(labelText: "Name"),
+                    enabled: false,
+                  ),
+                ),
+                Expanded(
+                  child: TextFormField(
+                    initialValue: value.currentUserModel.phoneNumber,
+                    decoration: InputDecoration(labelText: "Phone No."),
+                    enabled: false,
+                  ),
+                ),
+              ],
+            );
+          })),
+          Expanded(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ElevatedButton(
+                    onPressed: () => downloadFlights(),
+                    child: Text("Download recent flights")),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

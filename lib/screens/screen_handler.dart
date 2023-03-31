@@ -78,6 +78,14 @@ class ScreenHandlerState extends State<ScreenHandler> {
               Icons.add,
             ))
       ];
+    } else if (page is UserPage) {
+      return [
+        IconButton(
+            onPressed: () => page.logout(context),
+            icon: const Icon(
+              Icons.logout,
+            ))
+      ];
     } else {
       return [];
     }
