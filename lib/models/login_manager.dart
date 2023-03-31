@@ -10,21 +10,28 @@ import '../utilities/utils.dart';
 class LoginManager extends ChangeNotifier {
   bool _isLoggedIn;
   User? _currentUser;
+  UserModel _currentUserModel;
   StreamSubscription? listener;
   bool _isRegistering = false;
   bool _disposed = false;
-  LoginManager() : _isLoggedIn = false {
+  LoginManager()
+      : _isLoggedIn = false,
+        _currentUserModel =
+            UserModel("placeholder", "placeholder", "placeholder") {
     initListener();
   }
 
   bool get isLoggedIn => _isLoggedIn;
   User? get currentUser => _currentUser;
+  UserModel get currentUserModel => _currentUserModel;
 
   Future<String> loginUser(String email, String password) async {
     try {
       final credential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
-      notifyListeners();
+      if (credential.user != null) {
+        updateUserModel(credential.user!);
+      }
       return "success";
     } on FirebaseAuthException catch (e) {
       return e.code;
@@ -83,6 +90,23 @@ class LoginManager extends ChangeNotifier {
         .listen((User? user) => listenerCallback(user));
   }
 
+  Future<void> updateUserModel(User user) async {
+    FirebaseFirestore db = FirebaseFirestore.instance;
+    if (_currentUserModel.email != user.email) {
+      db.collection("users").doc(user.email).get().then(
+        (docSnapshot) {
+          _currentUserModel = UserModel.fromJson(docSnapshot.data()!);
+          notifyListeners();
+        },
+      );
+    } else {
+      db.collection("users").doc(user.email).get().then((docSnapshot) {
+        _currentUserModel = UserModel.fromJson(docSnapshot.data()!);
+        notifyListeners();
+      });
+    }
+  }
+
   void listenerCallback(User? user) {
     if (user == null) {
       print('User is currently signed out!');
@@ -96,19 +120,6 @@ class LoginManager extends ChangeNotifier {
       }
       print('User is signed in!');
       _isLoggedIn = true;
-      getObject("user_object").then((result) {
-        Map<String, dynamic> userMap = result;
-        if (UserModel.fromJson(userMap).email != user.email) {
-          FirebaseFirestore db = FirebaseFirestore.instance;
-          db.collection("users").doc(user.email).get().then(
-            (docSnapshot) {
-              storeObject(
-                      UserModel.fromJson(docSnapshot.data()!), "user_object")
-                  .then((value) => notifyListeners());
-            },
-          );
-        }
-      });
     }
   }
 }
