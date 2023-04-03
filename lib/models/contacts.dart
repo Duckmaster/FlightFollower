@@ -37,10 +37,9 @@ class Contacts extends ChangeNotifier {
       final data = docSnapshot.data() as Map<String, dynamic>;
       String contactsList = data["contact_list"];
       if (contactsList.isEmpty) return;
-      if (contactsList.length == _contacts.length) return;
       for (var user in contactsList.split(",")) {
         getUser(user).then((value) {
-          _contacts.add(value);
+          if (!_contacts.contains(value)) _contacts.add(value);
           notifyListeners();
         });
       }
