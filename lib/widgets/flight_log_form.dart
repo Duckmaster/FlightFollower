@@ -129,7 +129,7 @@ class FlightLogFormState extends State<FlightLogForm> {
         db
             .collection("requests")
             .doc(requestID)
-            .update({"status": FlightStatuses.completed});
+            .update({"status": FlightStatuses.completed.name});
       }
 
       _formKey.currentState!.reset();
