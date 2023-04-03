@@ -25,4 +25,15 @@ class UserModel {
   }
 
   Map<String, dynamic> toFirestore() => toJson();
+
+  @override
+  bool operator ==(Object other) {
+    if (other is! UserModel) {
+      return false;
+    }
+    return (other.email == email);
+  }
+
+  @override
+  int get hashCode => Object.hash(email, phoneNumber);
 }
