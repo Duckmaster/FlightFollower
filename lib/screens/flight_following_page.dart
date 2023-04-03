@@ -10,6 +10,9 @@ class FlightFollowingPage extends StatelessWidget {
     return Padding(
         padding: const EdgeInsets.all(8.0),
         child: Consumer<FlightsListener>(builder: (context, value, child) {
+          if (value.isListenerCancelled) {
+            value.initListener();
+          }
           return ListView(
             children: [for (FlightItem flightItem in value.items) flightItem],
           );
