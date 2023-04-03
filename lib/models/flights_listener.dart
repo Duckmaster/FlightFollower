@@ -14,6 +14,7 @@ class FlightsListener extends ChangeNotifier {
   final List<FlightItem> _flights = [];
   late UserModel _user;
   StreamSubscription? listener;
+  bool _isListenerCancelled = false;
 
   FlightsListener() {
     getObject("user_object").then((result) {
@@ -23,9 +24,11 @@ class FlightsListener extends ChangeNotifier {
     });
   }
 
+  bool get isListenerCancelled => _isListenerCancelled;
   UnmodifiableListView<FlightItem> get items => UnmodifiableListView(_flights);
 
   void initListener() {
+    _isListenerCancelled = false;
     FirebaseFirestore db = FirebaseFirestore.instance;
     listener = db
         .collection("requests")
@@ -84,5 +87,10 @@ class FlightsListener extends ChangeNotifier {
 
   FlightItem getFlightItemByFlight(Flight toFind) {
     return _flights.singleWhere((flight) => flight.flight == toFind);
+  }
+
+  Future<void> cancelListener() async {
+    await listener!.cancel();
+    _isListenerCancelled = true;
   }
 }
