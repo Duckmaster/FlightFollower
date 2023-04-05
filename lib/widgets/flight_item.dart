@@ -121,6 +121,15 @@ class FlightItemState extends State<FlightItem> {
             "eta": "ETA:"
           }.entries);
         }
+      case FlightStatuses.completed:
+        {
+          return Map.fromEntries(<String, String>{
+            "status": "LANDED",
+            "departure": "Departure:",
+            "arrival": "Arrival:",
+            "eta": "Duration:"
+          }.entries);
+        }
     }
     return Map.fromEntries(<String, String>{
       "status": "STATUS",
