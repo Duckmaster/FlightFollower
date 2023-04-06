@@ -59,40 +59,49 @@ class UserPage extends StatelessWidget {
     LoginManager manager = Provider.of<LoginManager>(context, listen: false);
     List<Map<Flight, FlightTimings>> flights =
         await retrieveAllFlightData(manager.currentUser!);
-    List<Map<String, Map<String, String>>> flightsTransformed = [];
+    List<String> flightsTransformed = [
+      """Flight ID, Organisation, Aircraft Ident, Copilot,
+      Num. Persons, Departure, Destination, Scheduled Departure,
+      Datcon Start, Rotor Start, Scheduled Arrival,
+      Rotor Stop, Datcon Stop, ETE, Fuel Endurance,
+      Flight Type"""
+          .replaceAll("\n", "")
+    ];
+
+    DateTime now = DateTime.now();
+    String date = now.toString().split(" ")[0];
+
     for (var pair in flights) {
       Flight flight = pair.keys.first;
       FlightTimings timings = pair.values.first;
 
-      DateTime now = DateTime.now();
-      String date = now.toString().split(" ")[0];
       String scheduledArrival = DateTime.parse("$date ${flight.departureTime}")
           .add(Duration(minutes: (flight.ete! * 60).toInt()))
           .toString()
           .split(" ")[1];
       flightsTransformed.add({
-        timings.flightID!: {
-          "organisation": flight.organisation ?? "N/A",
-          "aircraft_ident": flight.aircraftIdentifier!,
-          "copilot": flight.copilot ?? "N/A",
-          "num_persons": flight.numPersons!,
-          "departure_location": flight.departureLocation!,
-          "destination": flight.destination!,
-          "scheduled_departure": flight.departureTime!,
-          "datcon_start": timings.datconStart!,
-          "rotor_start": timings.rotorStart.toString(),
-          "scheduled_arrival": scheduledArrival,
-          "rotor_stop": timings.rotorStop.toString(),
-          "datcon_stop": timings.datconStop.toString(),
-          "ete": flight.ete.toString(),
-          "endurance": flight.endurance!,
-          "flight_type": flight.flightType!
-        }
-      });
+        "flight_id": timings.flightID,
+        "organisation": flight.organisation ?? "N/A",
+        "aircraft_ident": flight.aircraftIdentifier!,
+        "copilot": flight.copilot ?? "N/A",
+        "num_persons": flight.numPersons!,
+        "departure_location": flight.departureLocation!,
+        "destination": flight.destination!,
+        "scheduled_departure": flight.departureTime!,
+        "datcon_start": timings.datconStart!,
+        "rotor_start": timings.rotorStart.toString(),
+        "scheduled_arrival": scheduledArrival,
+        "rotor_stop": timings.rotorStop.toString(),
+        "datcon_stop": timings.datconStop.toString(),
+        "ete": flight.ete.toString(),
+        "endurance": flight.endurance!,
+        "flight_type": flight.flightType!
+      }.values.join(","));
     }
-    String flightsJSON = jsonEncode({"flights": flightsTransformed});
+    //String flightsJSON = jsonEncode({"flights": flightsTransformed});
 
-    File("$selectedDirectory/flights.json").writeAsString(flightsJSON);
+    await File("$selectedDirectory/flights.csv")
+        .writeAsString(flightsTransformed.join("\r\n"));
   }
 
   @override
