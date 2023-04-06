@@ -90,21 +90,17 @@ class LoginManager extends ChangeNotifier {
         .listen((User? user) => listenerCallback(user));
   }
 
-  Future<void> updateUserModel(User user) async {
+  void updateUserModel(User user) async {
     FirebaseFirestore db = FirebaseFirestore.instance;
     if (_currentUserModel.email != user.email) {
-      db.collection("users").doc(user.email).get().then(
-        (docSnapshot) {
-          _currentUserModel = UserModel.fromJson(docSnapshot.data()!);
-          notifyListeners();
-        },
-      );
+      var docSnapshot = await db.collection("users").doc(user.email).get();
+      _currentUserModel = UserModel.fromJson(docSnapshot.data()!);
     } else {
-      db.collection("users").doc(user.email).get().then((docSnapshot) {
-        _currentUserModel = UserModel.fromJson(docSnapshot.data()!);
-        notifyListeners();
-      });
+      var docSnapshot = await db.collection("users").doc(user.email).get();
+      _currentUserModel = UserModel.fromJson(docSnapshot.data()!);
     }
+    await storeObject(_currentUserModel, "user_object");
+    notifyListeners();
   }
 
   void listenerCallback(User? user) {
