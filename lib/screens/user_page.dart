@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flight_follower/models/flight.dart';
 import 'package:flight_follower/models/flight_timings.dart';
@@ -45,13 +47,15 @@ class UserPage extends StatelessWidget {
         .where("flight_id", whereIn: flightIDs)
         .get();
 
-    for (int i = 0; i < smth.size; i++) {
+    for (int i = 0; i < smth.size - 1; i++) {
       flights.add({smth.docs[i].data(): anotherSmth.docs[i].data()});
     }
     return flights;
   }
 
   void downloadFlights(BuildContext context) async {
+    String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
+    if (selectedDirectory == null) return;
     LoginManager manager = Provider.of<LoginManager>(context, listen: false);
     List<Map<Flight, FlightTimings>> flights =
         await retrieveAllFlightData(manager.currentUser!);
@@ -87,6 +91,8 @@ class UserPage extends StatelessWidget {
       });
     }
     String flightsJSON = jsonEncode({"flights": flightsTransformed});
+
+    File("$selectedDirectory/flights.json").writeAsString(flightsJSON);
   }
 
   @override
@@ -123,7 +129,7 @@ class UserPage extends StatelessWidget {
               children: [
                 ElevatedButton(
                     onPressed: () => downloadFlights(context),
-                    child: Text("Download recent flights")),
+                    child: Text("Download flights")),
               ],
             ),
           ),
