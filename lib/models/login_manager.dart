@@ -121,6 +121,7 @@ class LoginManager extends ChangeNotifier {
       print('User is signed in!');
       _isLoggedIn = true;
       notifyListeners();
+      updateUserModel(user);
     }
   }
 }
