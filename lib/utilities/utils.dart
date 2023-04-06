@@ -79,3 +79,14 @@ String formattedTimeFromDateTime(DateTime? dateTime) {
   if (dateTime == null) return "";
   return dateTime.toString().split(" ")[1];
 }
+
+DateTime getCutoffDateTime() {
+  DateTime now = DateTime.now();
+  String date = now.toString().split(" ")[0];
+  DateTime cutoff = DateTime.parse("$date 03:00");
+
+  if (now.isBefore(cutoff)) {
+    cutoff.add(Duration(days: 1));
+  }
+  return cutoff;
+}
