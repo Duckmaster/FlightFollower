@@ -29,8 +29,6 @@ class FlightsListener extends ChangeNotifier {
 
   void initListener() {
     _isListenerCancelled = false;
-    String todayDate = DateTime.now().toString().split(" ")[0];
-    DateTime cutoff = DateTime.parse("$todayDate 03:00");
     FirebaseFirestore db = FirebaseFirestore.instance;
     listener = db
         .collection("requests")
@@ -38,7 +36,7 @@ class FlightsListener extends ChangeNotifier {
             fromFirestore: Request.fromFirestore,
             toFirestore: (Request request, _) => request.toFirestore())
         .where("user_id", isEqualTo: _user.email)
-        .where("timestamp", isGreaterThanOrEqualTo: cutoff)
+        .where("timestamp", isGreaterThan: getCutoffDateTime())
         .snapshots()
         .listen((event) {
       for (var change in event.docChanges) {
