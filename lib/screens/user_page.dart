@@ -47,8 +47,12 @@ class UserPage extends StatelessWidget {
         .where("flight_id", whereIn: flightIDs)
         .get();
 
-    for (int i = 0; i < smth.size - 1; i++) {
-      flights.add({smth.docs[i].data(): anotherSmth.docs[i].data()});
+    for (var i in smth.docs) {
+      for (var j in anotherSmth.docs) {
+        if (i.id == j.data().flightID) {
+          flights.add({i.data(): j.data()});
+        }
+      }
     }
     return flights;
   }
