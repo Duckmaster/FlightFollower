@@ -2,11 +2,12 @@ import 'package:flight_follower/utilities/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Request {
+  final Timestamp? timestamp;
   final String flightID;
   final String userID;
   final FlightStatuses status;
 
-  Request(this.flightID, this.userID, this.status);
+  Request(this.flightID, this.userID, this.status, {this.timestamp});
 
   factory Request.fromFirestore(
     DocumentSnapshot<Map<String, dynamic>> snapshot,
@@ -14,10 +15,16 @@ class Request {
   ) {
     final data = snapshot.data();
     return Request(data?["flight_id"], data?["user_id"],
-        FlightStatuses.values.byName(data?["status"]));
+        FlightStatuses.values.byName(data?["status"]),
+        timestamp: data?["timestamp"]);
   }
 
   Map<String, dynamic> toFirestore() {
-    return {"flight_id": flightID, "user_id": userID, "status": status.name};
+    return {
+      "timestamp": FieldValue.serverTimestamp(),
+      "flight_id": flightID,
+      "user_id": userID,
+      "status": status.name
+    };
   }
 }
