@@ -21,7 +21,7 @@ class UserPage extends StatelessWidget {
     LoginManager manager = Provider.of<LoginManager>(context, listen: false);
     FlightsListener flightsListener =
         Provider.of<FlightsListener>(context, listen: false);
-    flightsListener.listener?.cancel().then((value) => manager.logoutUser());
+    flightsListener.cancelListener().then((value) => manager.logoutUser());
   }
 
   Future<List<Map<Flight, FlightTimings>>> retrieveAllFlightData(
