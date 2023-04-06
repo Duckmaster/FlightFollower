@@ -127,7 +127,7 @@ class FlightItemState extends State<FlightItem> {
             "status": "LANDED",
             "departure": "Departure:",
             "arrival": "Arrival:",
-            "eta": "Duration:"
+            "eta": ""
           }.entries);
         }
     }
@@ -176,6 +176,10 @@ class FlightItemState extends State<FlightItem> {
     DateTime currentTime =
         DateFormat("HH:mm").parse("${currentDate.hour}:${currentDate.minute}");
     DateTime time;
+
+    if (widget.flightStatus == FlightStatuses.completed) {
+      return "";
+    }
 
     if (widget.flightStatus == FlightStatuses.notstarted) {
       time = DateFormat("HH:mm").parse(widget.flight.departureTime!);
