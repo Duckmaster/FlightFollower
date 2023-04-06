@@ -102,6 +102,9 @@ class UserPage extends StatelessWidget {
 
     await File("$selectedDirectory/flights.csv")
         .writeAsString(flightsTransformed.join("\r\n"));
+
+    showSnackBar(
+        context, "Saved flight information to $selectedDirectory/flights.csv!");
   }
 
   @override
