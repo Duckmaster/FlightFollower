@@ -1,7 +1,6 @@
 import 'package:flight_follower/models/login_manager.dart';
 import 'package:flight_follower/models/user_model.dart';
 import 'package:flight_follower/utilities/utils.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,7 +12,7 @@ class RegisterPage extends StatelessWidget {
   static TextEditingController phoneController = TextEditingController();
   static TextEditingController passwordController = TextEditingController();
 
-  void register(BuildContext context) async {
+  void _register(BuildContext context) async {
     UserModel newUser = UserModel(
         nameController.text, emailController.text, phoneController.text);
     LoginManager manager = Provider.of<LoginManager>(context, listen: false);
@@ -112,7 +111,7 @@ class RegisterPage extends StatelessWidget {
                                         child: const Text("Back")),
                                     const Padding(padding: EdgeInsets.all(5)),
                                     ElevatedButton(
-                                        onPressed: () => register(context),
+                                        onPressed: () => _register(context),
                                         child: const Text("Register")),
                                   ]),
                             )

@@ -31,6 +31,8 @@ class FlightItem extends StatefulWidget {
     return FlightItemState();
   }
 
+  /// Calculates the arrival time for this flight item
+  /// If this flight is still requested or not started, returns value of ETE
   static String _calculateArrival(
       Enum flightStatus, double ete, String depTime) {
     if (flightStatus == FlightStatuses.requested ||
@@ -74,7 +76,11 @@ class FlightItemState extends State<FlightItem> {
     });
   }
 
-  Map<String, String> getLabelsForStatus() {
+  /// Gets the contextual labels for this flight item depending on the
+  /// current status
+  ///
+  /// Returns a map of label -> label text
+  Map<String, String> _getLabelsForStatus() {
     switch (widget.flightStatus) {
       case FlightStatuses.requested:
         {
@@ -97,7 +103,7 @@ class FlightItemState extends State<FlightItem> {
       case FlightStatuses.enroute:
         {
           return Map.fromEntries(<String, String>{
-            "status": "EN ROUTE",
+            "status": "ON TIME",
             "departure": "Departure:",
             "arrival": "Estimated arrival:",
             "eta": "ETA:"
@@ -106,7 +112,7 @@ class FlightItemState extends State<FlightItem> {
       case FlightStatuses.nearlyoverdue:
         {
           return Map.fromEntries(<String, String>{
-            "status": "NEARLY \nOVERDUE",
+            "status": "LATE",
             "departure": "Departure:",
             "arrival": "Estimated arrival:",
             "eta": "ETA:"
@@ -139,7 +145,8 @@ class FlightItemState extends State<FlightItem> {
     }.entries);
   }
 
-  Color getColour() {
+  /// Returns the associate Color for each flight status
+  Color _getColour() {
     switch (widget.flightStatus) {
       case FlightStatuses.requested:
         {
@@ -171,7 +178,11 @@ class FlightItemState extends State<FlightItem> {
     throw Exception("Invalid flight status");
   }
 
-  String calculateETA() {
+  /// Calculates the ETA value for this flight item
+  /// If the flight status is requested, nothing is shown
+  /// If the flight status is not started, time to departure is displayed
+  /// If the flight status is completed, this should display the flight duration
+  String _calculateETA() {
     DateTime currentDate = DateTime.now();
     DateTime currentTime =
         DateFormat("HH:mm").parse("${currentDate.hour}:${currentDate.minute}");
@@ -199,11 +210,11 @@ class FlightItemState extends State<FlightItem> {
     }
   }
 
-  String getCopilotName() {
+  String _getCopilotName() {
     return widget.flight.copilot ?? "N/A";
   }
 
-  void onAccept() {
+  void _onRequestAccept() {
     setState(() {
       widget.flightStatus = FlightStatuses.notstarted;
     });
@@ -215,7 +226,7 @@ class FlightItemState extends State<FlightItem> {
     // listen for timings
   }
 
-  void onDecline() {
+  void _onRequestDecline() {
     FirebaseFirestore db = FirebaseFirestore.instance;
     db
         .collection("requests")
@@ -225,7 +236,7 @@ class FlightItemState extends State<FlightItem> {
 
   @override
   Widget build(BuildContext context) {
-    Map<String, String> labels = getLabelsForStatus();
+    Map<String, String> labels = _getLabelsForStatus();
     return SizedBox(
       width: MediaQuery.of(context).size.width,
       height: widget.extended ? 175 : 100,
@@ -243,7 +254,7 @@ class FlightItemState extends State<FlightItem> {
                   color: Colors.black,
                 ),
                 borderRadius: BorderRadius.all(Radius.circular(20)),
-                color: getColour()),
+                color: _getColour()),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
@@ -306,7 +317,7 @@ class FlightItemState extends State<FlightItem> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text("${labels["eta"]!} ${calculateETA()}"),
+                              Text("${labels["eta"]!} ${_calculateETA()}"),
                               Visibility(
                                   visible: widget.flightStatus ==
                                           FlightStatuses.requested
@@ -316,13 +327,13 @@ class FlightItemState extends State<FlightItem> {
                                     child: Row(children: [
                                       Expanded(
                                         child: IconButton(
-                                            onPressed: onAccept,
+                                            onPressed: _onRequestAccept,
                                             iconSize: 30,
                                             icon: const Icon(Icons.check)),
                                       ),
                                       Expanded(
                                         child: IconButton(
-                                            onPressed: onDecline,
+                                            onPressed: _onRequestDecline,
                                             iconSize: 30,
                                             icon: const Icon(Icons.close)),
                                       )
@@ -343,7 +354,7 @@ class FlightItemState extends State<FlightItem> {
                           child: Column(
                             children: [
                               Text("Pilot: ${pilot.username}"),
-                              Text("Co-pilot: ${getCopilotName()}")
+                              Text("Co-pilot: ${_getCopilotName()}")
                             ],
                           ),
                         ),

@@ -21,25 +21,29 @@ class UserPage extends StatelessWidget {
     LoginManager manager = Provider.of<LoginManager>(context, listen: false);
     FlightsListener flightsListener =
         Provider.of<FlightsListener>(context, listen: false);
+    // We have to cancel this listener on logout (then start it on login) as
+    // the active subscription causes havoc with Firestore access perms when no
+    // user is signed in
     flightsListener.cancelListener().then((value) => manager.logoutUser());
   }
 
-  Future<List<Map<Flight, FlightTimings>>> retrieveAllFlightData(
+  /// Fetches all Flights and their FlightTimings for the logged in user
+  Future<List<Map<Flight, FlightTimings>>> _retrieveAllFlightData(
       User currentUser) async {
     List<Map<Flight, FlightTimings>> flights = [];
     FirebaseFirestore db = FirebaseFirestore.instance;
-    var smth = await db
+    var flightSnapshot = await db
         .collection("flights")
         .withConverter(
             fromFirestore: Flight.fromFirestore,
             toFirestore: (Flight flight, _) => flight.toFirestore())
         .where("user", isEqualTo: currentUser.email)
         .get();
-    if (smth.size == 0) {
+    if (flightSnapshot.size == 0) {
       return flights;
     }
-    List<String> flightIDs = smth.docs.map((e) => e.id).toList();
-    var anotherSmth = await db
+    List<String> flightIDs = flightSnapshot.docs.map((e) => e.id).toList();
+    var timingsSnapshot = await db
         .collection("timings")
         .withConverter(
             fromFirestore: FlightTimings.fromFirestore,
@@ -47,8 +51,9 @@ class UserPage extends StatelessWidget {
         .where("flight_id", whereIn: flightIDs)
         .get();
 
-    for (var i in smth.docs) {
-      for (var j in anotherSmth.docs) {
+    // Match up Flight objects to their correct FlightTimings
+    for (var i in flightSnapshot.docs) {
+      for (var j in timingsSnapshot.docs) {
         if (i.id == j.data().flightID) {
           flights.add({i.data(): j.data()});
         }
@@ -57,12 +62,17 @@ class UserPage extends StatelessWidget {
     return flights;
   }
 
+  /// Download the flight data for the logged in user
   void downloadFlights(BuildContext context) async {
+    // Let the user pick the directory
     String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
     if (selectedDirectory == null) return;
     LoginManager manager = Provider.of<LoginManager>(context, listen: false);
     List<Map<Flight, FlightTimings>> flights =
-        await retrieveAllFlightData(manager.currentUser!);
+        await _retrieveAllFlightData(manager.currentUser!);
+    // We will put our csv formatted lines in here
+    // Init list with the header and remove any \n created by multiline string
+    // (it looks nicer than one long line)
     List<String> flightsTransformed = [
       """Flight ID, Organisation, Aircraft Ident, Copilot,
       Num. Persons, Departure, Destination, Scheduled Departure,
@@ -79,10 +89,12 @@ class UserPage extends StatelessWidget {
       Flight flight = pair.keys.first;
       FlightTimings timings = pair.values.first;
 
+      // Calculate sched. arrival adhoc because I dont save it anywhere
       String scheduledArrival = DateTime.parse("$date ${flight.departureTime}")
           .add(Duration(minutes: (flight.ete! * 60).toInt()))
           .toString()
           .split(" ")[1];
+      // Create a map of values then join with comma to create a string
       flightsTransformed.add({
         "flight_id": timings.flightID,
         "organisation": flight.organisation ?? "N/A",
@@ -104,6 +116,7 @@ class UserPage extends StatelessWidget {
     }
     //String flightsJSON = jsonEncode({"flights": flightsTransformed});
 
+    // Once we've formatted everything, write our list to a file (joined by newline and carriage returns)
     await File("$selectedDirectory/flights.csv")
         .writeAsString(flightsTransformed.join("\r\n"));
 

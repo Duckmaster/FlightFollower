@@ -1,4 +1,3 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flight_follower/models/flight_timings.dart';
 import 'package:flight_follower/models/login_manager.dart';
 import 'package:flight_follower/models/request.dart';
@@ -24,7 +23,7 @@ class FlightLogForm extends StatefulWidget {
 
 class FlightLogFormState extends State<FlightLogForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  static List<String> orgList = <String>['One', 'Two', 'Three', 'Four'];
+  static List<String> orgList = <String>[];
   //static var peopleList = <UserModel>[];
   static List<String> flightTypes = <String>[
     'Private',
@@ -113,7 +112,6 @@ class FlightLogFormState extends State<FlightLogForm> {
         }
       });
     } else {
-      // TODO: parse rotor start/stop times from string to datetime
       DateTime now = DateTime.now();
       String date = now.toString().split(" ")[0];
       timings.rotorStart = DateTime.parse("$date ${rotorStartController.text}");
@@ -137,7 +135,7 @@ class FlightLogFormState extends State<FlightLogForm> {
   }
 
   void refreshMonitoringPerson() {
-    // do nothing yet
+    // TODO: Needs implementation
   }
 
   void rotorStartPressed() {
@@ -182,6 +180,8 @@ class FlightLogFormState extends State<FlightLogForm> {
   @override
   Widget build(BuildContext context) {
     formStateManager = Provider.of<FormStateManager>(context, listen: false);
+    // TODO: Move this elsewhere to fix persistence after submit
+    // Form state persistence
     setState(() {
       flight = formStateManager.flight;
       timings = formStateManager.timings;
@@ -226,14 +226,13 @@ class FlightLogFormState extends State<FlightLogForm> {
                       decoration: const InputDecoration(
                         labelText: "Organisation",
                       ),
-                      value: flight.organisation,
-                      items:
-                          orgList.map<DropdownMenuItem<String>>((String value) {
+                      items: null,
+                      /*orgList.map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
                           child: Text(value),
                         );
-                      }).toList(),
+                      }).toList()*/
                       onChanged: formSubmitted
                           ? null
                           : (String? value) {
@@ -401,8 +400,9 @@ class FlightLogFormState extends State<FlightLogForm> {
                             return DropdownButtonFormField(
                               isExpanded: true,
                               value: flight.monitoringPerson,
-                              items: value.items.map<DropdownMenuItem<String>>(
-                                  (UserModel value) {
+                              items: value.contacts
+                                  .map<DropdownMenuItem<String>>(
+                                      (UserModel value) {
                                 return DropdownMenuItem<String>(
                                   value: value.email,
                                   child: Text(value.username),
@@ -467,7 +467,6 @@ class FlightLogFormState extends State<FlightLogForm> {
                   ))
                 ],
               ),
-              // Honestly cant decide if i want 3 columns or 3 rows AAAAAAAAA
               const SizedBox(
                 height: 50,
               ),
@@ -555,10 +554,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                         flex: 1,
                         child: Column(
                           children: [
-                            //const ElevatedButton(
-                            //    onPressed: null, child: Text("test")),
                             const SizedBox(height: 48),
-
                             Expanded(
                               child: TextFormField(
                                 decoration: const InputDecoration(
@@ -591,12 +587,5 @@ class FlightLogFormState extends State<FlightLogForm> {
         ),
       ),
     );
-    /* TextFormField(
-        decoration: const InputDecoration(
-          labelText: "Name",
-        ),
-        initialValue: "John Smith",
-        enabled: false,
-      ), */
   }
 }

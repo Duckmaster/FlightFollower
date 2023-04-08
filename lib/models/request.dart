@@ -1,6 +1,7 @@
 import 'package:flight_follower/utilities/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+/// A Request submitted from one user for another to monitor their flight
 class Request {
   final Timestamp? timestamp;
   final String flightID;

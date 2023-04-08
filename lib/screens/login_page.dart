@@ -11,13 +11,15 @@ class LoginPage extends StatelessWidget {
   static TextEditingController emailController = TextEditingController();
   static TextEditingController passwordController = TextEditingController();
 
-  void login(BuildContext context) {
+  /// Log the user in
+  void _login(BuildContext context) {
+    // Make sure the login listener is running before anything else
     LoginManager loginManager =
         Provider.of<LoginManager>(context, listen: false);
     if (loginManager.listener!.isPaused) {
       loginManager.listener!.resume();
     }
-    //String result = "";
+
     loginManager
         .loginUser(emailController.text, passwordController.text)
         .then((returnCode) {
@@ -27,7 +29,11 @@ class LoginPage extends StatelessWidget {
     });
   }
 
-  void register(BuildContext context) {
+  /// Navigates user to the register page which handles register logic
+  void _register(BuildContext context) {
+    // Navigator doesn't let us access this instance of LoginManager, so
+    // we pause its listener to prevent any issues whilst the register
+    // page is open
     LoginManager loginManager =
         Provider.of<LoginManager>(context, listen: false);
     loginManager.listener!.pause();
@@ -101,10 +107,10 @@ class LoginPage extends StatelessWidget {
                           flex: 3,
                           child: Column(children: [
                             ElevatedButton(
-                                onPressed: () => login(context),
+                                onPressed: () => _login(context),
                                 child: const Text("Login")),
                             ElevatedButton(
-                                onPressed: () => register(context),
+                                onPressed: () => _register(context),
                                 child: const Text("Register"))
                           ]),
                         )

@@ -1,5 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+/// User information model
+/// This is necessary as Firebase Auth's own User class doesnt allow for
+/// storage of any other info, and we require a user's phone number within this app.
+/// So, this class is used to save database reads
 class UserModel {
   final String username;
   final String email;

@@ -10,11 +10,12 @@ class FlightFollowingPage extends StatelessWidget {
     return Padding(
         padding: const EdgeInsets.all(8.0),
         child: Consumer<FlightsListener>(builder: (context, value, child) {
+          // Restarts the listener if it was cancelled between user sessions
           if (value.isListenerCancelled) {
             value.initListener();
           }
           return ListView(
-            children: [for (FlightItem flightItem in value.items) flightItem],
+            children: [for (FlightItem flightItem in value.flights) flightItem],
           );
         }));
   }

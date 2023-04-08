@@ -1,11 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flight_follower/models/user_model.dart';
 import 'dart:convert';
 
+/// Set of various statuses a flight can take
 enum FlightStatuses {
   requested,
   notstarted,
@@ -17,12 +16,19 @@ enum FlightStatuses {
   completed
 }
 
+/// Stores [obj] into shared preferences as [name]
+///
+/// Returns a Future which completes once [obj] has been stored
 Future<void> storeObject(Object obj, String name) async {
   final prefs = await SharedPreferences.getInstance();
   String objString = jsonEncode(obj);
   await prefs.setString(name, objString);
 }
 
+/// Retrieves an object with [name] from shared preferences
+///
+/// Returns a Future which completes to give a map of [name] and the
+/// corresponding object. Throws if [name] is not found in shared preferences.
 Future<Map<String, dynamic>> getObject(String name) async {
   final prefs = await SharedPreferences.getInstance();
   String? objString = prefs.getString(name);
@@ -32,7 +38,11 @@ Future<Map<String, dynamic>> getObject(String name) async {
   return jsonDecode(objString);
 }
 
-// retrieves user data from db
+/// Gets the user information for [userID] from the database
+///
+/// Returns a Future that completes to give a UserModel object containing
+/// [userID]'s informations. If [userID] is not found in the database,
+/// a UserObject with empty strings is returned.
 Future<UserModel> getUser(String userID) async {
   FirebaseFirestore db = FirebaseFirestore.instance;
   return db.collection("users").doc(userID).get().then((docSnapshot) {
@@ -42,6 +52,7 @@ Future<UserModel> getUser(String userID) async {
   });
 }
 
+/// Uses [context] to show a [message] to the user as a snackbar.
 void showSnackBar(BuildContext context, String message) {
   SnackBar snackBar;
   switch (message) {
@@ -75,18 +86,22 @@ void showSnackBar(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
 
+/// Returns the time component of [dateTime] as a String
 String formattedTimeFromDateTime(DateTime? dateTime) {
   if (dateTime == null) return "";
   return dateTime.toString().split(" ")[1];
 }
 
+/// Calculates a [DateTime] for retrieving only today's
+/// flights (i.e. after 3am of that day) from the database
 DateTime getCutoffDateTime() {
   DateTime now = DateTime.now();
   String date = now.toString().split(" ")[0];
   DateTime cutoff = DateTime.parse("$date 03:00");
 
+  // After midnight, but before the next 3am cutoff
   if (now.isBefore(cutoff)) {
-    cutoff.add(Duration(days: 1));
+    cutoff.subtract(Duration(days: 1));
   }
   return cutoff;
 }

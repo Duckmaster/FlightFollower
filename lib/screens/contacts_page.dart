@@ -1,12 +1,8 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flight_follower/models/contacts.dart';
 import 'package:flight_follower/utilities/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flight_follower/widgets/flight_item.dart';
 import 'package:provider/provider.dart';
-import 'package:flight_follower/models/flights_listener.dart';
 
 import '../models/user_model.dart';
 
@@ -19,7 +15,7 @@ class ContactsPage extends StatelessWidget {
     });
   }
 
-  void addContactDialog(BuildContext context) {
+  void dialogAddNewContact(BuildContext context) {
     TextEditingController controller = TextEditingController();
     showDialog(
         context: context,
@@ -36,7 +32,8 @@ class ContactsPage extends StatelessWidget {
                             label: Text("Email address/phone number:")),
                       ),
                       ElevatedButton(
-                          onPressed: () => addContact(controller.text, context),
+                          onPressed: () =>
+                              _addContact(controller.text, context),
                           child: Text("Add"))
                     ],
                   ),
@@ -45,16 +42,17 @@ class ContactsPage extends StatelessWidget {
             ));
   }
 
-  void addContact(String value, BuildContext context) {
+  /// Add [value] as a new contact for this user
+  /// [value] can be either email or phone number, this method checks formatting
+  /// using regex
+  void _addContact(String value, BuildContext context) {
     FirebaseFirestore db = FirebaseFirestore.instance;
     var contacts = Provider.of<Contacts>(context, listen: false);
-    var contactsCopy = contacts.items.toList();
+    var contactsCopy = contacts.contacts.toList();
 
     value = value.trimLeft().trimRight();
 
     // regex to match either email or phone no, then query db
-    //db.collection("users").where("email", isEqualTo: )
-
     RegExp emailRegex = RegExp(r"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
     RegExp phoneRegex = RegExp("[0-9]{11}");
 
@@ -68,7 +66,7 @@ class ContactsPage extends StatelessWidget {
         if (match.email != "") {
           contactsCopy.add(match);
           contacts.addContact(match);
-          storeContacts(db, contactsCopy);
+          _storeContacts(db, contactsCopy);
           showSnackBar(context, "Contact successfully added!");
         } else {
           showSnackBar(context,
@@ -76,6 +74,7 @@ class ContactsPage extends StatelessWidget {
         }
       });
     } else if (phoneRegex.hasMatch(value)) {
+      // query db for phone number
       db
           .collection("users")
           .where("phoneNumber", isEqualTo: value)
@@ -88,7 +87,7 @@ class ContactsPage extends StatelessWidget {
         if (match.email != "") {
           contactsCopy.add(match);
           contacts.addContact(match);
-          storeContacts(db, contactsCopy);
+          _storeContacts(db, contactsCopy);
           showSnackBar(context, "Contact successfully added!");
         } else {
           showSnackBar(context,
@@ -103,7 +102,8 @@ class ContactsPage extends StatelessWidget {
     }
   }
 
-  void storeContacts(FirebaseFirestore db, List<UserModel> contactList) {
+  /// Updates this users contacts in the database with [contactList]
+  void _storeContacts(FirebaseFirestore db, List<UserModel> contactList) {
     db.collection("contacts").doc(_user.email).set(<String, dynamic>{
       "contact_list": contactList.map((e) => e.email).join(",")
     });
@@ -119,7 +119,7 @@ class ContactsPage extends StatelessWidget {
           child: Consumer<Contacts>(builder: (context, value, child) {
             return ListView(
               children: [
-                for (UserModel user in value.items)
+                for (UserModel user in value.contacts)
                   ListTile(title: Text(user.username)),
               ],
             );

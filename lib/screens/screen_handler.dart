@@ -8,6 +8,7 @@ import 'contacts_page.dart';
 import 'flight_following_page.dart';
 import 'flight_log_page.dart';
 
+/// Manages pages and their associated styling for this app
 class ScreenHandler extends StatefulWidget {
   const ScreenHandler({super.key});
 
@@ -35,32 +36,10 @@ class ScreenHandlerState extends State<ScreenHandler> {
       );
 
   final List<Map<String, Object>> _pages = [
-    {
-      'page': FlightLogPage(),
-      'title': 'Flight Details',
-      'actions': <Widget>[
-        /* List of actions for screen1 */
-      ] //<-- optional just in case you need default actions that depend on parent as well
-    },
-    {
-      'page': FlightFollowingPage(),
-      'title': 'Flight Following Log',
-      'actions': <Widget>[
-        /* List of actions for screen2 */
-      ] //<-- optional just in case you need default actions that depend on parent as well
-    },
-    {
-      'page': ContactsPage(),
-      'title': 'Contacts',
-      'actions': <
-          Widget>[] //<-- optional just in case you need default actions that depend on parent as well
-    },
-    {
-      'page': UserPage(),
-      'title': 'Contacts',
-      'actions': <
-          Widget>[] //<-- optional just in case you need default actions that depend on parent as well
-    },
+    {'page': FlightLogPage(), 'title': 'Flight Details'},
+    {'page': FlightFollowingPage(), 'title': 'Flight Following Log'},
+    {'page': ContactsPage(), 'title': 'Contacts'},
+    {'page': UserPage(), 'title': 'Contacts'},
   ];
 
   void _onItemTapped(int index) {
@@ -69,11 +48,14 @@ class ScreenHandlerState extends State<ScreenHandler> {
     });
   }
 
-  List<Widget>? getActionsForPage(Widget page) {
+  /// Gets [page]-specific app bar actions
+  ///
+  /// Returns a list of action widgets for [page]
+  List<Widget> getActionsForPage(Widget page) {
     if (page is ContactsPage) {
       return [
         IconButton(
-            onPressed: () => page.addContactDialog(context),
+            onPressed: () => page.dialogAddNewContact(context),
             icon: const Icon(
               Icons.add,
             ))

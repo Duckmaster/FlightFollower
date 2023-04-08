@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Custom widget for picking a time with drop down menus
 class TimePicker extends StatelessWidget {
   final String label;
   final Function callback;
@@ -8,7 +9,7 @@ class TimePicker extends StatelessWidget {
   int? minuteValue;
   TimePicker(this.label, this.callback, {super.key, this.enabled = true});
 
-  String prefixWithNaught(String value) {
+  String _prefixWithNaught(String value) {
     if (value.length == 1) {
       return "0$value";
     }
@@ -35,7 +36,7 @@ class TimePicker extends StatelessWidget {
                       return DropdownMenuItem(
                           value: value - 1,
                           child:
-                              Text(prefixWithNaught((value - 1).toString())));
+                              Text(_prefixWithNaught((value - 1).toString())));
                     }).toList(),
                     onChanged: !enabled
                         ? null
@@ -56,7 +57,7 @@ class TimePicker extends StatelessWidget {
                         .map<DropdownMenuItem<int>>((int value) {
                       return DropdownMenuItem(
                           value: value,
-                          child: Text(prefixWithNaught(value.toString())));
+                          child: Text(_prefixWithNaught(value.toString())));
                     }).toList(),
                     onChanged: !enabled
                         ? null

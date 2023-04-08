@@ -7,10 +7,13 @@ import 'package:flutter/cupertino.dart';
 
 import '../utilities/utils.dart';
 
+/// User authentication and login manager
+/// This class handles all user auth, login, logout, registering actions
 class LoginManager extends ChangeNotifier {
   bool _isLoggedIn;
   User? _currentUser;
   UserModel _currentUserModel;
+  // TODO: Refactor listener to be private again
   StreamSubscription? listener;
   bool _isRegistering = false;
   bool _disposed = false;
@@ -25,6 +28,9 @@ class LoginManager extends ChangeNotifier {
   User? get currentUser => _currentUser;
   UserModel get currentUserModel => _currentUserModel;
 
+  /// Attempts to sign in the user with [email] and [password]
+  ///
+  /// Returns a Future with the resulting status code
   Future<String> loginUser(String email, String password) async {
     try {
       final credential = await FirebaseAuth.instance
@@ -38,12 +44,16 @@ class LoginManager extends ChangeNotifier {
     }
   }
 
+  /// Attempts to create a new user account with [email] and [password]
+  ///
+  /// Returns a Future with the resulting status code
   Future<String> registerUser(UserModel user, String password) async {
     _isRegistering = true;
     try {
       final auth = FirebaseAuth.instance;
       final cred = await auth.createUserWithEmailAndPassword(
           email: user.email, password: password);
+      // Stores the new user info into database
       FirebaseFirestore.instance
           .collection("users")
           .withConverter(
@@ -63,9 +73,12 @@ class LoginManager extends ChangeNotifier {
     _currentUser!.sendEmailVerification();
   }
 
+  /// Sign out the currently signed in user
+  ///
+  /// Returns a Future with the resulting status code
   Future<String> logoutUser() async {
     try {
-      final credential = await FirebaseAuth.instance.signOut();
+      await FirebaseAuth.instance.signOut();
       notifyListeners();
       return "success";
     } on FirebaseAuthException catch (e) {
@@ -90,31 +103,34 @@ class LoginManager extends ChangeNotifier {
         .listen((User? user) => listenerCallback(user));
   }
 
+  /// Update this instance to store the UserModel object for [user]
   void updateUserModel(User user) async {
     FirebaseFirestore db = FirebaseFirestore.instance;
-    if (_currentUserModel.email != user.email) {
-      var docSnapshot = await db.collection("users").doc(user.email).get();
-      _currentUserModel = UserModel.fromJson(docSnapshot.data()!);
-    } else {
-      var docSnapshot = await db.collection("users").doc(user.email).get();
-      _currentUserModel = UserModel.fromJson(docSnapshot.data()!);
-    }
+
+    // TODO: Optimise so if _currentUserModel.email == user.email or
+    // getObject("user_model") == _currentUserModel, dont do anything
+    var docSnapshot = await db.collection("users").doc(user.email).get();
+    _currentUserModel = UserModel.fromJson(docSnapshot.data()!);
+
     await storeObject(_currentUserModel, "user_object");
     notifyListeners();
   }
 
   void listenerCallback(User? user) {
     if (user == null) {
-      print('User is currently signed out!');
+      // User is signed out
       _isLoggedIn = false;
       notifyListeners();
     } else {
+      // user is signed in
       _currentUser = user;
+
+      // Dont let the user sign in if they havent verified their email
       if (!user.emailVerified) {
         if (!_isRegistering) logoutUser();
         return;
       }
-      print('User is signed in!');
+
       _isLoggedIn = true;
       notifyListeners();
       updateUserModel(user);

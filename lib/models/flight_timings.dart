@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flight_follower/models/flight.dart';
 
+/// A class that models the "timings" portion of a flight
+/// Contains values like the rotor start/stop times etc
 class FlightTimings {
   String? flightID;
   DateTime? rotorStart;

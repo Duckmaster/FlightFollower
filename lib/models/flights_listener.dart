@@ -1,15 +1,16 @@
 import 'dart:async';
 import 'dart:collection';
 import 'package:flutter/foundation.dart';
-import 'package:provider/provider.dart';
 import 'package:flight_follower/models/flight.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flight_follower/models/request.dart';
-import 'package:flight_follower/models/flight.dart';
 import 'package:flight_follower/models/user_model.dart';
 import 'package:flight_follower/widgets/flight_item.dart';
 import 'package:flight_follower/utilities/utils.dart';
 
+/// Handles the persistence and updating of the flights the user is monitoring
+/// This class is responsible for storing monitored flights, and listening to
+/// changes from the database when new flights are added or existing flights updated
 class FlightsListener extends ChangeNotifier {
   final List<FlightItem> _flights = [];
   late UserModel _user;
@@ -25,8 +26,12 @@ class FlightsListener extends ChangeNotifier {
   }
 
   bool get isListenerCancelled => _isListenerCancelled;
-  UnmodifiableListView<FlightItem> get items => UnmodifiableListView(_flights);
 
+  /// Returns an immutable list of flights this FlightListener is currently storing
+  UnmodifiableListView<FlightItem> get flights =>
+      UnmodifiableListView(_flights);
+
+  /// Initialise this FlightListener's subscription to the database and callback
   void initListener() {
     _isListenerCancelled = false;
     FirebaseFirestore db = FirebaseFirestore.instance;
@@ -51,9 +56,10 @@ class FlightsListener extends ChangeNotifier {
             .then((value) {
           if (!value.exists) return;
           Flight flight = value.data()!;
+          // Construct a FlightItem instance for the flight with the new status
           FlightItem newFlightItem =
               FlightItem(flight, request.status, change.doc.id);
-          // need to fix this; equality testing between flight objects
+          // Find the old FlightItem in_flights for the updated flight
           FlightItem? oldFlightItem = _flights.singleWhere(
             (f) => f.flight == flight,
             orElse: () => FlightItem(flight, FlightStatuses.declined, ""),
@@ -61,6 +67,7 @@ class FlightsListener extends ChangeNotifier {
 
           switch (change.type) {
             case DocumentChangeType.added:
+              // We have a new request (new flight) so add the flight
               if (newFlightItem.flightStatus != FlightStatuses.declined) {
                 _flights.add(newFlightItem);
               }
@@ -68,6 +75,10 @@ class FlightsListener extends ChangeNotifier {
               notifyListeners();
               break;
             case DocumentChangeType.modified:
+              // Status has been updated, so remove the old flight from the list and add the new one
+
+              // Check to make sure the old flight exists in _flight
+              // (if the earlier singleWhere fails, orElse func creates a Request with empty requestID)
               if (oldFlightItem.requestID != "") {
                 _flights.remove(oldFlightItem);
               }
@@ -79,6 +90,7 @@ class FlightsListener extends ChangeNotifier {
 
               break;
             case DocumentChangeType.removed:
+              // We dont remove data so do nothing
               break;
           }
         });
@@ -86,10 +98,7 @@ class FlightsListener extends ChangeNotifier {
     });
   }
 
-  FlightItem getFlightItemByFlight(Flight toFind) {
-    return _flights.singleWhere((flight) => flight.flight == toFind);
-  }
-
+  /// Cancel the listener maintained by this instance and mark our internal state as such
   Future<void> cancelListener() async {
     await listener!.cancel();
     _isListenerCancelled = true;
