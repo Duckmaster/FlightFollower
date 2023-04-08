@@ -202,6 +202,15 @@ class FlightItemState extends State<FlightItem> {
     Duration diff = time.difference(currentTime);
 
     if (diff.inHours == 0) {
+      if (diff.inMinutes < 0 && diff.inMinutes > -8) {
+        setState(() {
+          widget.flightStatus = FlightStatuses.nearlyoverdue;
+        });
+      } else if (diff.inMinutes <= -8) {
+        setState(() {
+          widget.flightStatus = FlightStatuses.overdue;
+        });
+      }
       return "${diff.inMinutes}mins";
     } else {
       String hour = ((diff.inMinutes ~/ 60)).toString();
