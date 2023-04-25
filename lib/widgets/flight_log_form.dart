@@ -1,4 +1,3 @@
-import 'package:flight_follower/models/flight_timings.dart';
 import 'package:flight_follower/models/login_manager.dart';
 import 'package:flight_follower/models/request.dart';
 import 'package:flutter/material.dart';

@@ -5,7 +5,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flight_follower/models/flight.dart';
-import 'package:flight_follower/models/flight_timings.dart';
 import 'package:flight_follower/models/flights_listener.dart';
 import 'package:flight_follower/models/login_manager.dart';
 import 'package:flight_follower/models/user_model.dart';

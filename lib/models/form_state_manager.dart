@@ -1,4 +1,3 @@
-import 'package:flight_follower/models/flight_timings.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'flight.dart';
