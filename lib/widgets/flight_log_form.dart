@@ -290,7 +290,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                           labelText: "Num. Persons on Board",
                           contentPadding:
                               EdgeInsets.only(bottom: 9.5, top: 9.5)),
-                      value: int.parse(flight.numPersons ?? "1"),
+                      value: int.parse(flight.numPersons!),
                     ),
                   ),
                 ],
@@ -363,7 +363,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                           return DropdownMenuItem(
                               value: value, child: Text(value.toString()));
                         }).toList(),
-                        value: double.parse(flight.endurance ?? "0.1"),
+                        value: double.parse(flight.endurance!),
                         onChanged: formSubmitted
                             ? null
                             : (double? value) {
