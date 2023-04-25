@@ -183,7 +183,7 @@ class FlightLogFormState extends State<FlightLogForm> {
     // Form state persistence
     setState(() {
       flight = formStateManager.flight;
-      timings = formStateManager.timings;
+      timings = flight.timings!;
       formSubmitted = formStateManager.isSubmitted;
       flightID = formStateManager.flightID;
       requestID = formStateManager.requestID;
