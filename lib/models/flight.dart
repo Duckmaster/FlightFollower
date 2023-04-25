@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// Stores information relating to one singular flight
@@ -14,7 +16,7 @@ class Flight {
   String? endurance;
   String? monitoringPerson;
   String? flightType;
-  late FlightTimings timings;
+  FlightTimings? timings;
 
   Flight(
       {this.user,
@@ -28,8 +30,10 @@ class Flight {
       this.endurance,
       this.monitoringPerson,
       this.flightType,
-      this.copilot}) {
-    timings = FlightTimings();
+      this.copilot,
+      this.timings}) {
+    // initialise with a new object if no instance is passed in
+    timings = timings ?? FlightTimings();
     _prefixDepartureWithNaught();
   }
 
@@ -56,19 +60,19 @@ class Flight {
   ) {
     final data = snapshot.data();
     return Flight(
-      user: data?["user"],
-      organisation: data?["organisation"],
-      aircraftIdentifier: data?["aircraft_ident"],
-      copilot: data?["copilot"],
-      numPersons: data?["num_persons"],
-      departureLocation: data?["departure"],
-      destination: data?["destination"],
-      departureTime: data?["departure_time"],
-      ete: data?["ete"],
-      endurance: data?["endurance"],
-      monitoringPerson: data?["monitoring_person"],
-      flightType: data?["flight_type"],
-    );
+        user: data?["user"],
+        organisation: data?["organisation"],
+        aircraftIdentifier: data?["aircraft_ident"],
+        copilot: data?["copilot"],
+        numPersons: data?["num_persons"],
+        departureLocation: data?["departure"],
+        destination: data?["destination"],
+        departureTime: data?["departure_time"],
+        ete: data?["ete"],
+        endurance: data?["endurance"],
+        monitoringPerson: data?["monitoring_person"],
+        flightType: data?["flight_type"],
+        timings: data?["timings"]);
   }
 
   Map<String, dynamic> toFirestore() {
@@ -84,7 +88,8 @@ class Flight {
       "ete": ete,
       "endurance": endurance,
       "monitoring_person": monitoringPerson,
-      "flight_type": flightType
+      "flight_type": flightType,
+      "timings": timings,
     };
   }
 
