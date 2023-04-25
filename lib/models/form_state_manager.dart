@@ -12,7 +12,7 @@ class FormStateManager extends ChangeNotifier {
   String flightID;
   String requestID;
   FormStateManager()
-      : flight = Flight(),
+      : flight = Flight(numPersons: "1", endurance: "0.1", ete: 0.1),
         timings = FlightTimings(),
         isSubmitted = false,
         flightID = "",
