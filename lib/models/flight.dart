@@ -14,6 +14,7 @@ class Flight {
   String? endurance;
   String? monitoringPerson;
   String? flightType;
+  late FlightTimings timings;
 
   Flight(
       {this.user,
@@ -28,6 +29,7 @@ class Flight {
       this.monitoringPerson,
       this.flightType,
       this.copilot}) {
+    timings = FlightTimings();
     _prefixDepartureWithNaught();
   }
 
