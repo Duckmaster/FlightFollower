@@ -26,9 +26,9 @@ class MyApp extends StatelessWidget {
       ),
       // Various providers that I need around the app
       home: MultiProvider(providers: [
+        ChangeNotifierProvider(create: (context) => LoginManager()),
         ChangeNotifierProvider(create: (context) => FlightsListener()),
         ChangeNotifierProvider(create: (context) => Contacts()),
-        ChangeNotifierProvider(create: (context) => LoginManager()),
         ChangeNotifierProvider(create: (context) => FormStateManager())
       ], child: const MyHomePage()),
     );
