@@ -72,7 +72,7 @@ class Flight {
         endurance: data?["endurance"],
         monitoringPerson: data?["monitoring_person"],
         flightType: data?["flight_type"],
-        timings: data?["timings"]);
+        timings: FlightTimings.fromFirestore(snapshot, options));
   }
 
   Map<String, dynamic> toFirestore() {
@@ -89,7 +89,7 @@ class Flight {
       "endurance": endurance,
       "monitoring_person": monitoringPerson,
       "flight_type": flightType,
-      "timings": timings,
+      "timings": timings!.toFirestore(),
     };
   }
 
@@ -127,7 +127,7 @@ class FlightTimings {
     DocumentSnapshot<Map<String, dynamic>> snapshot,
     SnapshotOptions? options,
   ) {
-    final data = snapshot.data();
+    final data = snapshot.data()!["timings"];
     return FlightTimings(
         flightID: data?["flight_id"],
         rotorStart: DateTime.parse(data?["rotor_start"]),
