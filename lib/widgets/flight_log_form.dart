@@ -47,7 +47,8 @@ class FlightLogFormState extends State<FlightLogForm> {
 
   late UserModel user;
   Flight flight = Flight();
-  FlightTimings timings = FlightTimings();
+  late FlightTimings timings;
+  //FlightTimings timings = FlightTimings();
   late FormStateManager formStateManager;
 
   String? flightID;
@@ -69,6 +70,7 @@ class FlightLogFormState extends State<FlightLogForm> {
       setState(() {
         user = UserModel.fromJson(userMap);
         flight.user = user.email;
+        timings = flight.timings!;
         rotorStartController.text =
             formattedTimeFromDateTime(timings.rotorStart);
         rotorStopController.text = formattedTimeFromDateTime(timings.rotorStop);
