@@ -78,7 +78,8 @@ class UserPage extends StatelessWidget {
           .split(" ")[1];
       // Create a map of values then join with comma to create a string
       flightsTransformed.add({
-        "flight_id": flight.timings!.flightID,
+        // TODO: Decide if this is necessary
+        //"flight_id": flight.timings!.flightID,
         "organisation": flight.organisation ?? "N/A",
         "aircraft_ident": flight.aircraftIdentifier!,
         "copilot": flight.copilot ?? "N/A",

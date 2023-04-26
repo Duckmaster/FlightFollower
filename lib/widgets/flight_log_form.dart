@@ -51,7 +51,6 @@ class FlightLogFormState extends State<FlightLogForm> {
   //FlightTimings timings = FlightTimings();
   late FormStateManager formStateManager;
 
-  String? flightID;
   String? requestID;
 
   TextEditingController rotorStartController = TextEditingController();
@@ -97,8 +96,7 @@ class FlightLogFormState extends State<FlightLogForm> {
           .add(flight)
           .then((value) {
         print("sent data");
-        flightID = value.id;
-        formStateManager.flightID = flightID!;
+        formStateManager.flightID = value.id;
         if (flight.monitoringPerson != null) {
           Request request = Request(
               value.id, flight.monitoringPerson!, FlightStatuses.requested);
@@ -117,13 +115,13 @@ class FlightLogFormState extends State<FlightLogForm> {
       String date = now.toString().split(" ")[0];
       timings.rotorStart = DateTime.parse("$date ${rotorStartController.text}");
       timings.rotorStop = DateTime.parse("$date ${rotorStopController.text}");
-      timings.flightID = flightID;
       db
-          .collection("timings")
+          .collection("flights")
           .withConverter(
-              fromFirestore: FlightTimings.fromFirestore,
-              toFirestore: (FlightTimings t, options) => t.toFirestore())
-          .add(timings);
+              fromFirestore: Flight.fromFirestore,
+              toFirestore: (Flight flight, options) => flight.toFirestore())
+          .doc(formStateManager.flightID)
+          .update({"timings": flight.timings!.toFirestore()});
       if (flight.monitoringPerson != null) {
         db
             .collection("requests")
@@ -187,7 +185,6 @@ class FlightLogFormState extends State<FlightLogForm> {
       flight = formStateManager.flight;
       timings = flight.timings!;
       formSubmitted = formStateManager.isSubmitted;
-      flightID = formStateManager.flightID;
       requestID = formStateManager.requestID;
     });
     return Form(
