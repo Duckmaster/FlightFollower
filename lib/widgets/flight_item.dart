@@ -140,7 +140,7 @@ class FlightItemState extends State<FlightItem> {
             "status": "LANDED",
             "departure": "Departure:",
             "arrival": "Arrival:",
-            "eta": ""
+            "eta": "Duration:"
           }.entries);
         }
     }
