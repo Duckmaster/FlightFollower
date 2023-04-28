@@ -111,8 +111,8 @@ class FlightItemState extends State<FlightItem> {
         {
           return Map.fromEntries(<String, String>{
             "status": "ON TIME",
-            "departure": "Departure:",
-            "arrival": "Estimated arrival:",
+            "departure": "Sched. departure:",
+            "arrival": "Est. arrival:",
             "eta": "ETA:"
           }.entries);
         }
@@ -120,8 +120,8 @@ class FlightItemState extends State<FlightItem> {
         {
           return Map.fromEntries(<String, String>{
             "status": "LATE",
-            "departure": "Departure:",
-            "arrival": "Estimated arrival:",
+            "departure": "Sched. departure:",
+            "arrival": "Est. arrival:",
             "eta": "ETA:"
           }.entries);
         }
@@ -129,8 +129,8 @@ class FlightItemState extends State<FlightItem> {
         {
           return Map.fromEntries(<String, String>{
             "status": "OVERDUE",
-            "departure": "Departure:",
-            "arrival": "Estimated arrival:",
+            "departure": "Sched. departure:",
+            "arrival": "Est. arrival:",
             "eta": "ETA:"
           }.entries);
         }
