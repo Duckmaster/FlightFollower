@@ -335,6 +335,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                       (String time) {
                         flight.departureTime = time;
                       },
+                      time: flight.departureTime,
                       enabled: !formSubmitted,
                       validator: (int? value) {
                         return value == null ? "This field is required." : null;
