@@ -61,6 +61,13 @@ class FlightItem extends StatefulWidget {
       return "$hour:$min";
     }
   }
+
+  String getDeparture() {
+    if (flightStatus == FlightStatuses.completed)
+      return formattedTimeFromDateTime(flight.timings!.rotorStart);
+    else
+      return flight.departureTime!;
+  }
 }
 
 class FlightItemState extends State<FlightItem> {
@@ -189,7 +196,9 @@ class FlightItemState extends State<FlightItem> {
     DateTime time;
 
     if (widget.flightStatus == FlightStatuses.completed) {
-      return "";
+      var timings = widget.flight.timings!;
+      Duration diff = timings.rotorStop!.difference(timings.rotorStart!);
+      return "${diff.inHours}hrs ${diff.inMinutes % 60}mins";
     }
 
     if (widget.flightStatus == FlightStatuses.notstarted) {
@@ -308,7 +317,7 @@ class FlightItemState extends State<FlightItem> {
                                   Row(
                                     children: [
                                       Text(
-                                          "${labels["departure"]!} ${widget.flight.departureTime}")
+                                          "${labels["departure"]!} ${widget.getDeparture()}")
                                     ],
                                   ),
                                   Row(
