@@ -7,7 +7,9 @@ class TimePicker extends StatelessWidget {
   bool enabled;
   int? hourValue;
   int? minuteValue;
-  TimePicker(this.label, this.callback, {super.key, this.enabled = true});
+  String? Function(int? value)? validator;
+  TimePicker(this.label, this.callback,
+      {super.key, this.validator, this.enabled = true});
 
   String _prefixWithNaught(String value) {
     if (value.length == 1) {
@@ -31,19 +33,20 @@ class TimePicker extends StatelessWidget {
               children: [
                 const Text("Hour"),
                 DropdownButtonFormField(
-                    items: List<int>.generate(24, (i) => i + 1)
-                        .map<DropdownMenuItem<int>>((int value) {
-                      return DropdownMenuItem(
-                          value: value - 1,
-                          child:
-                              Text(_prefixWithNaught((value - 1).toString())));
-                    }).toList(),
-                    onChanged: !enabled
-                        ? null
-                        : (int? value) {
-                            hourValue = value;
-                            callback("$hourValue:$minuteValue");
-                          }),
+                  items: List<int>.generate(24, (i) => i + 1)
+                      .map<DropdownMenuItem<int>>((int value) {
+                    return DropdownMenuItem(
+                        value: value - 1,
+                        child: Text(_prefixWithNaught((value - 1).toString())));
+                  }).toList(),
+                  onChanged: !enabled
+                      ? null
+                      : (int? value) {
+                          hourValue = value;
+                          callback("$hourValue:$minuteValue");
+                        },
+                  validator: validator,
+                ),
               ],
             )),
             const Text(":"),
@@ -53,18 +56,20 @@ class TimePicker extends StatelessWidget {
               children: [
                 const Text("Minute"),
                 DropdownButtonFormField(
-                    items: List<int>.generate(12, (i) => i * 5, growable: false)
-                        .map<DropdownMenuItem<int>>((int value) {
-                      return DropdownMenuItem(
-                          value: value,
-                          child: Text(_prefixWithNaught(value.toString())));
-                    }).toList(),
-                    onChanged: !enabled
-                        ? null
-                        : (int? value) {
-                            minuteValue = value;
-                            callback("$hourValue:$minuteValue");
-                          }),
+                  items: List<int>.generate(12, (i) => i * 5, growable: false)
+                      .map<DropdownMenuItem<int>>((int value) {
+                    return DropdownMenuItem(
+                        value: value,
+                        child: Text(_prefixWithNaught(value.toString())));
+                  }).toList(),
+                  onChanged: !enabled
+                      ? null
+                      : (int? value) {
+                          minuteValue = value;
+                          callback("$hourValue:$minuteValue");
+                        },
+                  validator: validator,
+                ),
               ],
             ))
           ],

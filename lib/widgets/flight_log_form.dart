@@ -81,6 +81,8 @@ class FlightLogFormState extends State<FlightLogForm> {
     FirebaseFirestore db = FirebaseFirestore.instance;
     _formKey.currentState!.save();
 
+    if (!_formKey.currentState!.validate()) return;
+
     setState(() {
       formSubmitted = formStateManager.isSubmitted = !formSubmitted;
       submitButtonLabel = formSubmitted ? "Flight Completed" : "Submit";
@@ -176,6 +178,10 @@ class FlightLogFormState extends State<FlightLogForm> {
     rotorDiffController.text = diff;
   }
 
+  String? validatorEmpty(String? value) {
+    return value == "" || value == null ? "This field is required." : null;
+  }
+
   @override
   Widget build(BuildContext context) {
     formStateManager = Provider.of<FormStateManager>(context, listen: false);
@@ -247,13 +253,13 @@ class FlightLogFormState extends State<FlightLogForm> {
                 children: [
                   Expanded(
                     child: TextFormField(
-                      initialValue: flight.aircraftIdentifier,
-                      decoration: const InputDecoration(
-                        labelText: "Aircraft Reg/Callsign",
-                      ),
-                      enabled: !formSubmitted,
-                      onChanged: (value) => flight.aircraftIdentifier = value,
-                    ),
+                        initialValue: flight.aircraftIdentifier,
+                        decoration: const InputDecoration(
+                          labelText: "Aircraft Reg/Callsign",
+                        ),
+                        enabled: !formSubmitted,
+                        onChanged: (value) => flight.aircraftIdentifier = value,
+                        validator: validatorEmpty),
                   ),
                 ],
               ),
@@ -304,6 +310,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                       ),
                       enabled: !formSubmitted,
                       onChanged: (value) => flight.departureLocation = value,
+                      validator: validatorEmpty,
                     ),
                   ),
                   Expanded(
@@ -314,6 +321,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                       ),
                       enabled: !formSubmitted,
                       onChanged: (value) => flight.destination = value,
+                      validator: validatorEmpty,
                     ),
                   )
                 ],
@@ -328,6 +336,9 @@ class FlightLogFormState extends State<FlightLogForm> {
                         flight.departureTime = time;
                       },
                       enabled: !formSubmitted,
+                      validator: (int? value) {
+                        return value == null ? "This field is required." : null;
+                      },
                     ),
                   ),
                   Expanded(
@@ -398,14 +409,16 @@ class FlightLogFormState extends State<FlightLogForm> {
                             return DropdownButtonFormField(
                               isExpanded: true,
                               value: flight.monitoringPerson,
-                              items: value.contacts
-                                  .map<DropdownMenuItem<String>>(
+                              items: [
+                                    DropdownMenuItem<String>(child: Text(""))
+                                  ] +
+                                  value.contacts.map<DropdownMenuItem<String>>(
                                       (UserModel value) {
-                                return DropdownMenuItem<String>(
-                                  value: value.email,
-                                  child: Text(value.username),
-                                );
-                              }).toList(),
+                                    return DropdownMenuItem<String>(
+                                      value: value.email,
+                                      child: Text(value.username),
+                                    );
+                                  }).toList(),
                               onChanged: formSubmitted
                                   ? null
                                   : (String? value) {
@@ -462,6 +475,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                     decoration: const InputDecoration(
                       label: Text("Type of Flight"),
                     ),
+                    validator: validatorEmpty,
                   ))
                 ],
               ),
@@ -488,6 +502,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                                   labelText: "Start Time",
                                 ),
                                 controller: rotorStartController,
+                                validator: validatorEmpty,
                               ),
                             ),
                             Expanded(
@@ -521,6 +536,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                                   labelText: "Stop Time",
                                 ),
                                 controller: rotorStopController,
+                                validator: validatorEmpty,
                               ),
                             ),
                             Expanded(
@@ -559,6 +575,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                                     labelText: "Flight Time",
                                     labelStyle: TextStyle(fontSize: 14)),
                                 controller: rotorDiffController,
+                                enabled: false,
                               ),
                             ),
                             Expanded(
@@ -567,6 +584,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                                     labelText: "Maintenance\nTime",
                                     labelStyle: TextStyle(fontSize: 12)),
                                 controller: datconDiffController,
+                                enabled: false,
                               ),
                             ),
                           ],
