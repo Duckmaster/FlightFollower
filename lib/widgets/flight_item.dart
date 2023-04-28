@@ -198,7 +198,9 @@ class FlightItemState extends State<FlightItem> {
     if (widget.flightStatus == FlightStatuses.completed) {
       var timings = widget.flight.timings!;
       Duration diff = timings.rotorStop!.difference(timings.rotorStart!);
-      return "${diff.inHours}hrs ${diff.inMinutes % 60}mins";
+      return diff.inHours == 0
+          ? "${diff.inMinutes % 60}mins"
+          : "${diff.inHours}hrs ${diff.inMinutes % 60}mins";
     }
 
     if (widget.flightStatus == FlightStatuses.notstarted) {
