@@ -14,4 +14,11 @@ class DatabaseWrapper extends ChangeNotifier {
     DocumentReference ref = await _db.collection(collection).add(data);
     return ref.id;
   }
+
+  /// Updates an existing document within [collection] with an identifier matching [documentID]
+  /// [data] should take the form {fieldToUpdate: updatedValue}
+  Future<void> updateDocument(
+      String collection, String documentID, Map<String, dynamic> data) async {
+    return await _db.collection(collection).doc(documentID).update(data);
+  }
 }
