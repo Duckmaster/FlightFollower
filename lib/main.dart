@@ -4,6 +4,7 @@ import 'package:flight_follower/models/form_state_manager.dart';
 import 'package:flight_follower/models/login_manager.dart';
 import 'package:flight_follower/screens/login_page.dart';
 import 'package:flight_follower/screens/screen_handler.dart';
+import 'package:flight_follower/utilities/database_api.dart';
 import 'package:flutter/material.dart';
 import 'package:flight_follower/models/flights_listener.dart';
 import 'package:provider/provider.dart';
@@ -26,6 +27,7 @@ class MyApp extends StatelessWidget {
       ),
       // Various providers that I need around the app
       home: MultiProvider(providers: [
+        ChangeNotifierProvider(create: (context) => DatabaseWrapper()),
         ChangeNotifierProvider(create: (context) => LoginManager()),
         ChangeNotifierProvider(create: (context) => FlightsListener()),
         ChangeNotifierProvider(create: (context) => Contacts()),

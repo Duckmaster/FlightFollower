@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flight_follower/models/login_manager.dart';
 import 'package:flight_follower/models/request.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +8,8 @@ import 'package:flight_follower/models/flight.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flight_follower/widgets/time_picker.dart';
 import 'package:flight_follower/utilities/utils.dart';
+import 'package:flight_follower/utilities/database_api.dart';
+import 'package:flight_follower/main.dart';
 import 'package:provider/provider.dart';
 
 import '../models/contacts.dart';
@@ -90,26 +94,15 @@ class FlightLogFormState extends State<FlightLogForm> {
 
     if (formSubmitted) {
       // push to database
-      db
-          .collection("flights")
-          .withConverter(
-              fromFirestore: Flight.fromFirestore,
-              toFirestore: (Flight flight, options) => flight.toFirestore())
-          .add(flight)
-          .then((value) {
+      DatabaseWrapper db = Provider.of<DatabaseWrapper>(context, listen: false);
+      db.addDocument("flights", flight.toFirestore()).then((flightID) {
         print("sent data");
-        formStateManager.flightID = value.id;
+        formStateManager.flightID = flightID;
         if (flight.monitoringPerson != null) {
           Request request = Request(
-              value.id, flight.monitoringPerson!, FlightStatuses.requested);
-          db
-              .collection("requests")
-              .withConverter(
-                  fromFirestore: Request.fromFirestore,
-                  toFirestore: (Request r, options) => r.toFirestore())
-              .add(request)
-              .then(
-                  (value) => formStateManager.requestID = requestID = value.id);
+              flightID, flight.monitoringPerson!, FlightStatuses.requested);
+          db.addDocument("requests", request.toFirestore()).then((requestID) =>
+              formStateManager.requestID = this.requestID = requestID);
         }
       });
     } else {
