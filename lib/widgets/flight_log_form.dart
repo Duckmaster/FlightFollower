@@ -82,7 +82,6 @@ class FlightLogFormState extends State<FlightLogForm> {
   }
 
   void onPressed() {
-    FirebaseFirestore db = FirebaseFirestore.instance;
     _formKey.currentState!.save();
 
     if (!_formKey.currentState!.validate()) return;
@@ -92,9 +91,9 @@ class FlightLogFormState extends State<FlightLogForm> {
       submitButtonLabel = formSubmitted ? "Flight Completed" : "Submit";
     });
 
+    DatabaseWrapper db = Provider.of<DatabaseWrapper>(context, listen: false);
     if (formSubmitted) {
       // push to database
-      DatabaseWrapper db = Provider.of<DatabaseWrapper>(context, listen: false);
       db.addDocument("flights", flight.toFirestore()).then((flightID) {
         print("sent data");
         formStateManager.flightID = flightID;
@@ -110,18 +109,11 @@ class FlightLogFormState extends State<FlightLogForm> {
       String date = now.toString().split(" ")[0];
       timings.rotorStart = DateTime.parse("$date ${rotorStartController.text}");
       timings.rotorStop = DateTime.parse("$date ${rotorStopController.text}");
-      db
-          .collection("flights")
-          .withConverter(
-              fromFirestore: Flight.fromFirestore,
-              toFirestore: (Flight flight, options) => flight.toFirestore())
-          .doc(formStateManager.flightID)
-          .update({"timings": flight.timings!.toFirestore()});
+      db.updateDocument("flights", formStateManager.flightID,
+          {"timings": flight.timings!.toFirestore()});
       if (flight.monitoringPerson != null) {
-        db
-            .collection("requests")
-            .doc(requestID)
-            .update({"status": FlightStatuses.completed.name});
+        db.updateDocument(
+            "requests", requestID!, {"status": FlightStatuses.completed.name});
       }
 
       _formKey.currentState!.reset();
@@ -148,11 +140,10 @@ class FlightLogFormState extends State<FlightLogForm> {
     rotorStartController.text = time;
 
     if (flight.monitoringPerson != null) {
-      FirebaseFirestore db = FirebaseFirestore.instance;
-      db
-          .collection("requests")
-          .doc(requestID)
-          .update({"status": FlightStatuses.enroute.name});
+      //FirebaseFirestore db = FirebaseFirestore.instance;
+      DatabaseWrapper db = Provider.of<DatabaseWrapper>(context, listen: false);
+      db.updateDocument(
+          "requests", requestID!, {"status": FlightStatuses.enroute.name});
     }
   }
 
