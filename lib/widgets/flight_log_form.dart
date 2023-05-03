@@ -54,6 +54,7 @@ class FlightLogFormState extends State<FlightLogForm> {
   late FlightTimings timings;
   //FlightTimings timings = FlightTimings();
   late FormStateManager formStateManager;
+  late DatabaseWrapper _db;
 
   String? requestID;
 
@@ -77,6 +78,7 @@ class FlightLogFormState extends State<FlightLogForm> {
         rotorStartController.text =
             formattedTimeFromDateTime(timings.rotorStart);
         rotorStopController.text = formattedTimeFromDateTime(timings.rotorStop);
+        _db = Provider.of<DatabaseWrapper>(context, listen: false);
       });
     });
   }
@@ -91,16 +93,15 @@ class FlightLogFormState extends State<FlightLogForm> {
       submitButtonLabel = formSubmitted ? "Flight Completed" : "Submit";
     });
 
-    DatabaseWrapper db = Provider.of<DatabaseWrapper>(context, listen: false);
     if (formSubmitted) {
       // push to database
-      db.addDocument("flights", flight.toFirestore()).then((flightID) {
+      _db.addDocument("flights", flight.toFirestore()).then((flightID) {
         print("sent data");
         formStateManager.flightID = flightID;
         if (flight.monitoringPerson != null) {
           Request request = Request(
               flightID, flight.monitoringPerson!, FlightStatuses.requested);
-          db.addDocument("requests", request.toFirestore()).then((requestID) =>
+          _db.addDocument("requests", request.toFirestore()).then((requestID) =>
               formStateManager.requestID = this.requestID = requestID);
         }
       });
@@ -109,10 +110,10 @@ class FlightLogFormState extends State<FlightLogForm> {
       String date = now.toString().split(" ")[0];
       timings.rotorStart = DateTime.parse("$date ${rotorStartController.text}");
       timings.rotorStop = DateTime.parse("$date ${rotorStopController.text}");
-      db.updateDocument("flights", formStateManager.flightID,
+      _db.updateDocument("flights", formStateManager.flightID,
           {"timings": flight.timings!.toFirestore()});
       if (flight.monitoringPerson != null) {
-        db.updateDocument(
+        _db.updateDocument(
             "requests", requestID!, {"status": FlightStatuses.completed.name});
       }
 
@@ -141,8 +142,7 @@ class FlightLogFormState extends State<FlightLogForm> {
 
     if (flight.monitoringPerson != null) {
       //FirebaseFirestore db = FirebaseFirestore.instance;
-      DatabaseWrapper db = Provider.of<DatabaseWrapper>(context, listen: false);
-      db.updateDocument(
+      _db.updateDocument(
           "requests", requestID!, {"status": FlightStatuses.enroute.name});
     }
   }
