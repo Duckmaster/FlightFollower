@@ -1,11 +1,17 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 
 /// Database handler class
-class DatabaseWrapper extends ChangeNotifier {
-  final FirebaseFirestore _db;
-  DatabaseWrapper() : _db = FirebaseFirestore.instance;
+class DatabaseWrapper {
+  static final DatabaseWrapper _databaseWrapper = DatabaseWrapper._internal();
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  //DatabaseWrapper() : _db = FirebaseFirestore.instance;
+
+  factory DatabaseWrapper() {
+    return _databaseWrapper;
+  }
+
+  DatabaseWrapper._internal();
 
   /// Stores [data] into the specified [collection] within the database
   /// Returns a future containing the ID of the newly added document

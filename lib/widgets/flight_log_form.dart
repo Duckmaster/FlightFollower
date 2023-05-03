@@ -54,7 +54,7 @@ class FlightLogFormState extends State<FlightLogForm> {
   late FlightTimings timings;
   //FlightTimings timings = FlightTimings();
   late FormStateManager formStateManager;
-  late DatabaseWrapper _db;
+  final DatabaseWrapper _db = DatabaseWrapper();
 
   String? requestID;
 
@@ -78,7 +78,6 @@ class FlightLogFormState extends State<FlightLogForm> {
         rotorStartController.text =
             formattedTimeFromDateTime(timings.rotorStart);
         rotorStopController.text = formattedTimeFromDateTime(timings.rotorStop);
-        _db = Provider.of<DatabaseWrapper>(context, listen: false);
       });
     });
   }
