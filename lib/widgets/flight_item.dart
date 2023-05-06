@@ -39,6 +39,8 @@ class FlightItem extends StatefulWidget {
     if (flightStatus == FlightStatuses.requested ||
         flightStatus == FlightStatuses.notstarted) {
       return ete.toString();
+    } else if (flightStatus == FlightStatuses.completed) {
+      return formattedTimeFromDateTime(flight.timings!.rotorStop);
     } else {
       String hour = depTime.split(":")[0];
       String min = depTime.split(":")[1];
