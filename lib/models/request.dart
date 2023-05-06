@@ -13,9 +13,9 @@ class Request {
   factory Request.fromMap(
     Map<String, dynamic> data,
   ) {
-    return Request(data?["flight_id"], data?["user_id"],
-        FlightStatuses.values.byName(data?["status"]),
-        timestamp: data?["timestamp"]);
+    return Request(data["flight_id"], data["user_id"],
+        FlightStatuses.values.byName(data["status"]),
+        timestamp: data["timestamp"]);
   }
 
   Map<String, dynamic> toFirestore() {
