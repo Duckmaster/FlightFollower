@@ -26,7 +26,7 @@ class ScreenHandlerState extends State<ScreenHandler> {
     super.initState();
     FlightsListener flightsListener =
         Provider.of<FlightsListener>(context, listen: false);
-    flightsListener.listener?.resume();
+    flightsListener.initListener();
   }
 
   AppBar _buildAppBar(String title, {List<Widget>? actions}) => AppBar(

@@ -3,6 +3,7 @@ import 'dart:core';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flight_follower/models/user_model.dart';
+import 'package:flight_follower/utilities/database_api.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../utilities/utils.dart';
@@ -17,6 +18,7 @@ class LoginManager extends ChangeNotifier {
   StreamSubscription? listener;
   bool _isRegistering = false;
   bool _disposed = false;
+  final DatabaseWrapper _db = DatabaseWrapper();
   LoginManager()
       : _isLoggedIn = false,
         _currentUserModel =
@@ -54,13 +56,7 @@ class LoginManager extends ChangeNotifier {
       final cred = await auth.createUserWithEmailAndPassword(
           email: user.email, password: password);
       // Stores the new user info into database
-      FirebaseFirestore.instance
-          .collection("users")
-          .withConverter(
-              fromFirestore: UserModel.fromFirestore,
-              toFirestore: (UserModel user, options) => user.toFirestore())
-          .doc(user.email)
-          .set(user);
+      await _db.addDocumentWithID("users", user.email, user.toFirestore());
       _isRegistering = false;
       return "success";
     } on FirebaseAuthException catch (e) {
@@ -105,12 +101,11 @@ class LoginManager extends ChangeNotifier {
 
   /// Update this instance to store the UserModel object for [user]
   void updateUserModel(User user) async {
-    FirebaseFirestore db = FirebaseFirestore.instance;
-
     // TODO: Optimise so if _currentUserModel.email == user.email or
     // getObject("user_model") == _currentUserModel, dont do anything
-    var docSnapshot = await db.collection("users").doc(user.email).get();
-    _currentUserModel = UserModel.fromJson(docSnapshot.data()!);
+    final data = await _db.getDocument("users", user.email!);
+    if (data == null) return;
+    _currentUserModel = UserModel.fromJson(data);
 
     await storeObject(_currentUserModel, "user_object");
     notifyListeners();

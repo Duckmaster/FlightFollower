@@ -8,6 +8,7 @@ import 'package:flight_follower/models/flight.dart';
 import 'package:flight_follower/models/flights_listener.dart';
 import 'package:flight_follower/models/login_manager.dart';
 import 'package:flight_follower/models/user_model.dart';
+import 'package:flight_follower/utilities/database_api.dart';
 import 'package:flight_follower/utilities/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -29,20 +30,14 @@ class UserPage extends StatelessWidget {
   /// Fetches all Flights and their FlightTimings for the logged in user
   Future<List<Flight>> _retrieveAllFlightData(User currentUser) async {
     List<Flight> flights = [];
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    var flightSnapshot = await db
-        .collection("flights")
-        .withConverter(
-            fromFirestore: Flight.fromFirestore,
-            toFirestore: (Flight flight, _) => flight.toFirestore())
-        .where("user", isEqualTo: currentUser.email)
-        .get();
-    if (flightSnapshot.size == 0) {
+    var docs = await DatabaseWrapper().getDocumentsWhere("flights", [
+      ["user", "==", currentUser.email]
+    ]);
+    if (docs.isEmpty) {
       return flights;
     }
-
-    for (var doc in flightSnapshot.docs) {
-      flights.add(doc.data());
+    for (var doc in docs) {
+      flights.add(Flight.fromMap(doc));
     }
 
     return flights;

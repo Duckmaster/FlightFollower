@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flight_follower/models/contacts.dart';
+import 'package:flight_follower/utilities/database_api.dart';
 import 'package:flight_follower/utilities/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -8,6 +9,7 @@ import '../models/user_model.dart';
 
 class ContactsPage extends StatelessWidget {
   late UserModel _user;
+  final _db = DatabaseWrapper();
   ContactsPage({super.key}) {
     getObject("user_object").then((result) {
       Map<String, dynamic> userMap = result;
@@ -46,7 +48,6 @@ class ContactsPage extends StatelessWidget {
   /// [value] can be either email or phone number, this method checks formatting
   /// using regex
   void _addContact(String value, BuildContext context) {
-    FirebaseFirestore db = FirebaseFirestore.instance;
     var contacts = Provider.of<Contacts>(context, listen: false);
     var contactsCopy = contacts.contacts.toList();
 
@@ -66,7 +67,7 @@ class ContactsPage extends StatelessWidget {
         if (match.email != "") {
           contactsCopy.add(match);
           contacts.addContact(match);
-          _storeContacts(db, contactsCopy);
+          _storeContacts(contactsCopy);
           showSnackBar(context, "Contact successfully added!");
         } else {
           showSnackBar(context,
@@ -75,19 +76,16 @@ class ContactsPage extends StatelessWidget {
       });
     } else if (phoneRegex.hasMatch(value)) {
       // query db for phone number
-      db
-          .collection("users")
-          .where("phoneNumber", isEqualTo: value)
-          .get()
-          .then((querySnapshot) {
-        for (var docSnapshot in querySnapshot.docs) {
-          final data = docSnapshot.data();
-          match = UserModel.fromJson(data);
-        }
+      _db.getDocumentsWhere("users", [
+        ["phoneNumber", "==", value]
+      ]).then((docs) {
+        if (docs.isEmpty) return;
+        match = UserModel.fromJson(docs.first);
+
         if (match.email != "") {
           contactsCopy.add(match);
           contacts.addContact(match);
-          _storeContacts(db, contactsCopy);
+          _storeContacts(contactsCopy);
           showSnackBar(context, "Contact successfully added!");
         } else {
           showSnackBar(context,
@@ -103,8 +101,8 @@ class ContactsPage extends StatelessWidget {
   }
 
   /// Updates this users contacts in the database with [contactList]
-  void _storeContacts(FirebaseFirestore db, List<UserModel> contactList) {
-    db.collection("contacts").doc(_user.email).set(<String, dynamic>{
+  void _storeContacts(List<UserModel> contactList) {
+    _db.addDocumentWithID("contacts", _user.email, <String, dynamic>{
       "contact_list": contactList.map((e) => e.email).join(",")
     });
   }

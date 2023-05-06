@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flight_follower/utilities/database_api.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flight_follower/utilities/utils.dart';
@@ -72,6 +73,7 @@ class FlightItem extends StatefulWidget {
 
 class FlightItemState extends State<FlightItem> {
   UserModel pilot = UserModel("placeholder", "placeholder", "placeholder");
+  final _db = DatabaseWrapper();
 
   @override
   void initState() {
@@ -238,20 +240,14 @@ class FlightItemState extends State<FlightItem> {
     setState(() {
       widget.flightStatus = FlightStatuses.notstarted;
     });
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    db
-        .collection("requests")
-        .doc(widget.requestID)
-        .update({"status": FlightStatuses.accepted.name});
+    _db.updateDocument(
+        "requests", widget.requestID, {"status": FlightStatuses.accepted.name});
     // listen for timings
   }
 
   void _onRequestDecline() {
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    db
-        .collection("requests")
-        .doc(widget.requestID)
-        .update({"status": FlightStatuses.declined.name});
+    _db.updateDocument(
+        "requests", widget.requestID, {"status": FlightStatuses.declined.name});
   }
 
   @override

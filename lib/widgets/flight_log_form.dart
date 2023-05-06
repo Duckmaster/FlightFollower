@@ -140,7 +140,6 @@ class FlightLogFormState extends State<FlightLogForm> {
     rotorStartController.text = time;
 
     if (flight.monitoringPerson != null) {
-      //FirebaseFirestore db = FirebaseFirestore.instance;
       _db.updateDocument(
           "requests", requestID!, {"status": FlightStatuses.enroute.name});
     }

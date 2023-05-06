@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flight_follower/utilities/database_api.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flight_follower/models/user_model.dart';
@@ -44,11 +45,9 @@ Future<Map<String, dynamic>> getObject(String name) async {
 /// [userID]'s informations. If [userID] is not found in the database,
 /// a UserObject with empty strings is returned.
 Future<UserModel> getUser(String userID) async {
-  FirebaseFirestore db = FirebaseFirestore.instance;
-  return db.collection("users").doc(userID).get().then((docSnapshot) {
-    if (!docSnapshot.exists) return UserModel("", "", "");
-    final data = docSnapshot.data();
-    return UserModel.fromJson(data!);
+  return DatabaseWrapper().getDocument("users", userID).then((data) {
+    if (data == null) return UserModel("", "", "");
+    return UserModel.fromJson(data);
   });
 }
 
