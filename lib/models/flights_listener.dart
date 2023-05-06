@@ -36,6 +36,7 @@ class FlightsListener extends ChangeNotifier {
   void initListener() {
     if (!_isListenerCancelled) return;
     _isListenerCancelled = false;
+    _flights.clear();
     _listener = DatabaseWrapper().addListener(
         "requests",
         [
