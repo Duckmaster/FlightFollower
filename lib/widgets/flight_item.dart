@@ -19,8 +19,7 @@ class FlightItem extends StatefulWidget {
     this.flightStatus,
     this.requestID, {
     super.key,
-  })  : _arrival =
-            _calculateArrival(flightStatus, flight.ete!, flight.departureTime!),
+  })  : _arrival = _calculateArrival(flightStatus, flight),
         extended = false {
     if (flightStatus == FlightStatuses.accepted) {
       flightStatus = FlightStatuses.notstarted;
@@ -34,8 +33,9 @@ class FlightItem extends StatefulWidget {
 
   /// Calculates the arrival time for this flight item
   /// If this flight is still requested or not started, returns value of ETE
-  static String _calculateArrival(
-      Enum flightStatus, double ete, String depTime) {
+  static String _calculateArrival(Enum flightStatus, Flight flight) {
+    var ete = flight.ete!;
+    var depTime = flight.departureTime!;
     if (flightStatus == FlightStatuses.requested ||
         flightStatus == FlightStatuses.notstarted) {
       return ete.toString();
