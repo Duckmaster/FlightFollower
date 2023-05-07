@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 import 'flight.dart';
 
@@ -11,6 +14,10 @@ class FormStateManager {
   bool isSubmitted = false;
   String flightID = "";
   String requestID = "";
+  Icon monPersonIcon = const Icon(Icons.pending);
+  bool refreshButtonVisible = false;
+  bool monPersonSelectEnabled = true;
+  StreamSubscription? listener;
 
   factory FormStateManager() {
     return _formStateManager;

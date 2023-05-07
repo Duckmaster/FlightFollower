@@ -89,22 +89,24 @@ class FlightLogFormState extends State<FlightLogForm> {
 
     setState(() {
       formSubmitted = _formStateManager.isSubmitted = !formSubmitted;
+      _formStateManager.monPersonSelectEnabled = false;
       submitButtonLabel = formSubmitted ? "Flight Completed" : "Submit";
     });
 
     if (formSubmitted) {
       // push to database
-      _db.addDocument("flights", flight.toFirestore()).then((flightID) {
+      _db.addDocument("flights", flight.toFirestore()).then((flightID) async {
         print("sent data");
         _formStateManager.flightID = flightID;
         if (flight.monitoringPerson != null) {
-          Request request = Request(
-              flightID, flight.monitoringPerson!, FlightStatuses.requested);
-          _db.addDocument("requests", request.toFirestore()).then((requestID) =>
-              _formStateManager.requestID = this.requestID = requestID);
+          await _addRequestToDatabase();
+          _initMonitoringPersonListener();
         }
       });
     } else {
+      _db.removeListener(_formStateManager.listener!);
+      _formStateManager.listener = null;
+      _formStateManager.refreshButtonVisible = false;
       DateTime now = DateTime.now();
       String date = now.toString().split(" ")[0];
       timings.rotorStart = DateTime.parse("$date ${rotorStartController.text}");
@@ -120,8 +122,64 @@ class FlightLogFormState extends State<FlightLogForm> {
     }
   }
 
-  void refreshMonitoringPerson() {
+  void refreshMonitoringPerson() async {
     // TODO: Needs implementation
+    setState(() {
+      _formStateManager.monPersonIcon = const Icon(Icons.pending);
+      _formStateManager.monPersonSelectEnabled = false;
+      _formStateManager.refreshButtonVisible = false;
+    });
+    // cancel old listener
+    // send new request
+    // add listener for request
+    _db.removeListener(_formStateManager.listener!);
+    _formStateManager.listener = null;
+
+    await _addRequestToDatabase();
+
+    _initMonitoringPersonListener();
+  }
+
+  void _initMonitoringPersonListener() {
+    _formStateManager.listener = _db.addListener("requests", [
+      [FieldPath.documentId, "==", requestID]
+    ], (event) {
+      for (var change in event.docChanges) {
+        Request request =
+            Request.fromMap(change.doc.data()! as Map<String, dynamic>);
+
+        switch (change.type) {
+          case DocumentChangeType.added:
+            break;
+          case DocumentChangeType.modified:
+            if (request.status == FlightStatuses.accepted) {
+              _formStateManager.monPersonIcon =
+                  const Icon(Icons.check, color: Colors.green);
+              //monPersonSelectEnabled = false;
+            } else if (request.status == FlightStatuses.declined) {
+              _formStateManager.monPersonIcon =
+                  const Icon(Icons.close, color: Colors.red);
+              _formStateManager.refreshButtonVisible = true;
+              _formStateManager.monPersonSelectEnabled = true;
+            }
+            break;
+          case DocumentChangeType.removed:
+            break;
+        }
+      }
+    });
+  }
+
+  Future<void> _addRequestToDatabase() async {
+    if (flight.monitoringPerson != null) {
+      Request request = Request(_formStateManager.flightID,
+          flight.monitoringPerson!, FlightStatuses.requested);
+      String requestID =
+          await _db.addDocument("requests", request.toFirestore());
+      setState(() {
+        _formStateManager.requestID = this.requestID = requestID;
+      });
+    }
   }
 
   void rotorStartPressed() {
@@ -402,13 +460,14 @@ class FlightLogFormState extends State<FlightLogForm> {
                                       child: Text(value.username),
                                     );
                                   }).toList(),
-                              onChanged: formSubmitted
-                                  ? null
-                                  : (String? value) {
-                                      setState(() {
-                                        flight.monitoringPerson = value;
-                                      });
-                                    },
+                              onChanged:
+                                  !_formStateManager.monPersonSelectEnabled
+                                      ? null
+                                      : (String? value) {
+                                          setState(() {
+                                            flight.monitoringPerson = value;
+                                          });
+                                        },
                               decoration: const InputDecoration(
                                 label: Text("Monitoring Person"),
                               ),
@@ -421,13 +480,11 @@ class FlightLogFormState extends State<FlightLogForm> {
                           maintainSize: true,
                           maintainAnimation: true,
                           maintainState: true,
-                          child: const Icon(
-                            Icons.pending,
-                          ),
+                          child: _formStateManager.monPersonIcon,
                         ),
 
                         Visibility(
-                          visible: false,
+                          visible: _formStateManager.refreshButtonVisible,
                           maintainSize: true,
                           maintainAnimation: true,
                           maintainState: true,
