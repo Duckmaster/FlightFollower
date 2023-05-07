@@ -166,7 +166,7 @@ class FlightLogFormState extends State<FlightLogForm> {
 
   @override
   Widget build(BuildContext context) {
-    formStateManager = Provider.of<FormStateManager>(context, listen: false);
+    FormStateManager formStateManager = FormStateManager();
     // TODO: Move this elsewhere to fix persistence after submit
     // Form state persistence
     setState(() {

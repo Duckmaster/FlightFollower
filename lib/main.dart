@@ -30,7 +30,6 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => LoginManager()),
         ChangeNotifierProvider(create: (context) => FlightsListener()),
         ChangeNotifierProvider(create: (context) => Contacts()),
-        ChangeNotifierProvider(create: (context) => FormStateManager())
       ], child: const MyHomePage()),
     );
   }

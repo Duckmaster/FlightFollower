@@ -4,14 +4,23 @@ import 'flight.dart';
 
 /// Persistence for FlightLogForm state, allows us to keep the form populated
 /// between page switches
-class FormStateManager extends ChangeNotifier {
-  Flight flight;
-  bool isSubmitted;
-  String flightID;
-  String requestID;
-  FormStateManager()
+class FormStateManager {
+  static final FormStateManager _formStateManager =
+      FormStateManager._internal();
+  Flight flight = Flight(numPersons: "1", endurance: "0.1", ete: 0.1);
+  bool isSubmitted = false;
+  String flightID = "";
+  String requestID = "";
+
+  factory FormStateManager() {
+    return _formStateManager;
+  }
+
+  FormStateManager._internal();
+
+  /*FormStateManager()
       : flight = Flight(numPersons: "1", endurance: "0.1", ete: 0.1),
         isSubmitted = false,
         flightID = "",
-        requestID = "";
+        requestID = "";*/
 }
