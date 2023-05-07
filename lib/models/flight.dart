@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// Stores information relating to one singular flight
@@ -14,6 +16,7 @@ class Flight {
   String? endurance;
   String? monitoringPerson;
   String? flightType;
+  FlightTimings? timings;
 
   Flight(
       {this.user,
@@ -27,7 +30,10 @@ class Flight {
       this.endurance,
       this.monitoringPerson,
       this.flightType,
-      this.copilot}) {
+      this.copilot,
+      this.timings}) {
+    // initialise with a new object if no instance is passed in
+    timings = timings ?? FlightTimings();
     _prefixDepartureWithNaught();
   }
 
@@ -48,25 +54,21 @@ class Flight {
     departureTime = parts.join(":");
   }
 
-  factory Flight.fromFirestore(
-    DocumentSnapshot<Map<String, dynamic>> snapshot,
-    SnapshotOptions? options,
-  ) {
-    final data = snapshot.data();
+  factory Flight.fromMap(Map<String, dynamic> data) {
     return Flight(
-      user: data?["user"],
-      organisation: data?["organisation"],
-      aircraftIdentifier: data?["aircraft_ident"],
-      copilot: data?["copilot"],
-      numPersons: data?["num_persons"],
-      departureLocation: data?["departure"],
-      destination: data?["destination"],
-      departureTime: data?["departure_time"],
-      ete: data?["ete"],
-      endurance: data?["endurance"],
-      monitoringPerson: data?["monitoring_person"],
-      flightType: data?["flight_type"],
-    );
+        user: data["user"],
+        organisation: data["organisation"],
+        aircraftIdentifier: data["aircraft_ident"],
+        copilot: data["copilot"],
+        numPersons: data["num_persons"],
+        departureLocation: data["departure"],
+        destination: data["destination"],
+        departureTime: data["departure_time"],
+        ete: data["ete"],
+        endurance: data["endurance"],
+        monitoringPerson: data["monitoring_person"],
+        flightType: data["flight_type"],
+        timings: FlightTimings.fromMap(data["timings"]));
   }
 
   Map<String, dynamic> toFirestore() {
@@ -82,7 +84,8 @@ class Flight {
       "ete": ete,
       "endurance": endurance,
       "monitoring_person": monitoringPerson,
-      "flight_type": flightType
+      "flight_type": flightType,
+      "timings": timings!.toFirestore(),
     };
   }
 
@@ -100,4 +103,39 @@ class Flight {
 
   @override
   int get hashCode => Object.hash(aircraftIdentifier, departureTime);
+}
+
+class FlightTimings {
+  DateTime? rotorStart;
+  DateTime? rotorStop;
+  String? datconStart;
+  String? datconStop;
+
+  FlightTimings(
+      {this.rotorStart, this.rotorStop, this.datconStart, this.datconStop});
+
+  factory FlightTimings.fromMap(
+    Map<String, dynamic> data,
+  ) {
+    if (data["rotor_start"] == null) {
+      return FlightTimings();
+    }
+
+    return FlightTimings(
+        rotorStart: DateTime.tryParse(data["rotor_start"]),
+        rotorStop: DateTime.tryParse(data["rotor_stop"]),
+        datconStart: data["datcon_start"],
+        datconStop: data["datcon_stop"]);
+  }
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      "rotor_start":
+          rotorStart.toString() == "null" ? null : rotorStart.toString(),
+      "rotor_stop":
+          rotorStop.toString() == "null" ? null : rotorStop.toString(),
+      "datcon_start": datconStart,
+      "datcon_stop": datconStop,
+    };
+  }
 }

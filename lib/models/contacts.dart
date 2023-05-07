@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flight_follower/utilities/database_api.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flight_follower/models/user_model.dart';
 import 'package:flight_follower/utilities/utils.dart';
@@ -36,10 +37,8 @@ class Contacts extends ChangeNotifier {
 
   /// Get the user's contacts as stored in the database and updates _contacts
   void _retrieveContactsFromDatabase() {
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    db.collection("contacts").doc(_user.email).get().then((docSnapshot) {
-      if (!docSnapshot.exists) return;
-      final data = docSnapshot.data() as Map<String, dynamic>;
+    DatabaseWrapper().getDocument("contacts", _user.email).then((data) {
+      if (data == null) return;
       String contactsList = data["contact_list"];
       if (contactsList.isEmpty) return;
       for (var user in contactsList.split(",")) {

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flight_follower/utilities/database_api.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flight_follower/utilities/utils.dart';
@@ -18,8 +19,7 @@ class FlightItem extends StatefulWidget {
     this.flightStatus,
     this.requestID, {
     super.key,
-  })  : _arrival =
-            _calculateArrival(flightStatus, flight.ete!, flight.departureTime!),
+  })  : _arrival = _calculateArrival(flightStatus, flight),
         extended = false {
     if (flightStatus == FlightStatuses.accepted) {
       flightStatus = FlightStatuses.notstarted;
@@ -33,11 +33,14 @@ class FlightItem extends StatefulWidget {
 
   /// Calculates the arrival time for this flight item
   /// If this flight is still requested or not started, returns value of ETE
-  static String _calculateArrival(
-      Enum flightStatus, double ete, String depTime) {
+  static String _calculateArrival(Enum flightStatus, Flight flight) {
+    var ete = flight.ete!;
+    var depTime = flight.departureTime!;
     if (flightStatus == FlightStatuses.requested ||
         flightStatus == FlightStatuses.notstarted) {
       return ete.toString();
+    } else if (flightStatus == FlightStatuses.completed) {
+      return formattedTimeFromDateTime(flight.timings!.rotorStop);
     } else {
       String hour = depTime.split(":")[0];
       String min = depTime.split(":")[1];
@@ -61,10 +64,18 @@ class FlightItem extends StatefulWidget {
       return "$hour:$min";
     }
   }
+
+  String getDeparture() {
+    if (flightStatus == FlightStatuses.completed)
+      return formattedTimeFromDateTime(flight.timings!.rotorStart);
+    else
+      return flight.departureTime!;
+  }
 }
 
 class FlightItemState extends State<FlightItem> {
   UserModel pilot = UserModel("placeholder", "placeholder", "placeholder");
+  final _db = DatabaseWrapper();
 
   @override
   void initState() {
@@ -104,8 +115,8 @@ class FlightItemState extends State<FlightItem> {
         {
           return Map.fromEntries(<String, String>{
             "status": "ON TIME",
-            "departure": "Departure:",
-            "arrival": "Estimated arrival:",
+            "departure": "Sched. departure:",
+            "arrival": "Est. arrival:",
             "eta": "ETA:"
           }.entries);
         }
@@ -113,8 +124,8 @@ class FlightItemState extends State<FlightItem> {
         {
           return Map.fromEntries(<String, String>{
             "status": "LATE",
-            "departure": "Departure:",
-            "arrival": "Estimated arrival:",
+            "departure": "Sched. departure:",
+            "arrival": "Est. arrival:",
             "eta": "ETA:"
           }.entries);
         }
@@ -122,8 +133,8 @@ class FlightItemState extends State<FlightItem> {
         {
           return Map.fromEntries(<String, String>{
             "status": "OVERDUE",
-            "departure": "Departure:",
-            "arrival": "Estimated arrival:",
+            "departure": "Sched. departure:",
+            "arrival": "Est. arrival:",
             "eta": "ETA:"
           }.entries);
         }
@@ -133,7 +144,7 @@ class FlightItemState extends State<FlightItem> {
             "status": "LANDED",
             "departure": "Departure:",
             "arrival": "Arrival:",
-            "eta": ""
+            "eta": "Duration:"
           }.entries);
         }
     }
@@ -189,7 +200,11 @@ class FlightItemState extends State<FlightItem> {
     DateTime time;
 
     if (widget.flightStatus == FlightStatuses.completed) {
-      return "";
+      var timings = widget.flight.timings!;
+      Duration diff = timings.rotorStop!.difference(timings.rotorStart!);
+      return diff.inHours == 0
+          ? "${diff.inMinutes % 60}mins"
+          : "${diff.inHours}hrs ${diff.inMinutes % 60}mins";
     }
 
     if (widget.flightStatus == FlightStatuses.notstarted) {
@@ -227,20 +242,14 @@ class FlightItemState extends State<FlightItem> {
     setState(() {
       widget.flightStatus = FlightStatuses.notstarted;
     });
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    db
-        .collection("requests")
-        .doc(widget.requestID)
-        .update({"status": FlightStatuses.accepted.name});
+    _db.updateDocument(
+        "requests", widget.requestID, {"status": FlightStatuses.accepted.name});
     // listen for timings
   }
 
   void _onRequestDecline() {
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    db
-        .collection("requests")
-        .doc(widget.requestID)
-        .update({"status": FlightStatuses.declined.name});
+    _db.updateDocument(
+        "requests", widget.requestID, {"status": FlightStatuses.declined.name});
   }
 
   @override
@@ -308,7 +317,7 @@ class FlightItemState extends State<FlightItem> {
                                   Row(
                                     children: [
                                       Text(
-                                          "${labels["departure"]!} ${widget.flight.departureTime}")
+                                          "${labels["departure"]!} ${widget.getDeparture()}")
                                     ],
                                   ),
                                   Row(

@@ -1,4 +1,5 @@
-import 'package:flight_follower/models/flight_timings.dart';
+import 'dart:convert';
+
 import 'package:flight_follower/models/login_manager.dart';
 import 'package:flight_follower/models/request.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,8 @@ import 'package:flight_follower/models/flight.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flight_follower/widgets/time_picker.dart';
 import 'package:flight_follower/utilities/utils.dart';
+import 'package:flight_follower/utilities/database_api.dart';
+import 'package:flight_follower/main.dart';
 import 'package:provider/provider.dart';
 
 import '../models/contacts.dart';
@@ -48,10 +51,11 @@ class FlightLogFormState extends State<FlightLogForm> {
 
   late UserModel user;
   Flight flight = Flight();
-  FlightTimings timings = FlightTimings();
-  late FormStateManager formStateManager;
+  late FlightTimings timings;
+  //FlightTimings timings = FlightTimings();
+  FormStateManager _formStateManager = FormStateManager();
+  final DatabaseWrapper _db = DatabaseWrapper();
 
-  String? flightID;
   String? requestID;
 
   TextEditingController rotorStartController = TextEditingController();
@@ -70,6 +74,7 @@ class FlightLogFormState extends State<FlightLogForm> {
       setState(() {
         user = UserModel.fromJson(userMap);
         flight.user = user.email;
+        timings = flight.timings!;
         rotorStartController.text =
             formattedTimeFromDateTime(timings.rotorStart);
         rotorStopController.text = formattedTimeFromDateTime(timings.rotorStop);
@@ -78,64 +83,103 @@ class FlightLogFormState extends State<FlightLogForm> {
   }
 
   void onPressed() {
-    FirebaseFirestore db = FirebaseFirestore.instance;
     _formKey.currentState!.save();
 
+    if (!_formKey.currentState!.validate()) return;
+
     setState(() {
-      formSubmitted = formStateManager.isSubmitted = !formSubmitted;
+      formSubmitted = _formStateManager.isSubmitted = !formSubmitted;
+      _formStateManager.monPersonSelectEnabled = false;
       submitButtonLabel = formSubmitted ? "Flight Completed" : "Submit";
     });
 
     if (formSubmitted) {
       // push to database
-      db
-          .collection("flights")
-          .withConverter(
-              fromFirestore: Flight.fromFirestore,
-              toFirestore: (Flight flight, options) => flight.toFirestore())
-          .add(flight)
-          .then((value) {
+      _db.addDocument("flights", flight.toFirestore()).then((flightID) async {
         print("sent data");
-        flightID = value.id;
-        formStateManager.flightID = flightID!;
+        _formStateManager.flightID = flightID;
         if (flight.monitoringPerson != null) {
-          Request request = Request(
-              value.id, flight.monitoringPerson!, FlightStatuses.requested);
-          db
-              .collection("requests")
-              .withConverter(
-                  fromFirestore: Request.fromFirestore,
-                  toFirestore: (Request r, options) => r.toFirestore())
-              .add(request)
-              .then(
-                  (value) => formStateManager.requestID = requestID = value.id);
+          await _addRequestToDatabase();
+          _initMonitoringPersonListener();
         }
       });
     } else {
+      _db.removeListener(_formStateManager.listener!);
+      _formStateManager.listener = null;
+      _formStateManager.refreshButtonVisible = false;
       DateTime now = DateTime.now();
       String date = now.toString().split(" ")[0];
       timings.rotorStart = DateTime.parse("$date ${rotorStartController.text}");
       timings.rotorStop = DateTime.parse("$date ${rotorStopController.text}");
-      timings.flightID = flightID;
-      db
-          .collection("timings")
-          .withConverter(
-              fromFirestore: FlightTimings.fromFirestore,
-              toFirestore: (FlightTimings t, options) => t.toFirestore())
-          .add(timings);
+      _db.updateDocument("flights", _formStateManager.flightID,
+          {"timings": flight.timings!.toFirestore()});
       if (flight.monitoringPerson != null) {
-        db
-            .collection("requests")
-            .doc(requestID)
-            .update({"status": FlightStatuses.completed.name});
+        _db.updateDocument(
+            "requests", requestID!, {"status": FlightStatuses.completed.name});
       }
 
       _formKey.currentState!.reset();
     }
   }
 
-  void refreshMonitoringPerson() {
+  void refreshMonitoringPerson() async {
     // TODO: Needs implementation
+    setState(() {
+      _formStateManager.monPersonIcon = const Icon(Icons.pending);
+      _formStateManager.monPersonSelectEnabled = false;
+      _formStateManager.refreshButtonVisible = false;
+    });
+    // cancel old listener
+    // send new request
+    // add listener for request
+    _db.removeListener(_formStateManager.listener!);
+    _formStateManager.listener = null;
+
+    await _addRequestToDatabase();
+
+    _initMonitoringPersonListener();
+  }
+
+  void _initMonitoringPersonListener() {
+    _formStateManager.listener = _db.addListener("requests", [
+      [FieldPath.documentId, "==", requestID]
+    ], (event) {
+      for (var change in event.docChanges) {
+        Request request =
+            Request.fromMap(change.doc.data()! as Map<String, dynamic>);
+
+        switch (change.type) {
+          case DocumentChangeType.added:
+            break;
+          case DocumentChangeType.modified:
+            if (request.status == FlightStatuses.accepted) {
+              _formStateManager.monPersonIcon =
+                  const Icon(Icons.check, color: Colors.green);
+              //monPersonSelectEnabled = false;
+            } else if (request.status == FlightStatuses.declined) {
+              _formStateManager.monPersonIcon =
+                  const Icon(Icons.close, color: Colors.red);
+              _formStateManager.refreshButtonVisible = true;
+              _formStateManager.monPersonSelectEnabled = true;
+            }
+            break;
+          case DocumentChangeType.removed:
+            break;
+        }
+      }
+    });
+  }
+
+  Future<void> _addRequestToDatabase() async {
+    if (flight.monitoringPerson != null) {
+      Request request = Request(_formStateManager.flightID,
+          flight.monitoringPerson!, FlightStatuses.requested);
+      String requestID =
+          await _db.addDocument("requests", request.toFirestore());
+      setState(() {
+        _formStateManager.requestID = this.requestID = requestID;
+      });
+    }
   }
 
   void rotorStartPressed() {
@@ -154,11 +198,8 @@ class FlightLogFormState extends State<FlightLogForm> {
     rotorStartController.text = time;
 
     if (flight.monitoringPerson != null) {
-      FirebaseFirestore db = FirebaseFirestore.instance;
-      db
-          .collection("requests")
-          .doc(requestID)
-          .update({"status": FlightStatuses.enroute.name});
+      _db.updateDocument(
+          "requests", requestID!, {"status": FlightStatuses.enroute.name});
     }
   }
 
@@ -177,16 +218,19 @@ class FlightLogFormState extends State<FlightLogForm> {
     rotorDiffController.text = diff;
   }
 
+  String? validatorEmpty(String? value) {
+    return value == "" || value == null ? "This field is required." : null;
+  }
+
   @override
   Widget build(BuildContext context) {
-    formStateManager = Provider.of<FormStateManager>(context, listen: false);
+    FormStateManager formStateManager = FormStateManager();
     // TODO: Move this elsewhere to fix persistence after submit
     // Form state persistence
     setState(() {
       flight = formStateManager.flight;
-      timings = formStateManager.timings;
+      timings = flight.timings!;
       formSubmitted = formStateManager.isSubmitted;
-      flightID = formStateManager.flightID;
       requestID = formStateManager.requestID;
     });
     return Form(
@@ -249,13 +293,13 @@ class FlightLogFormState extends State<FlightLogForm> {
                 children: [
                   Expanded(
                     child: TextFormField(
-                      initialValue: flight.aircraftIdentifier,
-                      decoration: const InputDecoration(
-                        labelText: "Aircraft Reg/Callsign",
-                      ),
-                      enabled: !formSubmitted,
-                      onChanged: (value) => flight.aircraftIdentifier = value,
-                    ),
+                        initialValue: flight.aircraftIdentifier,
+                        decoration: const InputDecoration(
+                          labelText: "Aircraft Reg/Callsign",
+                        ),
+                        enabled: !formSubmitted,
+                        onChanged: (value) => flight.aircraftIdentifier = value,
+                        validator: validatorEmpty),
                   ),
                 ],
               ),
@@ -306,6 +350,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                       ),
                       enabled: !formSubmitted,
                       onChanged: (value) => flight.departureLocation = value,
+                      validator: validatorEmpty,
                     ),
                   ),
                   Expanded(
@@ -316,6 +361,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                       ),
                       enabled: !formSubmitted,
                       onChanged: (value) => flight.destination = value,
+                      validator: validatorEmpty,
                     ),
                   )
                 ],
@@ -329,7 +375,11 @@ class FlightLogFormState extends State<FlightLogForm> {
                       (String time) {
                         flight.departureTime = time;
                       },
+                      time: flight.departureTime,
                       enabled: !formSubmitted,
+                      validator: (int? value) {
+                        return value == null ? "This field is required." : null;
+                      },
                     ),
                   ),
                   Expanded(
@@ -400,21 +450,24 @@ class FlightLogFormState extends State<FlightLogForm> {
                             return DropdownButtonFormField(
                               isExpanded: true,
                               value: flight.monitoringPerson,
-                              items: value.contacts
-                                  .map<DropdownMenuItem<String>>(
+                              items: [
+                                    DropdownMenuItem<String>(child: Text(""))
+                                  ] +
+                                  value.contacts.map<DropdownMenuItem<String>>(
                                       (UserModel value) {
-                                return DropdownMenuItem<String>(
-                                  value: value.email,
-                                  child: Text(value.username),
-                                );
-                              }).toList(),
-                              onChanged: formSubmitted
-                                  ? null
-                                  : (String? value) {
-                                      setState(() {
-                                        flight.monitoringPerson = value;
-                                      });
-                                    },
+                                    return DropdownMenuItem<String>(
+                                      value: value.email,
+                                      child: Text(value.username),
+                                    );
+                                  }).toList(),
+                              onChanged:
+                                  !_formStateManager.monPersonSelectEnabled
+                                      ? null
+                                      : (String? value) {
+                                          setState(() {
+                                            flight.monitoringPerson = value;
+                                          });
+                                        },
                               decoration: const InputDecoration(
                                 label: Text("Monitoring Person"),
                               ),
@@ -427,13 +480,11 @@ class FlightLogFormState extends State<FlightLogForm> {
                           maintainSize: true,
                           maintainAnimation: true,
                           maintainState: true,
-                          child: const Icon(
-                            Icons.pending,
-                          ),
+                          child: _formStateManager.monPersonIcon,
                         ),
 
                         Visibility(
-                          visible: false,
+                          visible: _formStateManager.refreshButtonVisible,
                           maintainSize: true,
                           maintainAnimation: true,
                           maintainState: true,
@@ -464,6 +515,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                     decoration: const InputDecoration(
                       label: Text("Type of Flight"),
                     ),
+                    validator: validatorEmpty,
                   ))
                 ],
               ),
@@ -490,6 +542,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                                   labelText: "Start Time",
                                 ),
                                 controller: rotorStartController,
+                                validator: validatorEmpty,
                               ),
                             ),
                             Expanded(
@@ -523,6 +576,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                                   labelText: "Stop Time",
                                 ),
                                 controller: rotorStopController,
+                                validator: validatorEmpty,
                               ),
                             ),
                             Expanded(
@@ -561,6 +615,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                                     labelText: "Flight Time",
                                     labelStyle: TextStyle(fontSize: 14)),
                                 controller: rotorDiffController,
+                                enabled: false,
                               ),
                             ),
                             Expanded(
@@ -569,6 +624,7 @@ class FlightLogFormState extends State<FlightLogForm> {
                                     labelText: "Maintenance\nTime",
                                     labelStyle: TextStyle(fontSize: 12)),
                                 controller: datconDiffController,
+                                enabled: false,
                               ),
                             ),
                           ],

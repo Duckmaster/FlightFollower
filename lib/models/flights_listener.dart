@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
+import 'package:flight_follower/utilities/database_api.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flight_follower/models/flight.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,13 +15,13 @@ import 'package:flight_follower/utilities/utils.dart';
 class FlightsListener extends ChangeNotifier {
   final List<FlightItem> _flights = [];
   late UserModel _user;
-  StreamSubscription? listener;
+  StreamSubscription? _listener;
   bool _isListenerCancelled = false;
 
   FlightsListener() {
     getObject("user_object").then((result) {
-      Map<String, dynamic> userMap = result;
-      _user = UserModel.fromJson(userMap);
+      _user = UserModel.fromJson(result);
+      _isListenerCancelled = true;
       initListener();
     });
   }
@@ -33,74 +34,71 @@ class FlightsListener extends ChangeNotifier {
 
   /// Initialise this FlightListener's subscription to the database and callback
   void initListener() {
+    if (!_isListenerCancelled) return;
     _isListenerCancelled = false;
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    listener = db
-        .collection("requests")
-        .withConverter(
-            fromFirestore: Request.fromFirestore,
-            toFirestore: (Request request, _) => request.toFirestore())
-        .where("user_id", isEqualTo: _user.email)
-        .where("timestamp", isGreaterThan: getCutoffDateTime())
-        .snapshots()
-        .listen((event) {
-      for (var change in event.docChanges) {
-        Request request = change.doc.data()!;
-        db
-            .collection("flights")
-            .doc(request.flightID)
-            .withConverter(
-                fromFirestore: Flight.fromFirestore,
-                toFirestore: (Flight flight, _) => flight.toFirestore())
-            .get()
-            .then((value) {
-          if (!value.exists) return;
-          Flight flight = value.data()!;
-          // Construct a FlightItem instance for the flight with the new status
-          FlightItem newFlightItem =
-              FlightItem(flight, request.status, change.doc.id);
-          // Find the old FlightItem in_flights for the updated flight
-          FlightItem? oldFlightItem = _flights.singleWhere(
-            (f) => f.flight == flight,
-            orElse: () => FlightItem(flight, FlightStatuses.declined, ""),
-          );
+    _flights.clear();
+    _listener = DatabaseWrapper().addListener(
+        "requests",
+        [
+          ["user_id", "==", _user.email],
+          ["timestamp", ">", getCutoffDateTime()]
+        ],
+        listenerCallback);
+  }
 
-          switch (change.type) {
-            case DocumentChangeType.added:
-              // We have a new request (new flight) so add the flight
-              if (newFlightItem.flightStatus != FlightStatuses.declined) {
-                _flights.add(newFlightItem);
-              }
+  void listenerCallback(QuerySnapshot<Object?> event) {
+    for (var change in event.docChanges) {
+      Request request =
+          Request.fromMap(change.doc.data()! as Map<String, dynamic>);
+      DatabaseWrapper().getDocument("flights", request.flightID).then((value) {
+        if (value == null) return;
+        Flight flight = Flight.fromMap(value);
+        // Construct a FlightItem instance for the flight with the new status
+        FlightItem newFlightItem =
+            FlightItem(flight, request.status, change.doc.id);
+        // Find the old FlightItem in_flights for the updated flight
+        FlightItem? oldFlightItem = _flights.singleWhere(
+          (f) => f.flight == flight,
+          orElse: () => FlightItem(flight, FlightStatuses.declined, ""),
+        );
 
-              notifyListeners();
-              break;
-            case DocumentChangeType.modified:
-              // Status has been updated, so remove the old flight from the list and add the new one
+        switch (change.type) {
+          case DocumentChangeType.added:
+            // We have a new request (new flight) so add the flight
+            if (newFlightItem.flightStatus != FlightStatuses.declined) {
+              _flights.add(newFlightItem);
+            }
 
-              // Check to make sure the old flight exists in _flight
-              // (if the earlier singleWhere fails, orElse func creates a Request with empty requestID)
-              if (oldFlightItem.requestID != "") {
-                _flights.remove(oldFlightItem);
-              }
+            notifyListeners();
+            break;
+          case DocumentChangeType.modified:
+            // Status has been updated, so remove the old flight from the list and add the new one
 
-              if (newFlightItem.flightStatus != FlightStatuses.declined) {
-                _flights.add(newFlightItem);
-              }
-              notifyListeners();
+            // Check to make sure the old flight exists in _flight
+            // (if the earlier singleWhere fails, orElse func creates a Request with empty requestID)
+            if (oldFlightItem.requestID != "") {
+              _flights.remove(oldFlightItem);
+            }
 
-              break;
-            case DocumentChangeType.removed:
-              // We dont remove data so do nothing
-              break;
-          }
-        });
-      }
-    });
+            if (newFlightItem.flightStatus != FlightStatuses.declined) {
+              _flights.add(newFlightItem);
+            }
+            notifyListeners();
+
+            break;
+          case DocumentChangeType.removed:
+            // We dont remove data so do nothing
+            break;
+        }
+      });
+    }
   }
 
   /// Cancel the listener maintained by this instance and mark our internal state as such
   Future<void> cancelListener() async {
-    await listener!.cancel();
+    if (_isListenerCancelled) return;
+    await DatabaseWrapper().removeListener(_listener!);
+    _listener = null;
     _isListenerCancelled = true;
   }
 }

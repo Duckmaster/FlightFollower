@@ -5,10 +5,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flight_follower/models/flight.dart';
-import 'package:flight_follower/models/flight_timings.dart';
 import 'package:flight_follower/models/flights_listener.dart';
 import 'package:flight_follower/models/login_manager.dart';
 import 'package:flight_follower/models/user_model.dart';
+import 'package:flight_follower/utilities/database_api.dart';
 import 'package:flight_follower/utilities/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -28,37 +28,18 @@ class UserPage extends StatelessWidget {
   }
 
   /// Fetches all Flights and their FlightTimings for the logged in user
-  Future<List<Map<Flight, FlightTimings>>> _retrieveAllFlightData(
-      User currentUser) async {
-    List<Map<Flight, FlightTimings>> flights = [];
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    var flightSnapshot = await db
-        .collection("flights")
-        .withConverter(
-            fromFirestore: Flight.fromFirestore,
-            toFirestore: (Flight flight, _) => flight.toFirestore())
-        .where("user", isEqualTo: currentUser.email)
-        .get();
-    if (flightSnapshot.size == 0) {
+  Future<List<Flight>> _retrieveAllFlightData(User currentUser) async {
+    List<Flight> flights = [];
+    var docs = await DatabaseWrapper().getDocumentsWhere("flights", [
+      ["user", "==", currentUser.email]
+    ]);
+    if (docs.isEmpty) {
       return flights;
     }
-    List<String> flightIDs = flightSnapshot.docs.map((e) => e.id).toList();
-    var timingsSnapshot = await db
-        .collection("timings")
-        .withConverter(
-            fromFirestore: FlightTimings.fromFirestore,
-            toFirestore: (FlightTimings timings, _) => timings.toFirestore())
-        .where("flight_id", whereIn: flightIDs)
-        .get();
-
-    // Match up Flight objects to their correct FlightTimings
-    for (var i in flightSnapshot.docs) {
-      for (var j in timingsSnapshot.docs) {
-        if (i.id == j.data().flightID) {
-          flights.add({i.data(): j.data()});
-        }
-      }
+    for (var doc in docs) {
+      flights.add(Flight.fromMap(doc));
     }
+
     return flights;
   }
 
@@ -68,8 +49,7 @@ class UserPage extends StatelessWidget {
     String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
     if (selectedDirectory == null) return;
     LoginManager manager = Provider.of<LoginManager>(context, listen: false);
-    List<Map<Flight, FlightTimings>> flights =
-        await _retrieveAllFlightData(manager.currentUser!);
+    List<Flight> flights = await _retrieveAllFlightData(manager.currentUser!);
     // We will put our csv formatted lines in here
     // Init list with the header and remove any \n created by multiline string
     // (it looks nicer than one long line)
@@ -85,10 +65,7 @@ class UserPage extends StatelessWidget {
     DateTime now = DateTime.now();
     String date = now.toString().split(" ")[0];
 
-    for (var pair in flights) {
-      Flight flight = pair.keys.first;
-      FlightTimings timings = pair.values.first;
-
+    for (var flight in flights) {
       // Calculate sched. arrival adhoc because I dont save it anywhere
       String scheduledArrival = DateTime.parse("$date ${flight.departureTime}")
           .add(Duration(minutes: (flight.ete! * 60).toInt()))
@@ -96,7 +73,8 @@ class UserPage extends StatelessWidget {
           .split(" ")[1];
       // Create a map of values then join with comma to create a string
       flightsTransformed.add({
-        "flight_id": timings.flightID,
+        // TODO: Decide if this is necessary
+        //"flight_id": flight.timings!.flightID,
         "organisation": flight.organisation ?? "N/A",
         "aircraft_ident": flight.aircraftIdentifier!,
         "copilot": flight.copilot ?? "N/A",
@@ -104,11 +82,11 @@ class UserPage extends StatelessWidget {
         "departure_location": flight.departureLocation!,
         "destination": flight.destination!,
         "scheduled_departure": flight.departureTime!,
-        "datcon_start": timings.datconStart!,
-        "rotor_start": timings.rotorStart.toString(),
+        "datcon_start": flight.timings!.datconStart!,
+        "rotor_start": flight.timings!.rotorStart.toString(),
         "scheduled_arrival": scheduledArrival,
-        "rotor_stop": timings.rotorStop.toString(),
-        "datcon_stop": timings.datconStop.toString(),
+        "rotor_stop": flight.timings!.rotorStop.toString(),
+        "datcon_stop": flight.timings!.datconStop.toString(),
         "ete": flight.ete.toString(),
         "endurance": flight.endurance!,
         "flight_type": flight.flightType!
