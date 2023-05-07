@@ -53,7 +53,7 @@ class FlightLogFormState extends State<FlightLogForm> {
   Flight flight = Flight();
   late FlightTimings timings;
   //FlightTimings timings = FlightTimings();
-  late FormStateManager formStateManager;
+  FormStateManager _formStateManager = FormStateManager();
   final DatabaseWrapper _db = DatabaseWrapper();
 
   String? requestID;
@@ -88,7 +88,7 @@ class FlightLogFormState extends State<FlightLogForm> {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() {
-      formSubmitted = formStateManager.isSubmitted = !formSubmitted;
+      formSubmitted = _formStateManager.isSubmitted = !formSubmitted;
       submitButtonLabel = formSubmitted ? "Flight Completed" : "Submit";
     });
 
@@ -96,12 +96,12 @@ class FlightLogFormState extends State<FlightLogForm> {
       // push to database
       _db.addDocument("flights", flight.toFirestore()).then((flightID) {
         print("sent data");
-        formStateManager.flightID = flightID;
+        _formStateManager.flightID = flightID;
         if (flight.monitoringPerson != null) {
           Request request = Request(
               flightID, flight.monitoringPerson!, FlightStatuses.requested);
           _db.addDocument("requests", request.toFirestore()).then((requestID) =>
-              formStateManager.requestID = this.requestID = requestID);
+              _formStateManager.requestID = this.requestID = requestID);
         }
       });
     } else {
@@ -109,7 +109,7 @@ class FlightLogFormState extends State<FlightLogForm> {
       String date = now.toString().split(" ")[0];
       timings.rotorStart = DateTime.parse("$date ${rotorStartController.text}");
       timings.rotorStop = DateTime.parse("$date ${rotorStopController.text}");
-      _db.updateDocument("flights", formStateManager.flightID,
+      _db.updateDocument("flights", _formStateManager.flightID,
           {"timings": flight.timings!.toFirestore()});
       if (flight.monitoringPerson != null) {
         _db.updateDocument(
