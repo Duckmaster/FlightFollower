@@ -43,6 +43,7 @@ dependencies:
   shared_preferences:
   provider:
   file_picker:
+  geolocator:
 
 dev_dependencies:
   flutter_test:
