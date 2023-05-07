@@ -95,4 +95,9 @@ class DatabaseWrapper {
     _subscriptions.clear();
     return;
   }
+
+  DocumentReference getReferenceForDocument(
+      String collection, String documentID) {
+    return _db.collection(collection).doc(documentID);
+  }
 }
