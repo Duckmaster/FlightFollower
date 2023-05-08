@@ -86,9 +86,10 @@ void showSnackBar(BuildContext context, String message) {
 }
 
 /// Returns the time component of [dateTime] as a String
-String formattedTimeFromDateTime(DateTime? dateTime) {
+String formattedTimeFromDateTime(DateTime? dateTime, {seconds = false}) {
   if (dateTime == null) return "";
   String time = dateTime.toString().split(" ")[1].split(".")[0];
+  if (seconds) return time;
   List<String> parts = time.split(":");
   return "${parts[0]}:${parts[1]}";
 }
