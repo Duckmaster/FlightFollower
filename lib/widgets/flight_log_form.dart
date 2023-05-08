@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flight_follower/models/login_manager.dart';
 import 'package:flight_follower/models/request.dart';
+import 'package:flight_follower/utilities/gps_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flight_follower/models/user_model.dart';
 import 'package:flight_follower/models/flight.dart';
@@ -201,6 +202,9 @@ class FlightLogFormState extends State<FlightLogForm> {
       _db.updateDocument(
           "requests", requestID!, {"status": FlightStatuses.enroute.name});
     }
+    if (locationServices) {
+      GPSManager().start(FormStateManager().flightID);
+    }
   }
 
   void rotorStopPressed() {
@@ -216,6 +220,8 @@ class FlightLogFormState extends State<FlightLogForm> {
     String diff = timings.rotorStop!.difference(timings.rotorStart!).toString();
     rotorStopController.text = time;
     rotorDiffController.text = diff;
+
+    GPSManager().stop();
   }
 
   String? validatorEmpty(String? value) {
