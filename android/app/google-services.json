@@ -1,34 +1,41 @@
 {
   "project_info": {
-    "project_number": "935820223612",
-    "project_id": "flight-follower",
-    "storage_bucket": "flight-follower.appspot.com"
+    "project_number": "616646145851",
+    "project_id": "flight-follower-dev",
+    "storage_bucket": "flight-follower-dev.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:935820223612:android:27f0f8dde62c153803d5f9",
+        "mobilesdk_app_id": "1:616646145851:android:ce7445164df5a77e6e691e",
         "android_client_info": {
           "package_name": "com.example.flight_follower"
         }
       },
       "oauth_client": [
         {
-          "client_id": "935820223612-iob86inkgk9hdal6tn2k2u3qpse38uq1.apps.googleusercontent.com",
+          "client_id": "616646145851-2dbfc433mk61aarddk3qfsgpct315d1m.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAMadY-j9_sjN5ob4rqimwB91FXKxQPiXg"
+          "current_key": "AIzaSyCqMtLojV6DmWciz7tZvitrID8agtA3oIw"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "935820223612-iob86inkgk9hdal6tn2k2u3qpse38uq1.apps.googleusercontent.com",
+              "client_id": "616646145851-2dbfc433mk61aarddk3qfsgpct315d1m.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "616646145851-0vf3oom8k3v6q0b7b0ajdcibskbk69gq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.flightFollower"
+              }
             }
           ]
         }
