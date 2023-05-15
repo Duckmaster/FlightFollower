@@ -1,13 +1,12 @@
 import 'package:flight_follower/utilities/gps_manager.dart';
-import 'package:flight_follower/widgets/flight_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class FlightMap extends StatelessWidget {
-  List<GPSData> _gpsData = [];
-  FlightMap(this._gpsData, {super.key});
+  final List<GPSData> _gpsData;
+  const FlightMap(this._gpsData, {super.key});
 
   LatLng getCentroidLatLng() {
     if (_gpsData.isEmpty) {
