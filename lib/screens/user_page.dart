@@ -1,16 +1,11 @@
-import 'dart:convert';
 import 'dart:io';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flight_follower/models/flight.dart';
 import 'package:flight_follower/models/flights_listener.dart';
 import 'package:flight_follower/models/login_manager.dart';
-import 'package:flight_follower/models/user_model.dart';
 import 'package:flight_follower/utilities/database_api.dart';
 import 'package:flight_follower/utilities/utils.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

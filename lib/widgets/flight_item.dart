@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flight_follower/utilities/database_api.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';

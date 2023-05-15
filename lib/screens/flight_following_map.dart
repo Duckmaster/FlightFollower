@@ -1,17 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flight_follower/models/flight.dart';
-import 'package:flight_follower/models/form_state_manager.dart';
 import 'package:flight_follower/utilities/gps_manager.dart';
 import 'package:flight_follower/utilities/utils.dart';
 import 'package:flight_follower/widgets/flight_map.dart';
 import 'package:flutter/material.dart';
 import 'package:flight_follower/widgets/flight_item.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:flight_follower/models/flights_listener.dart';
 import 'package:flight_follower/utilities/database_api.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class FlightFollowingMap extends StatefulWidget {
   Function? refreshCallback;

@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flight_follower/models/login_manager.dart';
 import 'package:flight_follower/models/request.dart';
 import 'package:flight_follower/utilities/gps_manager.dart';
@@ -10,7 +8,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flight_follower/widgets/time_picker.dart';
 import 'package:flight_follower/utilities/utils.dart';
 import 'package:flight_follower/utilities/database_api.dart';
-import 'package:flight_follower/main.dart';
 import 'package:provider/provider.dart';
 
 import '../models/contacts.dart';
