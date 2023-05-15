@@ -1,4 +1,5 @@
 import 'package:flight_follower/models/flights_listener.dart';
+import 'package:flight_follower/screens/flight_following_map.dart';
 import 'package:flight_follower/screens/user_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,7 @@ class ScreenHandler extends StatefulWidget {
 
 class ScreenHandlerState extends State<ScreenHandler> {
   int _selectedIndex = 0;
+  bool _flightTrackingIsList = true;
 
   @override
   void initState() {
@@ -68,14 +70,37 @@ class ScreenHandlerState extends State<ScreenHandler> {
               Icons.logout,
             ))
       ];
+    } else if (page is FlightFollowingPage) {
+      return [
+        IconButton(
+            onPressed: () => switchFlightFollowingListMap(),
+            icon: const Icon(Icons.map_outlined))
+      ];
+    } else if (page is FlightFollowingMap) {
+      return [
+        IconButton(
+            onPressed: () => page.refresh(), icon: const Icon(Icons.refresh)),
+        IconButton(
+            onPressed: () => switchFlightFollowingListMap(),
+            icon: const Icon(Icons.list))
+      ];
     } else {
       return [];
     }
   }
 
+  void switchFlightFollowingListMap() {
+    setState(() {
+      _flightTrackingIsList = !_flightTrackingIsList;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget page = _pages[_selectedIndex]["page"] as Widget;
+    if (page is FlightFollowingPage && !_flightTrackingIsList) {
+      page = FlightFollowingMap();
+    }
     return Scaffold(
       appBar: _buildAppBar(_pages[_selectedIndex]["title"] as String,
           actions: getActionsForPage(page)),
