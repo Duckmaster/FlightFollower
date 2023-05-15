@@ -3,15 +3,16 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
-import 'firebase_options.dart';
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
 /// Example:
 /// ```dart
-
+/// import 'firebase_options.dart';
 /// // ...
-
+/// await Firebase.initializeApp(
+///   options: DefaultFirebaseOptions.currentPlatform,
+/// );
 /// ```
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
@@ -43,42 +44,40 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCvLkMMZB0BbcrTbILgccPfiYRq0FpDv_c',
-    appId: '1:935820223612:web:bb360b9e4c42be0503d5f9',
-    messagingSenderId: '935820223612',
-    projectId: 'flight-follower',
-    authDomain: 'flight-follower.firebaseapp.com',
-    storageBucket: 'flight-follower.appspot.com',
-    measurementId: 'G-95Z2DEM3G4',
+    apiKey: 'AIzaSyCs2KdP4KJwRxfK-bmMIxntSZlPHrB5alM',
+    appId: '1:616646145851:web:87fdbdc91e08ec5f6e691e',
+    messagingSenderId: '616646145851',
+    projectId: 'flight-follower-dev',
+    authDomain: 'flight-follower-dev.firebaseapp.com',
+    storageBucket: 'flight-follower-dev.appspot.com',
+    measurementId: 'G-C05P9WM6G3',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAMadY-j9_sjN5ob4rqimwB91FXKxQPiXg',
-    appId: '1:935820223612:android:27f0f8dde62c153803d5f9',
-    messagingSenderId: '935820223612',
-    projectId: 'flight-follower',
-    storageBucket: 'flight-follower.appspot.com',
+    apiKey: 'AIzaSyCqMtLojV6DmWciz7tZvitrID8agtA3oIw',
+    appId: '1:616646145851:android:ce7445164df5a77e6e691e',
+    messagingSenderId: '616646145851',
+    projectId: 'flight-follower-dev',
+    storageBucket: 'flight-follower-dev.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyANcw3TqbNGTUQS3nXfhMZJT6rfnOXPiFw',
-    appId: '1:935820223612:ios:4749aabc4d1dd50d03d5f9',
-    messagingSenderId: '935820223612',
-    projectId: 'flight-follower',
-    storageBucket: 'flight-follower.appspot.com',
-    iosClientId:
-        '935820223612-qh4auo66vn4l27mkacqs7a0bed7a2cg4.apps.googleusercontent.com',
+    apiKey: 'AIzaSyCoRrwImEN6QE27T1lXMxkVd-i5SSSCe2c',
+    appId: '1:616646145851:ios:c690ce529fabdab16e691e',
+    messagingSenderId: '616646145851',
+    projectId: 'flight-follower-dev',
+    storageBucket: 'flight-follower-dev.appspot.com',
+    iosClientId: '616646145851-0vf3oom8k3v6q0b7b0ajdcibskbk69gq.apps.googleusercontent.com',
     iosBundleId: 'com.example.flightFollower',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyANcw3TqbNGTUQS3nXfhMZJT6rfnOXPiFw',
-    appId: '1:935820223612:ios:4749aabc4d1dd50d03d5f9',
-    messagingSenderId: '935820223612',
-    projectId: 'flight-follower',
-    storageBucket: 'flight-follower.appspot.com',
-    iosClientId:
-        '935820223612-qh4auo66vn4l27mkacqs7a0bed7a2cg4.apps.googleusercontent.com',
+    apiKey: 'AIzaSyCoRrwImEN6QE27T1lXMxkVd-i5SSSCe2c',
+    appId: '1:616646145851:ios:c690ce529fabdab16e691e',
+    messagingSenderId: '616646145851',
+    projectId: 'flight-follower-dev',
+    storageBucket: 'flight-follower-dev.appspot.com',
+    iosClientId: '616646145851-0vf3oom8k3v6q0b7b0ajdcibskbk69gq.apps.googleusercontent.com',
     iosBundleId: 'com.example.flightFollower',
   );
 }
