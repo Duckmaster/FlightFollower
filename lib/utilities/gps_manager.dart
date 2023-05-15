@@ -11,7 +11,7 @@ class GPSManager {
   bool _isStarted = false;
   StreamSubscription<Position>? _listener;
   String? _flightID;
-  String? _gpsDocumentID;
+  CollectionReference? _gpsCollectionReference;
 
   GPSManager._internal();
 
@@ -40,16 +40,24 @@ class GPSManager {
       // handle denied forever
     }
     _flightID = flightID;
-    String currentTime =
-        formattedTimeFromDateTime(DateTime.now(), seconds: true);
+    //String currentTime =
+    //    formattedTimeFromDateTime(DateTime.now(), seconds: true);
     Position currentPos = await Geolocator.getCurrentPosition();
-    _GPSData data =
-        _GPSData(currentPos.latitude, currentPos.longitude, currentPos.heading);
-    _gpsDocumentID =
+    GPSData data = GPSData(DateTime.now(), currentPos.latitude,
+        currentPos.longitude, currentPos.heading);
+    /* _gpsDocumentID =
         await DatabaseWrapper().addDocument("gps", {currentTime: data.toMap()});
     DocumentReference ref =
         DatabaseWrapper().getReferenceForDocument("gps", _gpsDocumentID!);
-    DatabaseWrapper().updateDocument("flights", _flightID!, {"gps_data": ref});
+    DatabaseWrapper().updateDocument("flights", _flightID!, {"gps_data": ref}); */
+
+    _gpsCollectionReference = DatabaseWrapper()
+        .getReferenceForDocument("flights", _flightID!)
+        .collection("gps_data");
+
+    DocumentReference ref = _gpsCollectionReference!.doc();
+
+    await ref.set(data.toMap());
 
     final LocationSettings settings = LocationSettings(
         accuracy: LocationAccuracy.high, distanceFilter: _distance);
@@ -63,30 +71,41 @@ class GPSManager {
     await _listener!.cancel();
     _listener = null;
     _flightID = null;
-    _gpsDocumentID = null;
+    _gpsCollectionReference = null;
     _isStarted = false;
     return;
   }
 
   void _positionListenerCallback(Position? position) {
     if (position == null) return;
-    String currentTime =
-        formattedTimeFromDateTime(DateTime.now(), seconds: true);
-    _GPSData data =
-        _GPSData(position.latitude, position.longitude, position.heading);
-    DatabaseWrapper()
-        .updateDocument("gps", _gpsDocumentID!, {currentTime: data.toMap()});
+    //String currentTime =
+    //    formattedTimeFromDateTime(DateTime.now(), seconds: true);
+    GPSData data = GPSData(DateTime.now(), position.latitude,
+        position.longitude, position.heading);
+    DocumentReference ref = _gpsCollectionReference!.doc();
+    ref.set(data.toMap());
   }
 }
 
-class _GPSData {
+class GPSData {
+  final DateTime time;
   final double lat;
   final double long;
   final double heading;
 
-  _GPSData(this.lat, this.long, this.heading);
+  GPSData(this.time, this.lat, this.long, this.heading);
 
   Map<String, dynamic> toMap() {
-    return {"lat": lat, "long": long, "heading": heading};
+    return {
+      "time": time.toString(),
+      "lat": lat,
+      "long": long,
+      "heading": heading
+    };
+  }
+
+  factory GPSData.fromMap(Map<String, dynamic> data) {
+    return GPSData(DateTime.parse(data["time"]), data["lat"], data["long"],
+        data["heading"]);
   }
 }
