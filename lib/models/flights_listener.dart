@@ -55,11 +55,11 @@ class FlightsListener extends ChangeNotifier {
         Flight flight = Flight.fromMap(value);
         // Construct a FlightItem instance for the flight with the new status
         FlightItem newFlightItem =
-            FlightItem(flight, request.status, change.doc.id);
+            FlightItem(flight, request.status, change.doc.id, request.flightID);
         // Find the old FlightItem in_flights for the updated flight
         FlightItem? oldFlightItem = _flights.singleWhere(
           (f) => f.flight == flight,
-          orElse: () => FlightItem(flight, FlightStatuses.declined, ""),
+          orElse: () => FlightItem(flight, FlightStatuses.declined, "", ""),
         );
 
         switch (change.type) {
