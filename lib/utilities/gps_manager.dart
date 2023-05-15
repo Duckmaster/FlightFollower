@@ -1,8 +1,6 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flight_follower/utilities/database_api.dart';
-import 'package:flight_follower/utilities/utils.dart';
 import 'package:geolocator/geolocator.dart';
 
 class GPSManager {
