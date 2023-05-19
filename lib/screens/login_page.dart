@@ -5,11 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flight_follower/utilities/utils.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   static TextEditingController emailController = TextEditingController();
   static TextEditingController passwordController = TextEditingController();
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  bool _passwordVisible = false;
 
   /// Log the user in
   void _login(BuildContext context) {
@@ -21,7 +28,8 @@ class LoginPage extends StatelessWidget {
     }
 
     loginManager
-        .loginUser(emailController.text, passwordController.text)
+        .loginUser(
+            LoginPage.emailController.text, LoginPage.passwordController.text)
         .then((returnCode) {
       if (returnCode != "success") {
         showSnackBar(context, returnCode);
@@ -77,7 +85,7 @@ class LoginPage extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: TextFormField(
-                            controller: emailController,
+                            controller: LoginPage.emailController,
                             decoration:
                                 const InputDecoration(label: Text("Email")),
                           ),
@@ -85,10 +93,19 @@ class LoginPage extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: TextFormField(
-                            controller: passwordController,
-                            obscureText: true,
-                            decoration:
-                                const InputDecoration(label: Text("Password")),
+                            controller: LoginPage.passwordController,
+                            obscureText: !_passwordVisible,
+                            decoration: InputDecoration(
+                                label: Text("Password"),
+                                suffixIcon: IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _passwordVisible = !_passwordVisible;
+                                      });
+                                    },
+                                    icon: Icon(_passwordVisible
+                                        ? Icons.visibility
+                                        : Icons.visibility_off))),
                           ),
                         ),
                         Row(
