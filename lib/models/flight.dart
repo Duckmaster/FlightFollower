@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// Stores information relating to one singular flight
@@ -17,6 +15,7 @@ class Flight {
   String? monitoringPerson;
   String? flightType;
   FlightTimings? timings;
+  CollectionReference? gpsData;
 
   Flight(
       {this.user,
@@ -31,7 +30,8 @@ class Flight {
       this.monitoringPerson,
       this.flightType,
       this.copilot,
-      this.timings}) {
+      this.timings,
+      this.gpsData}) {
     // initialise with a new object if no instance is passed in
     timings = timings ?? FlightTimings();
     _prefixDepartureWithNaught();
@@ -68,7 +68,8 @@ class Flight {
         endurance: data["endurance"],
         monitoringPerson: data["monitoring_person"],
         flightType: data["flight_type"],
-        timings: FlightTimings.fromMap(data["timings"]));
+        timings: FlightTimings.fromMap(data["timings"]),
+        gpsData: data["gps_data"]);
   }
 
   Map<String, dynamic> toFirestore() {

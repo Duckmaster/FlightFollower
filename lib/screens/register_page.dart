@@ -36,17 +36,17 @@ class RegisterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle linkStyle = const TextStyle(color: Colors.blue);
+    //TextStyle linkStyle = const TextStyle(color: Colors.blue);
     return Scaffold(
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.only(left: 50, right: 50),
           child: Column(
             children: [
-              Expanded(
+              const Expanded(
                   child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children: [
                   Expanded(
                     child: FittedBox(
                       fit: BoxFit.contain,

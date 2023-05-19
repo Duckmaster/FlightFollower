@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flight_follower/utilities/database_api.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -56,27 +55,27 @@ void showSnackBar(BuildContext context, String message) {
   SnackBar snackBar;
   switch (message) {
     case "email-already-in-use":
-      snackBar =
-          SnackBar(content: Text("An account with that email already exists."));
+      snackBar = const SnackBar(
+          content: Text("An account with that email already exists."));
       break;
     case "invalid-email":
-      snackBar = SnackBar(
+      snackBar = const SnackBar(
           content: Text(
               "The email address provided is not valid. Please try again."));
       break;
     case "user-disabled":
-      snackBar = SnackBar(
+      snackBar = const SnackBar(
           content: Text(
               "The account associated with this email has been disabled."));
       break;
     case "user-not-found":
-      snackBar = SnackBar(
+      snackBar = const SnackBar(
           content: Text(
               "An account matching the given email address could not be found. Please check the email address is correct, or register an account."));
       break;
     case "wrong-password":
-      snackBar =
-          SnackBar(content: Text("Incorrect password, please try again."));
+      snackBar = const SnackBar(
+          content: Text("Incorrect password, please try again."));
       break;
     default:
       snackBar = SnackBar(content: Text(message));
@@ -86,9 +85,10 @@ void showSnackBar(BuildContext context, String message) {
 }
 
 /// Returns the time component of [dateTime] as a String
-String formattedTimeFromDateTime(DateTime? dateTime) {
+String formattedTimeFromDateTime(DateTime? dateTime, {seconds = false}) {
   if (dateTime == null) return "";
   String time = dateTime.toString().split(" ")[1].split(".")[0];
+  if (seconds) return time;
   List<String> parts = time.split(":");
   return "${parts[0]}:${parts[1]}";
 }

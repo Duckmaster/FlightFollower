@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:core';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flight_follower/models/user_model.dart';
 import 'package:flight_follower/utilities/database_api.dart';
@@ -53,7 +52,7 @@ class LoginManager extends ChangeNotifier {
     _isRegistering = true;
     try {
       final auth = FirebaseAuth.instance;
-      final cred = await auth.createUserWithEmailAndPassword(
+      await auth.createUserWithEmailAndPassword(
           email: user.email, password: password);
       // Stores the new user info into database
       await _db.addDocumentWithID("users", user.email, user.toFirestore());

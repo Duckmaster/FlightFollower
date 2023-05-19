@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flight_follower/utilities/database_api.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -9,6 +8,7 @@ import 'package:flight_follower/models/user_model.dart';
 class FlightItem extends StatefulWidget {
   final Flight flight;
   final String requestID;
+  final String flightID;
   Enum flightStatus;
   final String _arrival;
 
@@ -17,7 +17,8 @@ class FlightItem extends StatefulWidget {
   FlightItem(
     this.flight,
     this.flightStatus,
-    this.requestID, {
+    this.requestID,
+    this.flightID, {
     super.key,
   })  : _arrival = _calculateArrival(flightStatus, flight),
         extended = false {

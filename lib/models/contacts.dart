@@ -1,5 +1,4 @@
 import 'dart:collection';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flight_follower/utilities/database_api.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flight_follower/models/user_model.dart';

@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flight_follower/models/contacts.dart';
 import 'package:flight_follower/utilities/database_api.dart';
 import 'package:flight_follower/utilities/utils.dart';
@@ -57,7 +56,6 @@ class ContactsPage extends StatelessWidget {
     RegExp emailRegex = RegExp(r"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
     RegExp phoneRegex = RegExp("[0-9]{11}");
 
-    String message;
     UserModel match = UserModel("", "", "");
 
     if (emailRegex.hasMatch(value)) {
