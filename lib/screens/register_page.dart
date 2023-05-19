@@ -23,7 +23,7 @@ class RegisterPage extends StatelessWidget {
         showSnackBar(context,
             "Successfully registered! Please check your email for a verification email before logging in.");
       }
-      manager.sendVerificationEmail();
+      //manager.sendVerificationEmail();
       if (context.mounted) {
         Navigator.of(context).pop();
       }

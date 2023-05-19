@@ -52,8 +52,9 @@ class LoginManager extends ChangeNotifier {
     _isRegistering = true;
     try {
       final auth = FirebaseAuth.instance;
-      await auth.createUserWithEmailAndPassword(
+      final userCred = await auth.createUserWithEmailAndPassword(
           email: user.email, password: password);
+      userCred.user!.sendEmailVerification();
       // Stores the new user info into database
       await _db.addDocumentWithID("users", user.email, user.toFirestore());
       _isRegistering = false;
@@ -64,9 +65,9 @@ class LoginManager extends ChangeNotifier {
     }
   }
 
-  void sendVerificationEmail() {
+  /*void sendVerificationEmail() {
     _currentUser!.sendEmailVerification();
-  }
+  }*/
 
   /// Sign out the currently signed in user
   ///
