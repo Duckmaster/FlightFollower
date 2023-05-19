@@ -78,8 +78,8 @@ class LoginPage extends StatelessWidget {
                           padding: const EdgeInsets.all(8.0),
                           child: TextFormField(
                             controller: emailController,
-                            decoration: const InputDecoration(
-                                label: Text("Email/phone number")),
+                            decoration:
+                                const InputDecoration(label: Text("Email")),
                           ),
                         ),
                         Padding(
