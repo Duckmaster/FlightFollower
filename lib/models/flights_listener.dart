@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 import 'package:flight_follower/utilities/database_api.dart';
+import 'package:flight_follower/utilities/notification_manager.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flight_follower/models/flight.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -70,6 +71,11 @@ class FlightsListener extends ChangeNotifier {
             }
 
             notifyListeners();
+            NotificationManager().showLocalNotification(
+                title: "New Flight Monitoring Request",
+                body:
+                    "Request from ${newFlightItem.flight.user}, departing at ${newFlightItem.flight.departureTime}. Open the app now to view.",
+                payload: "");
             break;
           case DocumentChangeType.modified:
             // Status has been updated, so remove the old flight from the list and add the new one
