@@ -43,11 +43,11 @@ dependencies:
   shared_preferences:
   provider:
   file_picker:
-  geolocator:
   flutter_map: ^4.0.0
   latlong2: ^0.8.1
   url_launcher: ^6.1.10
-  flutter_local_notifications:
+  background_location:
+  permission_handler:
 
 dev_dependencies:
   flutter_test:
