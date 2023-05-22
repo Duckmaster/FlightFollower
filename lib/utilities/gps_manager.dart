@@ -1,13 +1,14 @@
 import 'dart:async';
+import 'package:background_location/background_location.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flight_follower/utilities/database_api.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class GPSManager {
   static final GPSManager _gpsManager = GPSManager._internal();
-  final int _distance = 100;
+  final double _distance = 100;
   bool _isStarted = false;
-  StreamSubscription<Position>? _listener;
+  //StreamSubscription<Position>? _listener;
   String? _flightID;
   CollectionReference? _gpsCollectionReference;
 
@@ -21,65 +22,41 @@ class GPSManager {
 
   Future<void> start(String flightID) async {
     if (_isStarted) return;
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // handle service disabled
-    }
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // handle denied
+    var status = await Permission.notification.status;
+    if (status.isDenied) {
+      if (await Permission.notification.request().isDenied) {
+        // denied again
       }
     }
 
-    if (permission == LocationPermission.deniedForever) {
-      // handle denied forever
-    }
-    _flightID = flightID;
-    //String currentTime =
-    //    formattedTimeFromDateTime(DateTime.now(), seconds: true);
-    Position currentPos = await Geolocator.getCurrentPosition();
-    GPSData data = GPSData(DateTime.now(), currentPos.latitude,
-        currentPos.longitude, currentPos.heading);
-    /* _gpsDocumentID =
-        await DatabaseWrapper().addDocument("gps", {currentTime: data.toMap()});
-    DocumentReference ref =
-        DatabaseWrapper().getReferenceForDocument("gps", _gpsDocumentID!);
-    DatabaseWrapper().updateDocument("flights", _flightID!, {"gps_data": ref}); */
+    BackgroundLocation.setAndroidNotification(
+        title: "Flight Follower",
+        message: "Flight Follower is using your location",
+        icon: "@mipmap/ic_launcher");
 
-    _gpsCollectionReference = DatabaseWrapper()
-        .getReferenceForDocument("flights", _flightID!)
-        .collection("gps_data");
+    BackgroundLocation.startLocationService(distanceFilter: _distance);
 
-    DocumentReference ref = _gpsCollectionReference!.doc();
-
-    await ref.set(data.toMap());
-
-    final LocationSettings settings = LocationSettings(
-        accuracy: LocationAccuracy.high, distanceFilter: _distance);
-    _listener = Geolocator.getPositionStream(locationSettings: settings)
-        .listen(_positionListenerCallback);
+    BackgroundLocation.getLocationUpdates(
+        (location) => _positionListenerCallback);
     _isStarted = true;
   }
 
   Future<void> stop() async {
     if (!_isStarted) return;
-    await _listener!.cancel();
-    _listener = null;
+    //await _listener!.cancel();
+    //_listener = null;
+    BackgroundLocation.stopLocationService();
     _flightID = null;
     _gpsCollectionReference = null;
     _isStarted = false;
     return;
   }
 
-  void _positionListenerCallback(Position? position) {
-    if (position == null) return;
+  void _positionListenerCallback(Location location) {
     //String currentTime =
     //    formattedTimeFromDateTime(DateTime.now(), seconds: true);
-    GPSData data = GPSData(DateTime.now(), position.latitude,
-        position.longitude, position.heading);
+    GPSData data = GPSData(DateTime.now(), location.latitude!,
+        location.longitude!, location.bearing!);
     DocumentReference ref = _gpsCollectionReference!.doc();
     ref.set(data.toMap());
   }
