@@ -28,12 +28,12 @@ Future<void> storeObject(Object obj, String name) async {
 /// Retrieves an object with [name] from shared preferences
 ///
 /// Returns a Future which completes to give a map of [name] and the
-/// corresponding object. Throws if [name] is not found in shared preferences.
+/// corresponding object. Returns empty map if [name] is not found in shared preferences.
 Future<Map<String, dynamic>> getObject(String name) async {
   final prefs = await SharedPreferences.getInstance();
   String? objString = prefs.getString(name);
   if (objString == null) {
-    throw Exception('"$name" not found in shared preferences');
+    return Map<String, dynamic>();
   }
   return jsonDecode(objString);
 }

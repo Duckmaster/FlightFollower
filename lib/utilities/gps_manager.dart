@@ -6,7 +6,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 class GPSManager {
   static final GPSManager _gpsManager = GPSManager._internal();
-  final double _distance = 100;
+  final double _distance = 10;
   bool _isStarted = false;
   //StreamSubscription<Position>? _listener;
   String? _flightID;
@@ -28,6 +28,17 @@ class GPSManager {
         // denied again
       }
     }
+
+    Location currentLocation = await BackgroundLocation().getCurrentLocation();
+    GPSData data = GPSData(DateTime.now(), currentLocation.latitude!,
+        currentLocation.longitude!, currentLocation.bearing!);
+
+    DocumentReference gpsDoc = DatabaseWrapper()
+        .getReferenceForDocument("flights", flightID)
+        .collection("gps_data")
+        .doc();
+    _gpsCollectionReference = gpsDoc.parent;
+    gpsDoc.set(data.toMap());
 
     BackgroundLocation.setAndroidNotification(
         title: "Flight Follower",
