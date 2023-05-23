@@ -10,14 +10,17 @@ import 'package:flight_follower/utilities/utils.dart';
 class Contacts extends ChangeNotifier {
   final List<UserModel> _contacts = [];
   late UserModel _user;
+  Future? _isReady;
 
   Contacts() {
-    refreshContacts();
+    _isReady = refreshContacts();
   }
 
   // Gets the contacts for the current user
   UnmodifiableListView<UserModel> get contacts =>
       UnmodifiableListView(_contacts);
+
+  Future? get isReady => _isReady;
 
   /// Adds [newContact] to internal contacts state and updates any listeners
   void addContact(UserModel newContact) {
@@ -25,27 +28,24 @@ class Contacts extends ChangeNotifier {
     notifyListeners();
   }
 
-  void refreshContacts() {
+  Future<void> refreshContacts() async {
     _contacts.clear();
-    getObject("user_object").then((result) {
-      Map<String, dynamic> userMap = result;
-      _user = UserModel.fromJson(userMap);
-      _retrieveContactsFromDatabase();
-    });
+    Map<String, dynamic> userMap = await getObject("user_object");
+    _user = UserModel.fromJson(userMap);
+    await _retrieveContactsFromDatabase();
   }
 
   /// Get the user's contacts as stored in the database and updates _contacts
-  void _retrieveContactsFromDatabase() {
-    DatabaseWrapper().getDocument("contacts", _user.email).then((data) {
-      if (data == null) return;
-      String contactsList = data["contact_list"];
-      if (contactsList.isEmpty) return;
-      for (var user in contactsList.split(",")) {
-        getUser(user).then((value) {
-          if (!_contacts.contains(value)) _contacts.add(value);
-          notifyListeners();
-        });
-      }
-    });
+  Future<void> _retrieveContactsFromDatabase() async {
+    Map<String, dynamic>? data =
+        await DatabaseWrapper().getDocument("contacts", _user.email);
+    if (data == null) return;
+    String contactsList = data["contact_list"];
+    if (contactsList.isEmpty) return;
+    for (var user in contactsList.split(",")) {
+      UserModel value = await getUser(user);
+      if (!_contacts.contains(value)) _contacts.add(value);
+      notifyListeners();
+    }
   }
 }
