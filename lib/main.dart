@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flight_follower/firebase_options.dart';
 import 'package:flight_follower/models/contacts.dart';
 import 'package:flight_follower/models/form_state_manager.dart';
 import 'package:flight_follower/models/login_manager.dart';
@@ -11,7 +12,7 @@ import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
