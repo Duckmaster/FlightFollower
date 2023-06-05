@@ -39,7 +39,6 @@ class FlightLogFormState extends State<FlightLogForm>
     'HESLO 4',
     'HESLO 5'
   ];
-  bool locationServices = true;
   //String? rotorStartTime;
   //DateTime? rotorStart;
   //String? datconStart;
@@ -149,11 +148,13 @@ class FlightLogFormState extends State<FlightLogForm>
         _db.updateDocument(
             "requests", requestID!, {"status": FlightStatuses.completed.name});
       }
-      // why dont this work:(
       _formLoaded = _formStateManager.reset().then((value) {
         flight = value.flight;
         timings = flight.timings!;
         flight.user = user.email;
+        if (value.locationServices && timings.rotorStart != null) {
+          GPSManager().start(value.flightID);
+        }
       });
       //await initForm();
     }
@@ -238,7 +239,7 @@ class FlightLogFormState extends State<FlightLogForm>
       _db.updateDocument(
           "requests", requestID!, {"status": FlightStatuses.enroute.name});
     }
-    if (locationServices) {
+    if (_formStateManager.locationServices) {
       GPSManager().start(FormStateManager().flightID);
     }
   }
@@ -477,12 +478,13 @@ class FlightLogFormState extends State<FlightLogForm>
                           ),
                           Expanded(
                               child: SwitchListTile(
-                            value: locationServices,
+                            value: _formStateManager.locationServices,
                             onChanged: formSubmitted
                                 ? null
                                 : (value) {
                                     setState(() {
-                                      locationServices = value;
+                                      _formStateManager.locationServices =
+                                          value;
                                     });
                                   },
                             title: const Text("Location Services"),
