@@ -17,6 +17,7 @@ class FormStateManager {
   Icon monPersonIcon = const Icon(Icons.pending);
   bool refreshButtonVisible = false;
   bool monPersonSelectEnabled = true;
+  bool locationServices = false;
   StreamSubscription? listener;
 
   factory FormStateManager() {
@@ -32,7 +33,8 @@ class FormStateManager {
       "flightID": flightID,
       "requestID": requestID,
       "refreshButtonVisible": refreshButtonVisible,
-      "monPersonSelectEnabled": true
+      "monPersonSelectEnabled": true,
+      "locationServices": locationServices
     };
     return storeObject(managerMap, "form_state");
   }
@@ -47,6 +49,7 @@ class FormStateManager {
     monPersonIcon = const Icon(Icons.pending);
     refreshButtonVisible = storedMap["refreshButtonVisible"];
     monPersonSelectEnabled = storedMap["monPersonSelectEnabled"];
+    locationServices = storedMap["locationServices"] ?? false;
 
     return;
   }
