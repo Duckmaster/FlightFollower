@@ -52,8 +52,9 @@ class LoginManager extends ChangeNotifier {
     _isRegistering = true;
     try {
       final auth = FirebaseAuth.instance;
-      await auth.createUserWithEmailAndPassword(
+      final userCred = await auth.createUserWithEmailAndPassword(
           email: user.email, password: password);
+      userCred.user!.sendEmailVerification();
       // Stores the new user info into database
       await _db.addDocumentWithID("users", user.email, user.toFirestore());
       _isRegistering = false;
@@ -64,9 +65,9 @@ class LoginManager extends ChangeNotifier {
     }
   }
 
-  void sendVerificationEmail() {
+  /*void sendVerificationEmail() {
     _currentUser!.sendEmailVerification();
-  }
+  }*/
 
   /// Sign out the currently signed in user
   ///
@@ -99,7 +100,7 @@ class LoginManager extends ChangeNotifier {
   }
 
   /// Update this instance to store the UserModel object for [user]
-  void updateUserModel(User user) async {
+  Future<void> updateUserModel(User user) async {
     // TODO: Optimise so if _currentUserModel.email == user.email or
     // getObject("user_model") == _currentUserModel, dont do anything
     final data = await _db.getDocument("users", user.email!);
@@ -110,7 +111,7 @@ class LoginManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  void listenerCallback(User? user) {
+  void listenerCallback(User? user) async {
     if (user == null) {
       // User is signed out
       _isLoggedIn = false;
@@ -127,7 +128,7 @@ class LoginManager extends ChangeNotifier {
 
       _isLoggedIn = true;
       notifyListeners();
-      updateUserModel(user);
+      await updateUserModel(user);
     }
   }
 }

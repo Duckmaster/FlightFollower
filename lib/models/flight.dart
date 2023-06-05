@@ -118,13 +118,9 @@ class FlightTimings {
   factory FlightTimings.fromMap(
     Map<String, dynamic> data,
   ) {
-    if (data["rotor_start"] == null) {
-      return FlightTimings();
-    }
-
     return FlightTimings(
-        rotorStart: DateTime.tryParse(data["rotor_start"]),
-        rotorStop: DateTime.tryParse(data["rotor_stop"]),
+        rotorStart: DateTime.tryParse(data["rotor_start"] ?? ""),
+        rotorStop: DateTime.tryParse(data["rotor_stop"] ?? ""),
         datconStart: data["datcon_start"],
         datconStop: data["datcon_stop"]);
   }

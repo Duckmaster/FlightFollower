@@ -4,26 +4,42 @@ import 'package:flight_follower/utilities/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class RegisterPage extends StatelessWidget {
+class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
 
   static TextEditingController nameController = TextEditingController();
   static TextEditingController emailController = TextEditingController();
   static TextEditingController phoneController = TextEditingController();
   static TextEditingController passwordController = TextEditingController();
+  static TextEditingController confirmPasswordController =
+      TextEditingController();
+
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
+  bool _passwordVisible = false;
+  bool _passwordVisibleConf = false;
 
   void _register(BuildContext context) async {
-    UserModel newUser = UserModel(
-        nameController.text, emailController.text, phoneController.text);
+    if (RegisterPage.emailController.text !=
+        RegisterPage.confirmPasswordController.text) {
+      showSnackBar(context,
+          "Passwords do not match, please check you have entered them correctly");
+      return;
+    }
+    UserModel newUser = UserModel(RegisterPage.nameController.text,
+        RegisterPage.emailController.text, RegisterPage.phoneController.text);
     LoginManager manager = Provider.of<LoginManager>(context, listen: false);
-    String returnCode =
-        await manager.registerUser(newUser, passwordController.text);
+    String returnCode = await manager.registerUser(
+        newUser, RegisterPage.passwordController.text);
     if (returnCode == "success") {
       if (context.mounted) {
         showSnackBar(context,
             "Successfully registered! Please check your email for a verification email before logging in.");
       }
-      manager.sendVerificationEmail();
+      //manager.sendVerificationEmail();
       if (context.mounted) {
         Navigator.of(context).pop();
       }
@@ -68,7 +84,7 @@ class RegisterPage extends StatelessWidget {
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: TextFormField(
-                                controller: nameController,
+                                controller: RegisterPage.nameController,
                                 decoration:
                                     const InputDecoration(label: Text("Name")),
                               ),
@@ -76,7 +92,7 @@ class RegisterPage extends StatelessWidget {
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: TextFormField(
-                                controller: emailController,
+                                controller: RegisterPage.emailController,
                                 decoration: const InputDecoration(
                                     label: Text("Email address")),
                               ),
@@ -84,20 +100,48 @@ class RegisterPage extends StatelessWidget {
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: TextFormField(
-                                controller: phoneController,
+                                controller: RegisterPage.phoneController,
                                 decoration: const InputDecoration(
                                     label: Text("Phone number")),
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: TextFormField(
-                                controller: passwordController,
-                                obscureText: true,
-                                decoration: const InputDecoration(
-                                    label: Text("Password")),
-                              ),
-                            ),
+                                padding: const EdgeInsets.all(8.0),
+                                child: TextFormField(
+                                  controller: RegisterPage.passwordController,
+                                  obscureText: !_passwordVisible,
+                                  decoration: InputDecoration(
+                                      label: Text("Password"),
+                                      suffixIcon: IconButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              _passwordVisible =
+                                                  !_passwordVisible;
+                                            });
+                                          },
+                                          icon: Icon(_passwordVisible
+                                              ? Icons.visibility
+                                              : Icons.visibility_off))),
+                                )),
+                            Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: TextFormField(
+                                  controller:
+                                      RegisterPage.confirmPasswordController,
+                                  obscureText: !_passwordVisibleConf,
+                                  decoration: InputDecoration(
+                                      label: Text("Confirm password"),
+                                      suffixIcon: IconButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              _passwordVisibleConf =
+                                                  !_passwordVisibleConf;
+                                            });
+                                          },
+                                          icon: Icon(_passwordVisibleConf
+                                              ? Icons.visibility
+                                              : Icons.visibility_off))),
+                                )),
                             const Spacer(),
                             Expanded(
                               flex: 3,
