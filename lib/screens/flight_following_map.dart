@@ -74,7 +74,7 @@ class _FlightFollowingMapState extends State<FlightFollowingMap> {
                 return Column(
                   children: [
                     Container(
-                      height: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height * 0.5,
                       child: FlightMap(snapshot.hasData
                           ? snapshot.data!.values.toList()
                           : []),
