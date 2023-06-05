@@ -1,9 +1,16 @@
+import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flight_follower/utilities/database_api.dart';
+import 'package:flight_follower/utilities/gps_manager.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:intl/intl.dart';
 import 'package:flight_follower/utilities/utils.dart';
 import 'package:flight_follower/models/flight.dart';
 import 'package:flight_follower/models/user_model.dart';
+import 'package:http/http.dart' as http;
 
 class FlightItem extends StatefulWidget {
   final Flight flight;
@@ -11,16 +18,13 @@ class FlightItem extends StatefulWidget {
   final String flightID;
   Enum flightStatus;
   final String _arrival;
+  final double MAX_WIDTH = 500;
 
   bool extended;
 
-  FlightItem(
-    this.flight,
-    this.flightStatus,
-    this.requestID,
-    this.flightID, {
-    super.key,
-  })  : _arrival = _calculateArrival(flightStatus, flight),
+  FlightItem(this.flight, this.flightStatus, this.requestID, this.flightID,
+      {super.key, bool showLocation = false})
+      : _arrival = _calculateArrival(flightStatus, flight),
         extended = false {
     if (flightStatus == FlightStatuses.accepted) {
       flightStatus = FlightStatuses.notstarted;
@@ -253,155 +257,202 @@ class FlightItemState extends State<FlightItem> {
         "requests", widget.requestID, {"status": FlightStatuses.declined.name});
   }
 
+  Future<String> getCurrentLocation() async {
+    CollectionReference ref = DatabaseWrapper()
+        .getReferenceForDocument("flights", widget.flightID)
+        .collection("gps_data");
+    QuerySnapshot result =
+        await ref.orderBy("time", descending: true).limit(1).get();
+    if (result.docs.isEmpty) return "N/A";
+    GPSData data =
+        GPSData.fromMap(result.docs.first.data() as Map<String, dynamic>);
+    if (kIsWeb) {
+      final response = await http.get(Uri.parse(
+          'https://nominatim.openstreetmap.org/reverse?lat=${data.lat}&lon=${data.long}&format=jsonv2'));
+      final jsonData = jsonDecode(response.body);
+      return jsonData["display_name"];
+    } else {
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(data.lat, data.long);
+      return placemarks.first.thoroughfare ?? "";
+    }
+  }
+
+  bool doShowLocation() {
+    return widget.flightStatus != FlightStatuses.declined &&
+        widget.flightStatus != FlightStatuses.notstarted &&
+        widget.flightStatus != FlightStatuses.requested;
+  }
+
   @override
   Widget build(BuildContext context) {
     Map<String, String> labels = _getLabelsForStatus();
-    return SizedBox(
-      width: MediaQuery.of(context).size.width,
-      height: widget.extended ? 175 : 100,
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 15),
-        child: GestureDetector(
-          onTap: () {
-            setState(() {
-              widget.extended = !widget.extended;
-            });
-          },
-          child: Container(
-            decoration: BoxDecoration(
-                border: Border.all(
-                  color: Colors.black,
-                ),
-                borderRadius: BorderRadius.all(Radius.circular(20)),
-                color: _getColour()),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 65,
-                    child: Row(
-                      children: [
-                        SizedBox(
-                          width: 100,
-                          child: Column(
-                            children: [
-                              Expanded(
-                                child: Row(
-                                  children: [Text(labels["status"]!)],
-                                ),
-                              ),
-                              Expanded(
-                                child: Row(
-                                  children: [
-                                    Text(widget.flight.aircraftIdentifier!)
-                                  ],
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Column(
-                            children: [
-                              Expanded(
+    return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+      SizedBox(
+        width: MediaQuery.of(context).size.width >= widget.MAX_WIDTH
+            ? widget.MAX_WIDTH
+            : MediaQuery.of(context).size.width,
+        height: widget.extended ? 180 : 100,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 15),
+          child: GestureDetector(
+            onTap: () {
+              setState(() {
+                widget.extended = !widget.extended;
+              });
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.black,
+                  ),
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                  color: _getColour()),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 65,
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            width: 100,
+                            child: Column(
+                              children: [
+                                Expanded(
                                   child: Row(
-                                children: [
-                                  Text(
-                                      "${widget.flight.departureLocation} -> ${widget.flight.destination}")
-                                ],
-                              )),
-                              Expanded(
-                                  child: Column(
-                                children: [
-                                  Row(
+                                    children: [Text(labels["status"]!)],
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Row(
                                     children: [
-                                      Text(
-                                          "${labels["departure"]!} ${widget.getDeparture()}")
+                                      Text(widget.flight.aircraftIdentifier!)
                                     ],
                                   ),
-                                  Row(
-                                    children: [
-                                      Text(
-                                          "${labels["arrival"]!} ${widget._arrival}")
-                                    ],
-                                  )
-                                ],
-                              ))
-                            ],
+                                )
+                              ],
+                            ),
                           ),
-                        ),
-                        Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text("${labels["eta"]!} ${_calculateETA()}"),
-                              Visibility(
-                                  visible: widget.flightStatus ==
-                                          FlightStatuses.requested
-                                      ? true
-                                      : false,
-                                  child: Expanded(
-                                    child: Row(children: [
-                                      Expanded(
-                                        child: IconButton(
-                                            onPressed: _onRequestAccept,
-                                            iconSize: 30,
-                                            icon: const Icon(Icons.check)),
-                                      ),
-                                      Expanded(
-                                        child: IconButton(
-                                            onPressed: _onRequestDecline,
-                                            iconSize: 30,
-                                            icon: const Icon(Icons.close)),
-                                      )
-                                    ]),
-                                  ))
-                            ],
+                          Expanded(
+                            flex: 2,
+                            child: Column(
+                              children: [
+                                Expanded(
+                                    child: Row(
+                                  children: [
+                                    Text(
+                                        "${widget.flight.departureLocation} -> ${widget.flight.destination}")
+                                  ],
+                                )),
+                                Expanded(
+                                    child: Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                            "${labels["departure"]!} ${widget.getDeparture()}")
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text(
+                                            "${labels["arrival"]!} ${widget._arrival}")
+                                      ],
+                                    )
+                                  ],
+                                ))
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                          Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text("${labels["eta"]!} ${_calculateETA()}"),
+                                Visibility(
+                                    visible: widget.flightStatus ==
+                                            FlightStatuses.requested
+                                        ? true
+                                        : false,
+                                    child: Expanded(
+                                      child: Row(children: [
+                                        Expanded(
+                                          child: IconButton(
+                                              onPressed: _onRequestAccept,
+                                              iconSize: 30,
+                                              icon: const Icon(Icons.check)),
+                                        ),
+                                        Expanded(
+                                          child: IconButton(
+                                              onPressed: _onRequestDecline,
+                                              iconSize: 30,
+                                              icon: const Icon(Icons.close)),
+                                        )
+                                      ]),
+                                    )),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  Visibility(
-                    visible: widget.extended,
-                    child: Expanded(
-                        child: Row(
-                      children: [
-                        Expanded(
+                    Visibility(
+                      visible: widget.extended,
+                      child: Expanded(
                           child: Column(
+                        children: [
+                          Row(children: [
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  Text("Pilot: ${pilot.username}"),
+                                  Text("Co-pilot: ${_getCopilotName()}")
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  Text(
+                                      "Persons on board: ${widget.flight.numPersons}"),
+                                  Text("Phone No.: ${pilot.phoneNumber}")
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  Text("Endurance: ${widget.flight.endurance}")
+                                ],
+                              ),
+                            )
+                          ]),
+                          Spacer(),
+                          Row(
                             children: [
-                              Text("Pilot: ${pilot.username}"),
-                              Text("Co-pilot: ${_getCopilotName()}")
+                              FutureBuilder<String>(
+                                  future: getCurrentLocation(),
+                                  builder: (BuildContext context,
+                                      AsyncSnapshot<String> snapshot) {
+                                    return Visibility(
+                                        visible: doShowLocation(),
+                                        child: Flexible(
+                                            child: Text(snapshot.data ?? "")));
+                                  })
                             ],
-                          ),
-                        ),
-                        Expanded(
-                          child: Column(
-                            children: [
-                              Text(
-                                  "Persons on board: ${widget.flight.numPersons}"),
-                              Text("Phone No.: ${pilot.phoneNumber}")
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: Column(
-                            children: [
-                              Text("Endurance: ${widget.flight.endurance}")
-                            ],
-                          ),
-                        ),
-                      ],
-                    )),
-                  ),
-                ],
+                          )
+                        ],
+                      )),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         ),
       ),
-    );
+    ]);
   }
 }
