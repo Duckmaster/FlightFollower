@@ -23,7 +23,7 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _passwordVisibleConf = false;
 
   void _register(BuildContext context) async {
-    if (RegisterPage.emailController.text !=
+    if (RegisterPage.passwordController.text !=
         RegisterPage.confirmPasswordController.text) {
       showSnackBar(context,
           "Passwords do not match, please check you have entered them correctly");
